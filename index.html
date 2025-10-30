@@ -9,7 +9,7 @@
 </style>
 </head>
 <body>
-<h2>ESP8266 MQTT Control1 - Mosquitto Chuẩn 443</h2>
+<h2>ESP8266 MQTT Control2 - Mosquitto Chuẩn 443</h2>
 <button id="onBtn">ON</button>
 <button id="offBtn">OFF</button>
 
@@ -19,8 +19,8 @@
     // ----------------------------------------------------------------
     // CẤU HÌNH SỬ DỤNG MOSQUITTO VỚI CỔNG 443
     // ----------------------------------------------------------------
-    const broker = "broker.hivemq.com";
-const port = 80;
+   const broker = "test.mosquitto.org"; // SỬ DỤNG 'test.mosquitto.org' thay vì 'broker.mosquitto.org'
+const port = 8081; // Cổng WSS/SSL cho Mosquitto Public Broker
     const clientId = "web_" + Math.floor(Math.random() * 1000000);
     const topic = "esp8266/control"; 
 
