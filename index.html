@@ -1,53 +1,58 @@
-
-
-
-
-
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>ESP8266 ON/OFF</title>
+  <meta charset="UTF-8">
+  <title>Điều khiển ESP8266 ON/OFF</title>
+  <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align:center; margin-top:50px; }
+    h2 { color: #333; }
+    button { font-size: 20px; padding: 10px 30px; margin: 10px; cursor:pointer; border:none; border-radius:5px; }
+    #onBtn { background-color: #4CAF50; color:white; }
+    #offBtn { background-color: #f44336; color:white; }
+  </style>
 </head>
 <body>
-<h2>Điều khiển ESP8266 ON/OFF</h2>
-<button onclick="turnOn()">ON</button>
-<button onclick="turnOff()">OFF</button>
+  <h2>Điều khiển ESP8266 ON/OFF</h2>
+  <button id="onBtn" onclick="sendON()">ON</button>
+  <button id="offBtn" onclick="sendOFF()">OFF</button>
 
-<script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
-<script>
-  const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_client_" + Math.floor(Math.random()*1000));
+  <script>
+    // Tạo client MQTT WebSocket
+    const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
 
-  client.onConnectionLost = function(responseObject){
-    console.log("Connection lost:", responseObject.errorMessage);
-  };
+    // Kết nối MQTT
+    client.connect({
+      onSuccess: onConnect,
+      onFailure: onFail
+    });
 
-  client.connect({
-    onSuccess: function() {
-      console.log("Connected to HiveMQ WebSocket");
-    },
-    onFailure: function(err){
-      console.log("Connection failed:", err);
+    function onConnect() {
+      console.log("✅ Connected to MQTT broker via WebSocket");
     }
-  });
 
-  const topic = "esp8266/control";
+    function onFail(error) {
+      console.log("❌ Connection failed:", error);
+    }
 
-  function turnOn() {
-    const message = new Paho.MQTT.Message("ON");
-    message.destinationName = topic;
-    client.send(message);
-    console.log("Sent: ON");
-  }
+    // Topic ESP subscribe
+    const topic = "esp8266/control";
 
-  function turnOff() {
-    const message = new Paho.MQTT.Message("OFF");
-    message.destinationName = topic;
-    client.send(message);
-    console.log("Sent: OFF");
-  }
-</script>
+    // Hàm gửi lệnh ON
+    function sendON() {
+      const message = new Paho.MQTT.Message("ON");
+      message.destinationName = topic;
+      client.send(message);
+      console.log("Sent: ON");
+    }
+
+    // Hàm gửi lệnh OFF
+    function sendOFF() {
+      const message = new Paho.MQTT.Message("OFF");
+      message.destinationName = topic;
+      client.send(message);
+      console.log("Sent: OFF");
+    }
+  </script>
 </body>
 </html>
