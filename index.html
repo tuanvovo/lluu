@@ -18,10 +18,10 @@
   <button id="offBtn" onclick="sendOFF()">OFF</button>
 
   <script>
-    // Tạo client MQTT WebSocket
+    // 1. Tạo client MQTT WebSocket
     const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
 
-    // Kết nối MQTT
+    // 2. Kết nối MQTT
     client.connect({
       onSuccess: onConnect,
       onFailure: onFail
@@ -35,10 +35,10 @@
       console.log("❌ Connection failed:", error);
     }
 
-    // Topic ESP subscribe
+    // 3. Topic ESP subscribe
     const topic = "esp8266/control";
 
-    // Hàm gửi lệnh ON
+    // 4. Hàm gửi lệnh ON
     function sendON() {
       const message = new Paho.MQTT.Message("ON");
       message.destinationName = topic;
@@ -46,7 +46,7 @@
       console.log("Sent: ON");
     }
 
-    // Hàm gửi lệnh OFF
+    // 5. Hàm gửi lệnh OFF
     function sendOFF() {
       const message = new Paho.MQTT.Message("OFF");
       message.destinationName = topic;
