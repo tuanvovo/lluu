@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Điều khiển ESP8266 qua MQTT</title>
+  <title>Điều khiển 1 ESP8266 qua MQTT</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,26 +22,31 @@
   </style>
 </head>
 <body>
-  <h1>Điều khiển ESP8266 qua MQTT</h1>
+  <h1>Điều khiển 1 ESP8266 qua MQTT</h1>
   <button onclick="sendCommand('ON')">Bật</button>
   <button onclick="sendCommand('OFF')">Tắt</button>
   <div id="status"></div>
 
- <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+ 
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
 
 <script>
-    // Cấu hình chuẩn WSS cho Web Client
+    // Cấu hình chuẩn WSS
     var mqttBroker = "broker.hivemq.com"; 
     var mqttPort = 8884; 
-    
-    // Topic 1: GỬI LỆNH XUỐNG ESP8266
     var topicCommand = "tanthanhlttb123/control"; 
-    // Topic 2: NHẬN PHẢN HỒI (ACK) TỪ ESP8266
     var topicStatus = "tanthanhlttb123/status"; 
     
+    // Khởi tạo Client (KHÔNG GỌI CONNECT Ở ĐÂY)
     var client = new Paho.MQTT.Client(mqttBroker, mqttPort, "web-client-" + parseInt(Math.random() * 1000)); 
 
-    // Các hàm xử lý sự kiện
+    // Mặc định trạng thái khi chưa làm gì
+    document.getElementById("status").innerHTML = "Trạng thái: CHƯA KẾT NỐI (Hãy nhấn nút)";
+
+
+    // Các hàm xử lý sự kiện (Giữ nguyên)
     client.onConnectionLost = function(responseObject) {
         if (responseObject.errorCode !== 0) {
             console.log("Mất kết nối:" + responseObject.errorMessage);
@@ -50,7 +55,6 @@
     }
 
     client.onMessageArrived = function(message) {
-        // CHỈ XỬ LÝ TIN NHẮN TỪ TOPIC PHẢN HỒI (STATUS)
         if (message.destinationName === topicStatus) {
             var payload = message.payloadString;
             console.log("ACK nhận được: " + payload);
@@ -65,28 +69,55 @@
         }
     }
 
-    // Kết nối
-    client.connect({
-      onSuccess: function() {
-        console.log("Connected to MQTT broker");
-        // Đăng ký Topic Status với QoS 1 để nhận phản hồi từ ESP8266
-        client.subscribe(topicStatus, { qos: 1 }); 
-        document.getElementById("status").innerHTML = "Trạng thái: ĐANG KẾT NỐI";
-      },
-      useSSL: true, // Bắt buộc cho cổng 8884
-      // Thêm thông tin đăng nhập nếu Broker yêu cầu (HiveMQ thì không)
-    });
+    // HÀM KẾT NỐI MQTT
+    function connectToMqtt() {
+        if (client.isConnected()) {
+            // Đã kết nối, không làm gì cả
+            return true;
+        }
 
-    // Hàm Gửi Lệnh (Gửi đến topicCommand)
+        // Bắt đầu kết nối
+        document.getElementById("status").innerHTML = "Trạng thái: ĐANG KẾT NỐI...";
+        
+        client.connect({
+            onSuccess: function() {
+                console.log("Connected to MQTT broker");
+                client.subscribe(topicStatus, { qos: 1 }); 
+                document.getElementById("status").innerHTML = "Trạng thái: KẾT NỐI THÀNH CÔNG";
+            },
+            onFailure: function(responseObject) {
+                console.log("Kết nối thất bại: " + responseObject.errorMessage);
+                document.getElementById("status").innerHTML = "Trạng thái: KẾT NỐI LỖI";
+            },
+            useSSL: true, 
+        });
+
+        return false;
+    }
+
+
+    // HÀM GỬI LỆNH (GỌI KẾT NỐI NẾU CHƯA KẾT NỐI)
     function sendCommand(command) {
         if (!client.isConnected()) {
-             document.getElementById("status").innerHTML = "Trạng thái: CHƯA KẾT NỐI";
-             return;
+            // Nếu chưa kết nối, thử kết nối trước.
+            connectToMqtt();
+            // Không gửi lệnh ngay, đợi lần nhấn nút tiếp theo
+            document.getElementById("status").innerHTML = "Trạng thái: ĐANG KẾT NỐI... (Nhấn lại sau)";
+            return; 
         }
+
+        // Đã kết nối, tiến hành gửi lệnh
         var message = new Paho.MQTT.Message(command);
         message.destinationName = topicCommand;
-        // Gửi tin nhắn với QoS 1 (ACK)
-        client.send(message, { qos: 1 });
+        message.qos = 1; 
+
+        client.send(message); 
+        
         document.getElementById("status").innerHTML = "Đang gửi lệnh " + command + "...";
     }
+
+    // CHÚ Ý: ĐÃ BỎ HÀM connect() RA KHỎI PHẦN KHỞI TẠO.
 </script>
+
+</body>
+</html>
