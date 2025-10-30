@@ -37,11 +37,12 @@
     // ----------------------------------------------------------------
     // CẤU HÌNH SSL/WSS (Chuẩn cho HTTPS)
     // ----------------------------------------------------------------
-    const broker = "broker.hivemq.com";
-    const port = 8884; // Cổng chuẩn cho MQTT qua WebSocket Secure (WSS)
-    const clientId = "web_" + Math.floor(Math.random() * 1000000);
-    const topic = "esp8266/control"; // Phải khớp với ESP8266
+    const broker = "broker.hivemq.com"; // Thử giữ HiveMQ với cổng 443 trước
+    const port = 443; // Cổng chuẩn WSS, LUÔN ĐƯỢC MỞ
+    // Hoặc nếu không chạy, dùng Mosquitto: const broker = "broker.mosquitto.org";
 
+    const clientId = "web_" + Math.floor(Math.random() * 1000000);
+    const topic = "esp8266/control";
     const client = new Paho.MQTT.Client(broker, port, clientId);
     
     let onBtn = document.getElementById("onBtn");
@@ -59,6 +60,17 @@
         }
         statusP.innerText = "❌ Mất kết nối! Thử kết nối lại...";
         client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
+
+
+ 
+
+       
+
+
+
+
+
+
     }
 
     function onFailure(e) {
