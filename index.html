@@ -1,123 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Điều khiển B ESP8266 qua MQTT</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    button {
-      width: 100px;
-      height: 50px;
-      font-size: 18px;
-      border-radius: 10px;
-      background-color: #4CAF50;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #3e8e41;
-    }
-  </style>
+    <title>Blynk MQTT Web Control (V0)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
+        .button-control {
+            padding: 15px 30px;
+            font-size: 20px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        #btn-on { background-color: #4CAF50; }
+        #btn-off { background-color: #f44336; }
+        #btn-on:hover { background-color: #45a049; }
+        #btn-off:hover { background-color: #da190b; }
+        #status-area { margin-top: 20px; font-size: 16px; color: #333; }
+    </style>
 </head>
 <body>
-  <h1>Điều khiển B ESP8266 qua MQTT</h1>
-  <button onclick="sendCommand('ON')">Bật</button>
-  <button onclick="sendCommand('OFF')">Tắt</button>
-  <div id="status"></div>
 
- 
-
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
-
-<script>
-    // Cấu hình chuẩn WSS
-    var mqttBroker = "broker.hivemq.com"; 
-    var mqttPort = 443; 
-    var topicCommand = "tanthanhlttb123/control"; 
-    var topicStatus = "tanthanhlttb123/status"; 
+    <h2>Điều khiển Servo qua Blynk MQTT (Pin V0)</h2>
+    <hr>
     
-    // Khởi tạo Client (KHÔNG GỌI CONNECT Ở ĐÂY)
-    var client = new Paho.MQTT.Client(mqttBroker, mqttPort, "web-client-" + parseInt(Math.random() * 1000)); 
+    <button id="btn-on" class="button-control" onclick="sendCommand(1)">BẬT VAN (ON)</button>
+    <button id="btn-off" class="button-control" onclick="sendCommand(0)">TẮT VAN (OFF)</button>
+    
+    <div id="status-area">
+        <p id="connection-status">Trạng thái Kết nối: Đang chờ...</p>
+        <p id="command-log">Lệnh gần nhất: Chưa có</p>
+    </div>
 
-    // Mặc định trạng thái khi chưa làm gì
-    document.getElementById("status").innerHTML = "Trạng thái: CHƯA KẾT NỐI (Hãy nhấn nút)";
+    <script>
+        var client;
+        // !!! THAY THẾ AUTH TOKEN CỦA BẠN VÀO ĐÂY !!!
+        var blynkAuth = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_"; 
 
+        // Cấu hình Blynk Broker
+        var mqttBroker = "blynk.cloud"; 
+        var mqttPort = 443; // Cổng WSS (Websockets Secure) chuẩn
 
-    // Các hàm xử lý sự kiện (Giữ nguyên)
-    client.onConnectionLost = function(responseObject) {
-        if (responseObject.errorCode !== 0) {
-            console.log("Mất kết nối:" + responseObject.errorMessage);
+        function connectToBlynkMqtt() {
+            var clientId = "WebAppClient_" + new Date().getTime(); // ClientID ngẫu nhiên
+
+            // Cấu hình kết nối
+            client = new Paho.MQTT.Client(mqttBroker, mqttPort, "/mqtt", clientId);
+
+            client.onConnectionLost = onConnectionLost;
+            client.onMessageArrived = onMessageArrived;
+
+            var options = {
+                onSuccess: onConnect,
+                onFailure: onFailure,
+                useSSL: true, // BẮT BUỘC dùng SSL/TLS
+                userName: blynkAuth, // Auth Token làm Tên người dùng
+                password: blynkAuth, // Auth Token làm Mật khẩu (hoặc có thể để trống)
+            };
+
+            client.connect(options);
+            document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: Đang kết nối...";
         }
-        document.getElementById("status").innerHTML = "Trạng thái: ĐÃ NGẮT KẾT NỐI";
-    }
 
-    client.onMessageArrived = function(message) {
-        if (message.destinationName === topicStatus) {
-            var payload = message.payloadString;
-            console.log("ACK nhận được: " + payload);
-            
-            if (payload === "OK") {
-                document.getElementById("status").innerHTML = "Lệnh đã thực hiện: ✅ **THÀNH CÔNG**";
-            } else if (payload === "FAIL") {
-                document.getElementById("status").innerHTML = "Lệnh đã thực hiện: ❌ **THẤT BẠI**";
-            } else {
-                document.getElementById("status").innerHTML = "Trạng thái ESP8266: " + payload;
+        function onConnect() {
+            document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: **ĐÃ KẾT NỐI BẢO MẬT (443)**";
+        }
+
+        function onFailure(responseObject) {
+            document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: LỖI! Thử lại trong 5s. (Code: " + responseObject.errorCode + ")";
+            setTimeout(connectToBlynkMqtt, 5000); // Tự động thử lại
+        }
+
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: **MẤT KẾT NỐI!**";
+                setTimeout(connectToBlynkMqtt, 5000);
             }
         }
-    }
 
-    // HÀM KẾT NỐI MQTT
-    function connectToMqtt() {
-        if (client.isConnected()) {
-            // Đã kết nối, không làm gì cả
-            return true;
+        function onMessageArrived(message) {
+            // Có thể dùng để nhận phản hồi từ thiết bị (ACK)
         }
 
-        // Bắt đầu kết nối
-        document.getElementById("status").innerHTML = "Trạng thái: ĐANG KẾT NỐI...";
-        
-        client.connect({
-            onSuccess: function() {
-                console.log("Connected to MQTT broker");
-                client.subscribe(topicStatus, { qos: 1 }); 
-                document.getElementById("status").innerHTML = "Trạng thái: KẾT NỐI THÀNH CÔNG";
-            },
-            onFailure: function(responseObject) {
-                console.log("Kết nối thất bại: " + responseObject.errorMessage);
-                document.getElementById("status").innerHTML = "Trạng thái: KẾT NỐI LỖI";
-            },
-            useSSL: true, 
-        });
-
-        return false;
-    }
+        function sendCommand(value) {
+            if (client && client.isConnected()) {
+                // Topic Blynk: /blynk/v1/hardware/YOUR_AUTH_TOKEN/pin/V0
+               var topic = "/blynk/v1/hardware/" + blynkAuth + "/pin/V1";
 
 
-    // HÀM GỬI LỆNH (GỌI KẾT NỐI NẾU CHƯA KẾT NỐI)
-    function sendCommand(command) {
-        if (!client.isConnected()) {
-            // Nếu chưa kết nối, thử kết nối trước.
-            connectToMqtt();
-            // Không gửi lệnh ngay, đợi lần nhấn nút tiếp theo
-            document.getElementById("status").innerHTML = "Trạng thái: ĐANG KẾT NỐI... (Nhấn lại sau)";
-            return; 
+
+                var message = new Paho.MQTT.Message(String(value));
+                message.destinationName = topic;
+                
+                client.send(message);
+                
+                var commandText = value == 1 ? "BẬT (ON)" : "TẮT (OFF)";
+                document.getElementById("command-log").innerHTML = "Lệnh gần nhất: **" + commandText + "** (Giá trị: " + value + ")";
+            } else {
+                alert("Web App chưa kết nối với Blynk! Vui lòng chờ.");
+            }
         }
 
-        // Đã kết nối, tiến hành gửi lệnh
-        var message = new Paho.MQTT.Message(command);
-        message.destinationName = topicCommand;
-        message.qos = 1; 
-
-        client.send(message); 
-        
-        document.getElementById("status").innerHTML = "Đang gửi lệnh " + command + "...";
-    }
-
-    // CHÚ Ý: ĐÃ BỎ HÀM connect() RA KHỎI PHẦN KHỞI TẠO.
-</script>
+        // Bắt đầu kết nối khi tải trang
+        connectToBlynkMqtt();
+    </script>
 
 </body>
 </html>
