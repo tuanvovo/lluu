@@ -1,55 +1,53 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Điều khiển ESP8266 ON/OFF</title>
-  <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
-  <style>
-    body { font-family: Arial; text-align:center; margin-top:50px; }
-    h2 { color: #333; }
-    button { font-size: 20px; padding:10px 30px; margin:10px; cursor:pointer; border:none; border-radius:5px; }
-    #onBtn { background-color: #4CAF50; color:white; }
-    #offBtn { background-color: #f44336; color:white; }
-  </style>
+<meta charset="UTF-8">
+<title>Điều khiển ESP8266 ON/OFF</title>
+<script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
+<style>
+  body { font-family: Arial; text-align:center; margin-top:50px; }
+  button { font-size:20px; padding:10px 30px; margin:10px; border:none; border-radius:5px; cursor:pointer;}
+  #onBtn { background-color: #4CAF50; color:white; }
+  #offBtn { background-color: #f44336; color:white; }
+</style>
 </head>
 <body>
-  <h2>Điều khiển ESP8266 ON/OFF</h2>
-  <button id="onBtn" onclick="sendON()">ON</button>
-  <button id="offBtn" onclick="sendOFF()">OFF</button>
+<h2>Điều khiển ESP8266 ON/OFF</h2>
+<button id="onBtn" onclick="sendON()">ON</button>
+<button id="offBtn" onclick="sendOFF()">OFF</button>
 
-  <script>
-    // Kết nối tới HiveMQ WebSocket
-    const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
-    const topic = "esp8266/control";
+<script>
+  // Kết nối HiveMQ WebSocket (cùng broker với ESP)
+  const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
+  const topic = "esp8266/control";
 
-    client.connect({
-      onSuccess: onConnect,
-      onFailure: function(e){ console.log("Connect failed:", e);}
-    });
+  client.connect({
+    onSuccess: onConnect,
+    onFailure: function(e){ console.log("Connect failed:", e);}
+  });
 
-    function onConnect() {
-      console.log("✅ Connected to HiveMQ WebSocket");
-      client.subscribe(topic);
-    }
+  function onConnect() {
+    console.log("✅ Connected to HiveMQ WebSocket");
+    client.subscribe(topic);
+  }
 
-    function sendON() {
-      const message = new Paho.MQTT.Message("ON");
-      message.destinationName = topic;
-      client.send(message);
-      console.log("Sent ON");
-    }
+  function sendON() {
+    const message = new Paho.MQTT.Message("ON");
+    message.destinationName = topic;
+    client.send(message);
+    console.log("Sent ON");
+  }
 
-    function sendOFF() {
-      const message = new Paho.MQTT.Message("OFF");
-      message.destinationName = topic;
-      client.send(message);
-      console.log("Sent OFF");
-    }
+  function sendOFF() {
+    const message = new Paho.MQTT.Message("OFF");
+    message.destinationName = topic;
+    client.send(message);
+    console.log("Sent OFF");
+  }
 
-    // Tùy chọn: nhận phản hồi từ ESP
-    client.onMessageArrived = function(msg) {
-      console.log("Message arrived:", msg.payloadString);
-    };
-  </script>
+  client.onMessageArrived = function(msg) {
+    console.log("Message arrived:", msg.payloadString);
+  };
+</script>
 </body>
 </html>
