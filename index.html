@@ -1,94 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>ESP8266 MQTT Control - Mosquitto WSS</title>
-<script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
-<style>
-    body { font-family: Arial; text-align:center; margin-top:50px; }
-    h2 { color:#333; }
-    button {
-        font-size: 20px; padding: 15px 40px; margin: 20px; border: none;
-        border-radius: 10px; cursor: pointer; transition: all 0.1s ease;
-        box-shadow: 0 5px #999; color: white;
+  <title>Điều khiển ESP8266 qua MQTT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
     }
-    #onBtn { background-color: #4CAF50; }
-    #offBtn { background-color: #f44336; }
-    button:active { transform: translateY(4px); box-shadow: 0 1px #666; }
-</style>
+    button {
+      width: 100px;
+      height: 50px;
+      font-size: 18px;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3e8e41;
+    }
+  </style>
 </head>
 <body>
-<h2>ESP8266 MQTT cai tien Control - Kết nối Ổn định</h2>
-<button id="onBtn">ON</button>
-<button id="offBtn">OFF</button>
+  <h1>Điều khiển ESP8266 qua MQTT</h1>
+  <button onclick="sendCommand('ON')">Bật</button>
+  <button onclick="sendCommand('OFF')">Tắt</button>
+  <div id="status"></div>
 
-<p id="status">Đang thiết lập kết nối WSS...</p>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
 
 <script>
-    // ----------------------------------------------------------------
-    // CẤU HÌNH WSS MOSQUITTO TEST BROKER
-    // ----------------------------------------------------------------
-    const broker = "test.mosquitto.org"; // Broker chuyên dụng để test
-    const port = 8081; // Cổng WSS (SSL) ổn định của Mosquitto Test
-    const clientId = "web_" + Math.floor(Math.random() * 1000000);
-    const topic = "esp8266/control"; // TOPIC ĐỒNG BỘ VỚI ESP
-
-    const client = new Paho.MQTT.Client(broker, port, clientId);
+    // Cấu hình chuẩn WSS cho Web Client
+    var mqttBroker = "broker.hivemq.com"; 
+    var mqttPort = 8884; 
     
-    let onBtn = document.getElementById("onBtn");
-    let offBtn = document.getElementById("offBtn");
-    let statusP = document.getElementById("status");
+    // Topic 1: GỬI LỆNH XUỐNG ESP8266
+    var topicCommand = "tanthanhlttb123/control"; 
+    // Topic 2: NHẬN PHẢN HỒI (ACK) TỪ ESP8266
+    var topicStatus = "tanthanhlttb123/status"; 
+    
+    var client = new Paho.MQTT.Client(mqttBroker, mqttPort, "web-client-" + parseInt(Math.random() * 1000)); 
 
-    function onConnect() {
-        console.log("✅ WSS CONNECTED (test.mosquitto.org:8081)");
-        statusP.innerText = "✅ Đã kết nối WSS. Sẵn sàng gửi lệnh!";
-    }
-
-    function onConnectionLost(responseObject) {
+    // Các hàm xử lý sự kiện
+    client.onConnectionLost = function(responseObject) {
         if (responseObject.errorCode !== 0) {
-            console.log("❌ CONNECTION LOST:", responseObject.errorMessage);
+            console.log("Mất kết nối:" + responseObject.errorMessage);
         }
-        statusP.innerText = "❌ Mất kết nối! Thử kết nối lại...";
-        client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
+        document.getElementById("status").innerHTML = "Trạng thái: ĐÃ NGẮT KẾT NỐI";
     }
 
-    function onFailure(e) {
-        console.log("❌ CONNECT FAILED:", e);
-        statusP.innerText = `❌ Lỗi kết nối WSS: ${e.errorMessage}.`;
-    }
-
-    function sendCommand(cmd) {
-        if (!client.isConnected()) {
-            console.error("❌ Not connected.");
-            statusP.innerText = "❌ Chưa kết nối! Vui lòng chờ.";
-            return;
-        }
-        
-        const message = new Paho.MQTT.Message(cmd);
-        message.destinationName = topic;
-        client.send(message);
-        console.log(`SENT: ${cmd}`);
-
-        if(cmd === "ON") {
-            onBtn.style.backgroundColor = "#2e7d32";
-            offBtn.style.backgroundColor = "#f44336";
-        } else if (cmd === "OFF") {
-            offBtn.style.backgroundColor = "#b71c1c";
-            onBtn.style.backgroundColor = "#4CAF50";
+    client.onMessageArrived = function(message) {
+        // CHỈ XỬ LÝ TIN NHẮN TỪ TOPIC PHẢN HỒI (STATUS)
+        if (message.destinationName === topicStatus) {
+            var payload = message.payloadString;
+            console.log("ACK nhận được: " + payload);
+            
+            if (payload === "OK") {
+                document.getElementById("status").innerHTML = "Lệnh đã thực hiện: ✅ **THÀNH CÔNG**";
+            } else if (payload === "FAIL") {
+                document.getElementById("status").innerHTML = "Lệnh đã thực hiện: ❌ **THẤT BẠI**";
+            } else {
+                document.getElementById("status").innerHTML = "Trạng thái ESP8266: " + payload;
+            }
         }
     }
-    
-    client.onConnectionLost = onConnectionLost;
 
-    // KẾT NỐI: useSSL: true VÀ PORT 8081
+    // Kết nối
     client.connect({
-        useSSL: true, // BẮT BUỘC
-        onSuccess: onConnect,
-        onFailure: onFailure
+      onSuccess: function() {
+        console.log("Connected to MQTT broker");
+        // Đăng ký Topic Status với QoS 1 để nhận phản hồi từ ESP8266
+        client.subscribe(topicStatus, { qos: 1 }); 
+        document.getElementById("status").innerHTML = "Trạng thái: ĐANG KẾT NỐI";
+      },
+      useSSL: true, // Bắt buộc cho cổng 8884
+      // Thêm thông tin đăng nhập nếu Broker yêu cầu (HiveMQ thì không)
     });
 
-    onBtn.addEventListener('click', () => sendCommand("ON"));
-    offBtn.addEventListener('click', () => sendCommand("OFF"));
+    // Hàm Gửi Lệnh (Gửi đến topicCommand)
+    function sendCommand(command) {
+        if (!client.isConnected()) {
+             document.getElementById("status").innerHTML = "Trạng thái: CHƯA KẾT NỐI";
+             return;
+        }
+        var message = new Paho.MQTT.Message(command);
+        message.destinationName = topicCommand;
+        // Gửi tin nhắn với QoS 1 (ACK)
+        client.send(message, { qos: 1 });
+        document.getElementById("status").innerHTML = "Đang gửi lệnh " + command + "...";
+    }
 </script>
-</body>
-</html>
