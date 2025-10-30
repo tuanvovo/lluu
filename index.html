@@ -1,63 +1,119 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bật/Tắt Aptomat</title>
-  <style>
-    body {
-      background-color: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      margin-bottom: 40px;
-    }
-    button {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      border: none;
-      font-size: 22px;
-      color: white;
-      background-color: #555;
-      transition: background-color 0.3s, transform 0.2s;
-      cursor: pointer;
-    }
-    button.active {
-      background-color: #00c851; /* xanh lá khi ON */
-      transform: scale(1.05);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aptomat Control</title>
+<style>
+  body {
+    background-color: #121212;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 60px;
+  }
+  #btn {
+    font-size: 24px;
+    padding: 20px 60px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 30px;
+  }
+  .on { background-color: #00c853; }   /* Xanh khi ON */
+  .off { background-color: #555; }     /* Xám khi OFF */
+  #statusSection {
+    margin-top: 20px;
+  }
+  #circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 15px;
+    vertical-align: middle;
+    background-color: #555;
+    box-shadow: 0 0 8px #222;
+  }
+  .circle-on { background-color: #00c853; box-shadow: 0 0 15px #00e676; }
+  .circle-off { background-color: #555; box-shadow: 0 0 5px #222; }
+  #checkBtn {
+    background-color: #2196f3;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+    padding: 10px 25px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+</style>
 </head>
 <body>
-  <h1>Điều khiển Aptomat</h1>
-  <button id="toggleBtn">OFF</button>
 
-  <script>
-    const token = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_";
-    const btn = document.getElementById("toggleBtn");
-    let isOn = false;
+<h2>⚡ Aptomat Web Control</h2>
 
-    btn.addEventListener("click", () => {
-      isOn = !isOn;
-      btn.classList.toggle("active", isOn);
-      btn.textContent = isOn ? "ON" : "OFF";
-      const value = isOn ? 1 : 0;
+<!-- Nút điều khiển ON/OFF -->
+<button id="btn" class="off" onclick="toggle()">OFF</button>
 
-      fetch(`https://blynk.cloud/external/api/update?token=${token}&V1=${value}`)
-        .then(res => {
-          if (!res.ok) throw new Error("Lỗi gửi lệnh");
-          console.log("Đã gửi lệnh:", value);
-        })
-        .catch(err => console.error(err));
-    });
-  </script>
+<!-- Khu vực hiển thị trạng thái -->
+<div id="statusSection">
+  <button id="checkBtn" onclick="getStatus()">Xem trạng thái</button>
+  <span id="circle" class="circle-off"></span>
+  <span id="statusText">CB OFF</span>
+</div>
+
+<script>
+const TOKEN = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_"; 
+const API_BASE = "https://blynk.cloud/external/api";
+
+// Gửi lệnh ON/OFF
+async function toggle() {
+  const btn = document.getElementById("btn");
+  const newState = btn.textContent === "OFF" ? 1 : 0;
+  await fetch(`${API_BASE}/update?token=${TOKEN}&V1=${newState}`);
+  updateButton(newState === 1);
+}
+
+// Cập nhật nút điều khiển
+function updateButton(isOn) {
+  const btn = document.getElementById("btn");
+  if (isOn) {
+    btn.textContent = "ON";
+    btn.className = "on";
+  } else {
+    btn.textContent = "OFF";
+    btn.className = "off";
+  }
+}
+
+// Khi nhấn nút “Xem trạng thái”
+async function getStatus() {
+  try {
+    const res = await fetch(`${API_BASE}/get?token=${TOKEN}&V1`);
+    const value = await res.text();
+    const isOn = value.trim() === "1";
+    updateStatus(isOn);
+  } catch (e) {
+    console.error("Lỗi đọc trạng thái:", e);
+  }
+}
+
+// Cập nhật vòng tròn + chữ
+function updateStatus(isOn) {
+  const circle = document.getElementById("circle");
+  const text = document.getElementById("statusText");
+  if (isOn) {
+    circle.className = "circle-on";
+    text.textContent = "CB ON";
+  } else {
+    circle.className = "circle-off";
+    text.textContent = "CB OFF";
+  }
+}
+</script>
+
 </body>
 </html>
