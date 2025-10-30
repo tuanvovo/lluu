@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Điều khiển 1 ESP8266 qua MQTT</title>
+  <title>Điều khiển 2 ESP8266 qua MQTT</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
   </style>
 </head>
 <body>
-  <h1>Điều khiển 1 ESP8266 qua MQTT</h1>
+  <h1>Điều khiển 2 ESP8266 qua MQTT</h1>
   <button onclick="sendCommand('ON')">Bật</button>
   <button onclick="sendCommand('OFF')">Tắt</button>
   <div id="status"></div>
@@ -35,7 +35,7 @@
 <script>
     // Cấu hình chuẩn WSS
     var mqttBroker = "broker.hivemq.com"; 
-    var mqttPort = 8884; 
+    var mqttPort = 1883; 
     var topicCommand = "tanthanhlttb123/control"; 
     var topicStatus = "tanthanhlttb123/status"; 
     
@@ -89,7 +89,7 @@
                 console.log("Kết nối thất bại: " + responseObject.errorMessage);
                 document.getElementById("status").innerHTML = "Trạng thái: KẾT NỐI LỖI";
             },
-            useSSL: true, 
+            useSSL: false, 
         });
 
         return false;
