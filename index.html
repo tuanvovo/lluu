@@ -5,80 +5,114 @@
 <title>ESP8266 MQTT ON/OFF Feedback</title>
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 <style>
-  body { font-family: Arial; text-align:center; margin-top:50px; }
-  h2 { color:#333; }
-  button {
-    font-size: 20px;
-    padding: 15px 40px;
-    margin: 20px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.1s ease;
-    box-shadow: 0 5px #999;
-    color: white;
-  }
-  #onBtn { background-color: #4CAF50; }
-  #offBtn { background-color: #f44336; }
-  button:active {
-    transform: translateY(4px);
-    box-shadow: 0 1px #666;
-  }
+  body { font-family: Arial; text-align:center; margin-top:50px; }
+  h2 { color:#333; }
+  button {
+    font-size: 20px;
+    padding: 15px 40px;
+    margin: 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 5px #999;
+    color: white;
+  }
+  #onBtn { background-color: #4CAF50; }
+  #offBtn { background-color: #f44336; }
+  button:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px #666;
+  }
 </style>
 </head>
 <body>
 <h2>ESP8266 MQTT ON/OFF Feedback</h2>
-<button id="onBtn" onclick="sendON()">ON</button>
-<button id="offBtn" onclick="sendOFF()">OFF</button>
+<button id="onBtn">ON</button>
+<button id="offBtn">OFF</button>
+
+<p id="status">Đang kết nối...</p>
 
 <script>
-  
+    // ----------------------------------------------------------------
+    // CẤU HÌNH KẾT NỐI (SỬ DỤNG WSS/SSL cho GitHub Pages)
+    // ----------------------------------------------------------------
+    const broker = "broker.hivemq.com";
+    const port = 8884; // Cổng WSS/SSL cho MQTT qua WebSocket
+    const clientId = "web_" + Math.floor(Math.random() * 1000000);
+    const topic = "esp8266/control";
 
-
-
-
-  const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
-  const topic = "esp8266/control";
-
-  let onBtn = document.getElementById("onBtn");
-  let offBtn = document.getElementById("offBtn");
-
- client.connect({
+    const client = new Paho.MQTT.Client(broker, port, clientId);
     
-    port: 8000, 
-    useSSL: false, // 
-    onSuccess: onConnect,
-    onFailure: function(e){ console.log("Connect failed:", e);}
-});
+    let onBtn = document.getElementById("onBtn");
+    let offBtn = document.getElementById("offBtn");
+    let statusP = document.getElementById("status");
 
-  function onConnect() {
-    console.log("✅ Connected to HiveMQ WebSocket");
-    client.subscribe(topic);
-  }
+    // ----------------------------------------------------------------
+    // HÀM XỬ LÝ SỰ KIỆN
+    // ----------------------------------------------------------------
+    
+    function onConnect() {
+        console.log("✅ Connected to HiveMQ WSS");
+        statusP.innerText = "✅ Đã kết nối. Sẵn sàng gửi lệnh!";
+        // Nếu ESP đã subscribe đúng, bạn chỉ cần gửi lệnh
+        // client.subscribe(topic); 
+    }
 
-  function sendON() {
-    const message = new Paho.MQTT.Message("ON");
-    message.destinationName = topic;
-    client.send(message);
-    console.log("Sent ON");
-    // Feedback màu
-    onBtn.style.backgroundColor = "#2e7d32"; //
-    offBtn.style.backgroundColor = "#f44336"; // 
-  }
+    function onConnectionLost(responseObject) {
+        if (responseObject.errorCode !== 0) {
+            console.log("Connection Lost:", responseObject.errorMessage);
+            statusP.innerText = "❌ Mất kết nối! Đang thử kết nối lại...";
+        }
+        // Thử kết nối lại
+        client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
+    }
 
-  function sendOFF() {
-    const message = new Paho.MQTT.Message("OFF");
-    message.destinationName = topic;
-    client.send(message);
-    console.log("Sent OFF");
-    // Feedback màu
-    offBtn.style.backgroundColor = "#b71c1c"; // 
-    onBtn.style.backgroundColor = "#4CAF50"; // 
-  }
+    function onFailure(e) {
+        console.log("Connect failed:", e);
+        statusP.innerText = `❌ Lỗi kết nối: ${e.errorMessage}`;
+    }
 
-  client.onMessageArrived = function(msg) {
-    console.log("Message arrived:", msg.payloadString);
-  };
+    function sendCommand(cmd) {
+        if (!client.isConnected()) {
+            console.error("Client not connected. Cannot send command.");
+            statusP.innerText = "❌ Chưa kết nối! Vui lòng chờ.";
+            return;
+        }
+        
+        const message = new Paho.MQTT.Message(cmd);
+        message.destinationName = topic;
+        client.send(message);
+        console.log(`Sent ${cmd} to topic ${topic}`);
+
+        // Feedback màu cho người dùng
+        if(cmd === "ON") {
+            onBtn.style.backgroundColor = "#2e7d32";
+            offBtn.style.backgroundColor = "#f44336";
+        } else if (cmd === "OFF") {
+            offBtn.style.backgroundColor = "#b71c1c";
+            onBtn.style.backgroundColor = "#4CAF50";
+        }
+    }
+    
+    // ----------------------------------------------------------------
+    // KHỞI TẠO VÀ GÁN SỰ KIỆN
+    // ----------------------------------------------------------------
+    
+    // 1. Đặt hàm xử lý mất kết nối
+    client.onConnectionLost = onConnectionLost;
+
+    // 2. Kết nối tới Broker
+    client.connect({
+        useSSL: true, // PHẢI LÀ TRUE
+        onSuccess: onConnect,
+        onFailure: onFailure
+    });
+
+    // 3. Gán sự kiện cho button sau khi đã định nghĩa hàm
+    onBtn.addEventListener('click', () => sendCommand("ON"));
+    offBtn.addEventListener('click', () => sendCommand("OFF"));
+
 </script>
 </body>
 </html>
