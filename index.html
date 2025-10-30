@@ -5,11 +5,20 @@
 <title>ESP8266 MQTT Control - Mosquitto WSS</title>
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 <style>
-    /* ... (CSS giữ nguyên) ... */
+    body { font-family: Arial; text-align:center; margin-top:50px; }
+    h2 { color:#333; }
+    button {
+        font-size: 20px; padding: 15px 40px; margin: 20px; border: none;
+        border-radius: 10px; cursor: pointer; transition: all 0.1s ease;
+        box-shadow: 0 5px #999; color: white;
+    }
+    #onBtn { background-color: #4CAF50; }
+    #offBtn { background-color: #f44336; }
+    button:active { transform: translateY(4px); box-shadow: 0 1px #666; }
 </style>
 </head>
 <body>
-<h2>ESP8266 MQTT Control2 - Mosquitto Chuẩn 443</h2>
+<h2>ESP8266 MQTT cai tien Control - Kết nối Ổn định</h2>
 <button id="onBtn">ON</button>
 <button id="offBtn">OFF</button>
 
@@ -17,19 +26,61 @@
 
 <script>
     // ----------------------------------------------------------------
-    // CẤU HÌNH SỬ DỤNG MOSQUITTO VỚI CỔNG 443
+    // CẤU HÌNH WSS MOSQUITTO TEST BROKER
     // ----------------------------------------------------------------
-   const broker = "test.mosquitto.org"; // SỬ DỤNG 'test.mosquitto.org' thay vì 'broker.mosquitto.org'
-const port = 8081; // Cổng WSS/SSL cho Mosquitto Public Broker
+    const broker = "test.mosquitto.org"; // Broker chuyên dụng để test
+    const port = 8081; // Cổng WSS (SSL) ổn định của Mosquitto Test
     const clientId = "web_" + Math.floor(Math.random() * 1000000);
-    const topic = "esp8266/control"; 
+    const topic = "esp8266/control"; // TOPIC ĐỒNG BỘ VỚI ESP
 
     const client = new Paho.MQTT.Client(broker, port, clientId);
     
-    // ... (Các định nghĩa biến và hàm giữ nguyên) ...
+    let onBtn = document.getElementById("onBtn");
+    let offBtn = document.getElementById("offBtn");
+    let statusP = document.getElementById("status");
 
-    // BẮT ĐẦU KẾT NỐI VỚI THAM SỐ useSSL: true VÀ PORT 443
+    function onConnect() {
+        console.log("✅ WSS CONNECTED (test.mosquitto.org:8081)");
+        statusP.innerText = "✅ Đã kết nối WSS. Sẵn sàng gửi lệnh!";
+    }
+
+    function onConnectionLost(responseObject) {
+        if (responseObject.errorCode !== 0) {
+            console.log("❌ CONNECTION LOST:", responseObject.errorMessage);
+        }
+        statusP.innerText = "❌ Mất kết nối! Thử kết nối lại...";
+        client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
+    }
+
+    function onFailure(e) {
+        console.log("❌ CONNECT FAILED:", e);
+        statusP.innerText = `❌ Lỗi kết nối WSS: ${e.errorMessage}.`;
+    }
+
+    function sendCommand(cmd) {
+        if (!client.isConnected()) {
+            console.error("❌ Not connected.");
+            statusP.innerText = "❌ Chưa kết nối! Vui lòng chờ.";
+            return;
+        }
+        
+        const message = new Paho.MQTT.Message(cmd);
+        message.destinationName = topic;
+        client.send(message);
+        console.log(`SENT: ${cmd}`);
+
+        if(cmd === "ON") {
+            onBtn.style.backgroundColor = "#2e7d32";
+            offBtn.style.backgroundColor = "#f44336";
+        } else if (cmd === "OFF") {
+            offBtn.style.backgroundColor = "#b71c1c";
+            onBtn.style.backgroundColor = "#4CAF50";
+        }
+    }
+    
     client.onConnectionLost = onConnectionLost;
+
+    // KẾT NỐI: useSSL: true VÀ PORT 8081
     client.connect({
         useSSL: true, // BẮT BUỘC
         onSuccess: onConnect,
