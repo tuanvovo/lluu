@@ -18,24 +18,38 @@
   <button id="offBtn" onclick="sendOFF()">OFF</button>
 
   <script>
-    // Kết nối WebSocket tới Node-RED hoặc broker hỗ trợ WebSocket
-    const client = new Paho.MQTT.Client("YOUR_NODE_RED_IP", 1880, "web_" + Math.floor(Math.random()*1000));
-    client.connect({onSuccess:onConnect});
-    const topic = "esp/web/control";
+    // Kết nối tới HiveMQ WebSocket
+    const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
+    const topic = "esp8266/control";
 
-    function onConnect() { console.log("✅ Connected to MQTT WebSocket"); }
+    client.connect({
+      onSuccess: onConnect,
+      onFailure: function(e){ console.log("Connect failed:", e);}
+    });
+
+    function onConnect() {
+      console.log("✅ Connected to HiveMQ WebSocket");
+      client.subscribe(topic);
+    }
+
     function sendON() {
-      const msg = new Paho.MQTT.Message("ON");
-      msg.destinationName = topic;
-      client.send(msg);
+      const message = new Paho.MQTT.Message("ON");
+      message.destinationName = topic;
+      client.send(message);
       console.log("Sent ON");
     }
+
     function sendOFF() {
-      const msg = new Paho.MQTT.Message("OFF");
-      msg.destinationName = topic;
-      client.send(msg);
+      const message = new Paho.MQTT.Message("OFF");
+      message.destinationName = topic;
+      client.send(message);
       console.log("Sent OFF");
     }
+
+    // Tùy chọn: nhận phản hồi từ ESP
+    client.onMessageArrived = function(msg) {
+      console.log("Message arrived:", msg.payloadString);
+    };
   </script>
 </body>
 </html>
