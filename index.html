@@ -1,110 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Blynk MQTT Web 22 Control (V1)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
-        .button-control {
-            padding: 15px 30px;
-            font-size: 20px;
-            margin: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            transition: background-color 0.3s;
-        }
-        #btn-on { background-color: #4CAF50; }
-        #btn-off { background-color: #f44336; }
-        #btn-on:hover { background-color: #45a049; }
-        #btn-off:hover { background-color: #da190b; }
-        #status-area { margin-top: 20px; font-size: 16px; color: #333; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bật/Tắt Aptomat</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 40px;
+    }
+    button {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: none;
+      font-size: 22px;
+      color: white;
+      background-color: #555;
+      transition: background-color 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+    button.active {
+      background-color: #00c851; /* xanh lá khi ON */
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
+  <h1>Điều khiển Aptomat</h1>
+  <button id="toggleBtn">OFF</button>
 
-    <h2>Điều khiển Servo qua 22 Blynk MQTT (Pin V1)</h2>
-    <hr>
-    
-    <button id="btn-on" class="button-control" onclick="sendCommand(1)">BẬT VAN (ON)</button>
-    <button id="btn-off" class="button-control" onclick="sendCommand(0)">TẮT VAN (OFF)</button>
-    
-    <div id="status-area">
-        <p id="connection-status">Trạng thái Kết nối: Đang chờ...</p>
-        <p id="command-log">Lệnh gần nhất: Chưa có</p>
-    </div>
+  <script>
+    const token = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_";
+    const btn = document.getElementById("toggleBtn");
+    let isOn = false;
 
-    <script>
-        var client;
-        // Auth Token ĐÃ XÁC NHẬN CHÍNH XÁC
-        var blynkAuth = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_"; 
+    btn.addEventListener("click", () => {
+      isOn = !isOn;
+      btn.classList.toggle("active", isOn);
+      btn.textContent = isOn ? "ON" : "OFF";
+      const value = isOn ? 1 : 0;
 
-        // Cấu hình Blynk Broker (Cổng 443 bắt buộc cho WSS)
-        var mqttBroker = "blynk.cloud"; 
-        var mqttPort = 443; 
-
-        function connectToBlynkMqtt() {
-            var clientId = "WebAppClient_" + new Date().getTime(); 
-
-            // Cấu hình kết nối
-            client = new Paho.MQTT.Client(mqttBroker, mqttPort, "/mqtt", clientId);
-
-            client.onConnectionLost = onConnectionLost;
-            client.onMessageArrived = onMessageArrived;
-
-            var options = {
-                onSuccess: onConnect,
-                onFailure: onFailure,
-                useSSL: true, // BẮT BUỘC dùng SSL/TLS
-                userName: blynkAuth, // Auth Token làm Tên người dùng
-                password: blynkAuth, // Auth Token làm Mật khẩu
-            };
-
-            client.connect(options);
-            document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: Đang kết nối...";
-        }
-
-        function onConnect() {
-            document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: **ĐÃ KẾT NỐI BẢO MẬT (443)**";
-        }
-
-        function onFailure(responseObject) {
-            // Lỗi Code 6 sẽ xảy ra nếu ESP8266 chưa online
-            document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: LỖI! Thử lại trong 5s. (Code: " + responseObject.errorCode + ")";
-            setTimeout(connectToBlynkMqtt, 5000); 
-        }
-
-        function onConnectionLost(responseObject) {
-            if (responseObject.errorCode !== 0) {
-                document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: **MẤT KẾT NỐI!**";
-                setTimeout(connectToBlynkMqtt, 5000);
-            }
-        }
-
-        function onMessageArrived(message) {
-            // Xử lý phản hồi (ACK) từ ESP8266 nếu cần
-        }
-
-        function sendCommand(value) {
-            if (client && client.isConnected()) {
-                // Topic đã sửa thành V1: /blynk/v1/hardware/AUTH/pin/V1
-                var topic = "/blynk/v1/hardware/" + blynkAuth + "/pin/V1"; 
-                var message = new Paho.MQTT.Message(String(value));
-                message.destinationName = topic;
-                
-                client.send(message);
-                
-                var commandText = value == 1 ? "BẬT (ON)" : "TẮT (OFF)";
-                document.getElementById("command-log").innerHTML = "Lệnh gần nhất: **" + commandText + "** (Giá trị: " + value + ")";
-            } else {
-                alert("Web App chưa kết nối với Blynk! Vui lòng chờ.");
-            }
-        }
-
-        // Bắt đầu kết nối khi tải trang
-        connectToBlynkMqtt();
-    </script>
-
+      fetch(`https://blynk.cloud/external/api/update?token=${token}&V1=${value}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Lỗi gửi lệnh");
+          console.log("Đã gửi lệnh:", value);
+        })
+        .catch(err => console.error(err));
+    });
+  </script>
 </body>
 </html>
