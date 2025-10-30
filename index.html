@@ -6,9 +6,24 @@
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 <style>
   body { font-family: Arial; text-align:center; margin-top:50px; }
-  button { font-size:20px; padding:10px 30px; margin:10px; border:none; border-radius:5px; cursor:pointer;}
-  #onBtn { background-color: #4CAF50; color:white; }
-  #offBtn { background-color: #f44336; color:white; }
+  h2 { color: #333; }
+  button {
+    font-size: 20px;
+    padding: 15px 40px;
+    margin: 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 5px #999;
+    color: white;
+  }
+  #onBtn { background-color: #4CAF50; }
+  #offBtn { background-color: #f44336; }
+  button:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px #666;
+  }
 </style>
 </head>
 <body>
@@ -17,7 +32,7 @@
 <button id="offBtn" onclick="sendOFF()">OFF</button>
 
 <script>
-  // Kết nối HiveMQ WebSocket (cùng broker với ESP)
+  // Kết nối HiveMQ WebSocket
   const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
   const topic = "esp8266/control";
 
@@ -45,6 +60,7 @@
     console.log("Sent OFF");
   }
 
+  // Nhận phản hồi từ ESP (tuỳ chọn)
   client.onMessageArrived = function(msg) {
     console.log("Message arrived:", msg.payloadString);
   };
