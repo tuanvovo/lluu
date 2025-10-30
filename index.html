@@ -32,16 +32,24 @@
 <button id="offBtn" onclick="sendOFF()">OFF</button>
 
 <script>
+  
+
+
+
+
   const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
   const topic = "esp8266/control";
 
   let onBtn = document.getElementById("onBtn");
   let offBtn = document.getElementById("offBtn");
 
-  client.connect({
+ client.connect({
+    
+    port: 8000, 
+    useSSL: false, // 
     onSuccess: onConnect,
     onFailure: function(e){ console.log("Connect failed:", e);}
-  });
+});
 
   function onConnect() {
     console.log("✅ Connected to HiveMQ WebSocket");
