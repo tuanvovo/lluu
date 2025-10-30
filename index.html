@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Blynk MQTT Web Control (V0)</title>
+    <title>Blynk MQTT Web 22 Control (V1)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
@@ -24,7 +24,7 @@
 </head>
 <body>
 
-    <h2>Điều khiển Servo qua Blynk MQTT (Pin V0)</h2>
+    <h2>Điều khiển Servo qua 22 Blynk MQTT (Pin V1)</h2>
     <hr>
     
     <button id="btn-on" class="button-control" onclick="sendCommand(1)">BẬT VAN (ON)</button>
@@ -37,15 +37,15 @@
 
     <script>
         var client;
-        // !!! THAY THẾ AUTH TOKEN CỦA BẠN VÀO ĐÂY !!!
+        // Auth Token ĐÃ XÁC NHẬN CHÍNH XÁC
         var blynkAuth = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_"; 
 
-        // Cấu hình Blynk Broker
+        // Cấu hình Blynk Broker (Cổng 443 bắt buộc cho WSS)
         var mqttBroker = "blynk.cloud"; 
-        var mqttPort = 443; // Cổng WSS (Websockets Secure) chuẩn
+        var mqttPort = 443; 
 
         function connectToBlynkMqtt() {
-            var clientId = "WebAppClient_" + new Date().getTime(); // ClientID ngẫu nhiên
+            var clientId = "WebAppClient_" + new Date().getTime(); 
 
             // Cấu hình kết nối
             client = new Paho.MQTT.Client(mqttBroker, mqttPort, "/mqtt", clientId);
@@ -58,7 +58,7 @@
                 onFailure: onFailure,
                 useSSL: true, // BẮT BUỘC dùng SSL/TLS
                 userName: blynkAuth, // Auth Token làm Tên người dùng
-                password: blynkAuth, // Auth Token làm Mật khẩu (hoặc có thể để trống)
+                password: blynkAuth, // Auth Token làm Mật khẩu
             };
 
             client.connect(options);
@@ -70,8 +70,9 @@
         }
 
         function onFailure(responseObject) {
+            // Lỗi Code 6 sẽ xảy ra nếu ESP8266 chưa online
             document.getElementById("connection-status").innerHTML = "Trạng thái Kết nối: LỖI! Thử lại trong 5s. (Code: " + responseObject.errorCode + ")";
-            setTimeout(connectToBlynkMqtt, 5000); // Tự động thử lại
+            setTimeout(connectToBlynkMqtt, 5000); 
         }
 
         function onConnectionLost(responseObject) {
@@ -82,16 +83,13 @@
         }
 
         function onMessageArrived(message) {
-            // Có thể dùng để nhận phản hồi từ thiết bị (ACK)
+            // Xử lý phản hồi (ACK) từ ESP8266 nếu cần
         }
 
         function sendCommand(value) {
             if (client && client.isConnected()) {
-                // Topic Blynk: /blynk/v1/hardware/YOUR_AUTH_TOKEN/pin/V0
-               var topic = "/blynk/v1/hardware/" + blynkAuth + "/pin/V1";
-
-
-
+                // Topic đã sửa thành V1: /blynk/v1/hardware/AUTH/pin/V1
+                var topic = "/blynk/v1/hardware/" + blynkAuth + "/pin/V1"; 
                 var message = new Paho.MQTT.Message(String(value));
                 message.destinationName = topic;
                 
