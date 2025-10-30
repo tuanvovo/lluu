@@ -27,7 +27,7 @@
 </style>
 </head>
 <body>
-<h2>ESP8266 MQTT1 ON/OFF Feedback</h2>
+<h2>ESP8266 MQTT2 ON/OFF Feedback</h2>
 <button id="onBtn">ON</button>
 <button id="offBtn">OFF</button>
 
@@ -35,10 +35,10 @@
 
 <script>
     // ----------------------------------------------------------------
-    // C
+    // CONFIGURATION
     // ----------------------------------------------------------------
     const broker = "broker.hivemq.com";
-    const port = 8884; // 
+    const port = 8884; // Use WSS/SSL Port for GitHub Pages (HTTPS)
     const clientId = "web_" + Math.floor(Math.random() * 1000000);
     const topic = "esp8266/control";
 
@@ -49,14 +49,12 @@
     let statusP = document.getElementById("status");
 
     // ----------------------------------------------------------------
-    // H
+    // EVENT HANDLERS
     // ----------------------------------------------------------------
     
     function onConnect() {
         console.log("✅ Connected to HiveMQ WSS");
         statusP.innerText = "✅ da ket noi san sang nhan lenh";
-        // 
-        // client.subscribe(topic); 
     }
 
     function onConnectionLost(responseObject) {
@@ -64,7 +62,6 @@
             console.log("Connection Lost:", responseObject.errorMessage);
             statusP.innerText = "❌ mat ket noi dang thu lai ket noi...";
         }
-        // T
         client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
     }
 
@@ -85,7 +82,7 @@
         client.send(message);
         console.log(`Sent ${cmd} to topic ${topic}`);
 
-        // Feedback
+        // Visual Feedback
         if(cmd === "ON") {
             onBtn.style.backgroundColor = "#2e7d32";
             offBtn.style.backgroundColor = "#f44336";
@@ -96,23 +93,18 @@
     }
     
     // ----------------------------------------------------------------
-    // K
+    // INITIALIZATION
     // ----------------------------------------------------------------
     
-    // 1. 
     client.onConnectionLost = onConnectionLost;
 
-    // 2. 
     client.connect({
-        useSSL: true, // 
+        useSSL: true, // MUST be true for GitHub Pages (HTTPS)
         onSuccess: onConnect,
         onFailure: onFailure
     });
 
-    // 3. 
     onBtn.addEventListener('click', () => sendCommand("ON"));
     offBtn.addEventListener('click', () => sendCommand("OFF"));
 
 </script>
-</body>
-</html>
