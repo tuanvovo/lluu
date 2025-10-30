@@ -2,47 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ESP8266 MQTT Control (SSL)</title>
+<title>ESP8266 MQTT Control (SSL 443)</title>
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 <style>
     body { font-family: Arial; text-align:center; margin-top:50px; }
     h2 { color:#333; }
     button {
-        font-size: 20px;
-        padding: 15px 40px;
-        margin: 20px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.1s ease;
-        box-shadow: 0 5px #999;
-        color: white;
+        font-size: 20px; padding: 15px 40px; margin: 20px; border: none;
+        border-radius: 10px; cursor: pointer; transition: all 0.1s ease;
+        box-shadow: 0 5px #999; color: white;
     }
     #onBtn { background-color: #4CAF50; }
     #offBtn { background-color: #f44336; }
-    button:active {
-        transform: translateY(4px);
-        box-shadow: 0 1px #666;
-    }
+    button:active { transform: translateY(4px); box-shadow: 0 1px #666; }
 </style>
 </head>
 <body>
-<h2>ESP8266 MQTT9 Control</h2>
+<h2>ESP8266 MQTT chuan Control - Giao thức Chuẩn 443</h2>
 <button id="onBtn">ON</button>
 <button id="offBtn">OFF</button>
 
-<p id="status">Đang thiết lập kết nối SSL...</p>
+<p id="status">Đang thiết lập kết nối WSS...</p>
 
 <script>
     // ----------------------------------------------------------------
-    // CẤU HÌNH SSL/WSS (Chuẩn cho HTTPS)
+    // CẤU HÌNH WSS CHUẨN (CỔNG 443 LUÔN MỞ)
     // ----------------------------------------------------------------
-    const broker = "broker.hivemq.com"; // Thử giữ HiveMQ với cổng 443 trước
-    const port = 443; // Cổng chuẩn WSS, LUÔN ĐƯỢC MỞ
-    // Hoặc nếu không chạy, dùng Mosquitto: const broker = "broker.mosquitto.org";
-
+    const broker = "broker.hivemq.com"; // Đồng bộ với ESP
+    const port = 443; // Cổng WSS chuẩn HTTPS, không bị tường lửa chặn
     const clientId = "web_" + Math.floor(Math.random() * 1000000);
-    const topic = "esp8266/control";
+    const topic = "esp8266/control"; // Đồng bộ với ESP8266
+
     const client = new Paho.MQTT.Client(broker, port, clientId);
     
     let onBtn = document.getElementById("onBtn");
@@ -50,7 +40,7 @@
     let statusP = document.getElementById("status");
 
     function onConnect() {
-        console.log("✅ WSS CONNECTED. Topic: " + topic);
+        console.log("✅ WSS CONNECTED (Port 443)");
         statusP.innerText = "✅ Đã kết nối WSS. Sẵn sàng gửi lệnh!";
     }
 
@@ -58,29 +48,18 @@
         if (responseObject.errorCode !== 0) {
             console.log("❌ CONNECTION LOST:", responseObject.errorMessage);
         }
-        statusP.innerText = "❌ Mất kết nối! Thử kết nối lại...";
+        statusP.innerText = "❌ Mất kết nối! Đang thử kết nối lại...";
         client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
-
-
- 
-
-       
-
-
-
-
-
-
     }
 
     function onFailure(e) {
         console.log("❌ CONNECT FAILED:", e);
-        statusP.innerText = `❌ Lỗi kết nối SSL: ${e.errorMessage}`;
+        statusP.innerText = `❌ Lỗi kết nối WSS: ${e.errorMessage}. Thử hard refresh (Ctrl+F5).`;
     }
 
     function sendCommand(cmd) {
         if (!client.isConnected()) {
-            console.error("❌ Client chưa kết nối.");
+            console.error("❌ Not connected.");
             statusP.innerText = "❌ Chưa kết nối! Vui lòng chờ.";
             return;
         }
@@ -90,7 +69,6 @@
         client.send(message);
         console.log(`SENT: ${cmd}`);
 
-        // Visual Feedback
         if(cmd === "ON") {
             onBtn.style.backgroundColor = "#2e7d32";
             offBtn.style.backgroundColor = "#f44336";
@@ -100,20 +78,17 @@
         }
     }
     
-    // Gán hàm xử lý sự kiện
     client.onConnectionLost = onConnectionLost;
 
-    // BẮT ĐẦU KẾT NỐI VỚI THAM SỐ useSSL: true
+    // BẮT ĐẦU KẾT NỐI VỚI THAM SỐ useSSL: true VÀ PORT 443
     client.connect({
-        useSSL: true, // Đây là tham số bắt buộc để dùng WSS
+        useSSL: true, // BẮT BUỘC
         onSuccess: onConnect,
         onFailure: onFailure
     });
 
-    // Gán sự kiện nhấn nút
     onBtn.addEventListener('click', () => sendCommand("ON"));
     offBtn.addEventListener('click', () => sendCommand("OFF"));
-
 </script>
 </body>
 </html>
