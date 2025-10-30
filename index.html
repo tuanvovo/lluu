@@ -5,40 +5,40 @@
 <title>ESP8266 MQTT ON/OFF Feedback</title>
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 <style>
-  body { font-family: Arial; text-align:center; margin-top:50px; }
-  h2 { color:#333; }
-  button {
-    font-size: 20px;
-    padding: 15px 40px;
-    margin: 20px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.1s ease;
-    box-shadow: 0 5px #999;
-    color: white;
-  }
-  #onBtn { background-color: #4CAF50; }
-  #offBtn { background-color: #f44336; }
-  button:active {
-    transform: translateY(4px);
-    box-shadow: 0 1px #666;
-  }
+ body { font-family: Arial; text-align:center; margin-top:50px; }
+ h2 { color:#333; }
+ button {
+ font-size: 20px;
+ padding: 15px 40px;
+ margin: 20px;
+ border: none;
+ border-radius: 10px;
+ cursor: pointer;
+ transition: all 0.1s ease;
+ box-shadow: 0 5px #999;
+ color: white;
+ }
+ #onBtn { background-color: #4CAF50; }
+ #offBtn { background-color: #f44336; }
+ button:active {
+ transform: translateY(4px);
+ box-shadow: 0 1px #666;
+ }
 </style>
 </head>
 <body>
-<h2>ESP8266 MQTT2 ON/OFF Feedback</h2>
+<h2>ESP8266 MQTT3 ON/OFF Feedback</h2>
 <button id="onBtn">ON</button>
 <button id="offBtn">OFF</button>
 
-<p id="status">Đang kết nối...</p>
+<p id="status">Dang ket noi...</p>
 
 <script>
     // ----------------------------------------------------------------
-    // CẤU HÌNH KẾT NỐI (SỬ DỤNG WSS/SSL cho GitHub Pages)
+    // C
     // ----------------------------------------------------------------
     const broker = "broker.hivemq.com";
-    const port = 8884; // Cổng WSS/SSL cho MQTT qua WebSocket
+    const port = 8884; // 
     const clientId = "web_" + Math.floor(Math.random() * 1000000);
     const topic = "esp8266/control";
 
@@ -49,34 +49,34 @@
     let statusP = document.getElementById("status");
 
     // ----------------------------------------------------------------
-    // HÀM XỬ LÝ SỰ KIỆN
+    // H
     // ----------------------------------------------------------------
     
     function onConnect() {
         console.log("✅ Connected to HiveMQ WSS");
-        statusP.innerText = "✅ Đã kết nối. Sẵn sàng gửi lệnh!";
-        // Nếu ESP đã subscribe đúng, bạn chỉ cần gửi lệnh
+        statusP.innerText = "✅ da ket noi san sang nhan lenh";
+        // 
         // client.subscribe(topic); 
     }
 
     function onConnectionLost(responseObject) {
         if (responseObject.errorCode !== 0) {
             console.log("Connection Lost:", responseObject.errorMessage);
-            statusP.innerText = "❌ Mất kết nối! Đang thử kết nối lại...";
+            statusP.innerText = "❌ mat ket noi dang thu lai ket noi...";
         }
-        // Thử kết nối lại
+        // T
         client.connect({ useSSL: true, onSuccess: onConnect, onFailure: onFailure });
     }
 
     function onFailure(e) {
         console.log("Connect failed:", e);
-        statusP.innerText = `❌ Lỗi kết nối: ${e.errorMessage}`;
+        statusP.innerText = `❌ loi ket noi: ${e.errorMessage}`;
     }
 
     function sendCommand(cmd) {
         if (!client.isConnected()) {
             console.error("Client not connected. Cannot send command.");
-            statusP.innerText = "❌ Chưa kết nối! Vui lòng chờ.";
+            statusP.innerText = "❌ chua ket noi! vui long cho.";
             return;
         }
         
@@ -85,7 +85,7 @@
         client.send(message);
         console.log(`Sent ${cmd} to topic ${topic}`);
 
-        // Feedback màu cho người dùng
+        // Feedback
         if(cmd === "ON") {
             onBtn.style.backgroundColor = "#2e7d32";
             offBtn.style.backgroundColor = "#f44336";
@@ -96,20 +96,20 @@
     }
     
     // ----------------------------------------------------------------
-    // KHỞI TẠO VÀ GÁN SỰ KIỆN
+    // K
     // ----------------------------------------------------------------
     
-    // 1. Đặt hàm xử lý mất kết nối
+    // 1. 
     client.onConnectionLost = onConnectionLost;
 
-    // 2. Kết nối tới Broker
+    // 2. 
     client.connect({
-        useSSL: true, // PHẢI LÀ TRUE
+        useSSL: true, // 
         onSuccess: onConnect,
         onFailure: onFailure
     });
 
-    // 3. Gán sự kiện cho button sau khi đã định nghĩa hàm
+    // 3. 
     onBtn.addEventListener('click', () => sendCommand("ON"));
     offBtn.addEventListener('click', () => sendCommand("OFF"));
 
