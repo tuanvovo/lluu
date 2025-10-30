@@ -2,11 +2,11 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Điều khiển ESP8266 ON/OFF</title>
+<title>ESP8266 MQTT ON/OFF Feedback</title>
 <script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
 <style>
   body { font-family: Arial; text-align:center; margin-top:50px; }
-  h2 { color: #333; }
+  h2 { color:#333; }
   button {
     font-size: 20px;
     padding: 15px 40px;
@@ -27,14 +27,16 @@
 </style>
 </head>
 <body>
-<h2>Điều khiển ESP8266 ON/OFF</h2>
+<h2>ESP8266 MQTT ON/OFF Feedback</h2>
 <button id="onBtn" onclick="sendON()">ON</button>
 <button id="offBtn" onclick="sendOFF()">OFF</button>
 
 <script>
-  // Kết nối HiveMQ WebSocket
   const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.floor(Math.random()*1000));
   const topic = "esp8266/control";
+
+  let onBtn = document.getElementById("onBtn");
+  let offBtn = document.getElementById("offBtn");
 
   client.connect({
     onSuccess: onConnect,
@@ -51,6 +53,9 @@
     message.destinationName = topic;
     client.send(message);
     console.log("Sent ON");
+    // Feedback màu
+    onBtn.style.backgroundColor = "#2e7d32"; // màu ON tối hơn
+    offBtn.style.backgroundColor = "#f44336"; // OFF trở lại màu cũ
   }
 
   function sendOFF() {
@@ -58,9 +63,11 @@
     message.destinationName = topic;
     client.send(message);
     console.log("Sent OFF");
+    // Feedback màu
+    offBtn.style.backgroundColor = "#b71c1c"; // màu OFF tối hơn
+    onBtn.style.backgroundColor = "#4CAF50"; // ON trở lại màu cũ
   }
 
-  // Nhận phản hồi từ ESP (tuỳ chọn)
   client.onMessageArrived = function(msg) {
     console.log("Message arrived:", msg.payloadString);
   };
