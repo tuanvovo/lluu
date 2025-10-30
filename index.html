@@ -1,229 +1,53 @@
+
+
+
+
+
+
+
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web App Điều Khiển Bếp (Dễ Đọc)</title>
-    <style>
-        /* Thiết lập giao diện tổng thể */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #e9ecef;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        /* Khung chứa nội dung */
-        .container {
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #343a40;
-            margin-bottom: 25px;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        /* Hộp hiển thị trạng thái */
-        .status-box {
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #fff;
-            transition: all 0.5s ease-in-out;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .status-loading {
-            background-color: #6c757d;
-            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
-        }
-        .status-on {
-            background-color: #28a745;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.6);
-        }
-        .status-off {
-            background-color: #dc3545;
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.6);
-        }
-        .status-label {
-            font-size: 0.8rem;
-            font-weight: 400;
-            margin-top: 5px;
-            opacity: 0.8;
-        }
-
-        /* Nhóm nút điều khiển */
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .control-btn {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-            text-transform: uppercase;
-        }
-        .control-btn:active {
-            transform: scale(0.98);
-        }
-        #btn-off {
-            background-color: #dc3545;
-            color: white;
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
-        }
-        #btn-on {
-            background-color: #28a745;
-            color: white;
-            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
-        }
-
-        /* Thông tin API */
-        .api-info {
-            margin-top: 20px;
-            font-size: 0.75rem;
-            color: #6c757d;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            text-align: left;
-        }
-        .api-info span {
-            display: block;
-            word-break: break-all;
-        }
-        
-        /* Responsive cho thiết bị di động */
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-            .status-box {
-                font-size: 1.2rem;
-            }
-            .control-btn {
-                padding: 12px;
-                font-size: 1rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>ESP8266 ON/OFF</title>
 </head>
 <body>
-    <div class="container">
-        <h1>ĐIỀU KHIỂN APTOMAT (SERVO)</h1>
-        
-        <div id="status-display" class="status-box status-loading">
-            ĐANG TẢI...
-            <span class="status-label">Trạng thái phản hồi thực tế (V3)</span>
-        </div>
+<h2>Điều khiển ESP8266 ON/OFF</h2>
+<button onclick="turnOn()">ON</button>
+<button onclick="turnOff()">OFF</button>
 
-        <div class="button-group">
-            <button id="btn-on" class="control-btn" onclick="sendCommand(1)">
-                BẬT BẾP (ON)
-            </button>
-            <button id="btn-off" class="control-btn" onclick="sendCommand(0)">
-                TẮT BẾP (OFF)
-            </button>
-        </div>
-        
-        <div class="api-info">
-            <span>Auth Token: rum78doJsOjCNQ6heXtKLS1WonPOhcH_</span>
-            <span>Lệnh gửi đến: V1</span>
-            <span>Trạng thái đọc từ: V3</span>
-        </div>
-    </div>
+<script src="https://unpkg.com/paho-mqtt/mqttws31.min.js"></script>
+<script>
+  const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_client_" + Math.floor(Math.random()*1000));
 
-    <script>
-        const BLYNK_AUTH_TOKEN = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_";
-        const BLYNK_API_URL = "https://blynk.cloud/external/api";
-        const VIRTUAL_PIN_COMMAND = 1; 
-        const VIRTUAL_PIN_STATUS = 3;  
-        const statusDisplay = document.getElementById('status-display');
-        const updateInterval = 5000;
+  client.onConnectionLost = function(responseObject){
+    console.log("Connection lost:", responseObject.errorMessage);
+  };
 
-        function updateUI(value) {
-            statusDisplay.classList.remove('status-loading', 'status-on', 'status-off');
-            
-            if (value === 1) {
-                statusDisplay.classList.add('status-on');
-                statusDisplay.innerHTML = 'ĐANG BẬT' + '<span class="status-label">Trạng thái phản hồi thực tế (V3)</span>';
-            } else if (value === 0) {
-                statusDisplay.classList.add('status-off');
-                statusDisplay.innerHTML = 'ĐANG TẮT' + '<span class="status-label">Trạng thái phản hồi thực tế (V3)</span>';
-            } else {
-                statusDisplay.classList.add('status-loading');
-                statusDisplay.innerHTML = 'LỖI KẾT NỐI' + '<span class="status-label">Không thể đọc V3</span>';
-            }
-        }
+  client.connect({
+    onSuccess: function() {
+      console.log("Connected to HiveMQ WebSocket");
+    },
+    onFailure: function(err){
+      console.log("Connection failed:", err);
+    }
+  });
 
-        async function fetchDeviceStatus() {
-            const url = `${BLYNK_API_URL}/get?token=${BLYNK_AUTH_TOKEN}&v=${VIRTUAL_PIN_STATUS}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                const value = parseInt(data[0], 10);
-                updateUI(value);
-            } catch (error) {
-                console.error("Lỗi khi lấy trạng thái (GET V3):", error);
-                statusDisplay.classList.add('status-loading');
-                statusDisplay.innerHTML = 'LỖI KẾT NỐI API<span class="status-label">Kiểm tra Token và Live Server</span>';
-            }
-        }
+  const topic = "esp8266/control";
 
-        async function sendCommand(command) {
-            const url = `${BLYNK_API_URL}/update/v${VIRTUAL_PIN_COMMAND}?token=${BLYNK_AUTH_TOKEN}&value=${command}`;
-            statusDisplay.classList.add('status-loading');
-            statusDisplay.innerHTML = 'ĐANG GỬI LỆNH...';
-            try {
-                const response = await fetch(url, { method: 'GET' });
-                if (response.ok) {
-                    console.log(`Đã gửi lệnh ${command} thành công lên V1.`);
-                    // Chờ 1 giây để Blynk cập nhật trước khi đọc lại
-                    setTimeout(fetchDeviceStatus, 1000); 
-                } else {
-                    statusDisplay.classList.remove('status-loading');
-                    statusDisplay.innerHTML = `LỖI GỬI LỆNH! (HTTP ${response.status})` + '<span class="status-label">Kiểm tra Token hoặc V1</span>';
-                    console.error("Lỗi khi gửi lệnh (SET V1), Status:", response.status);
-                }
-            } catch (error) {
-                console.error("Lỗi mạng khi gửi lệnh:", error);
-                statusDisplay.classList.remove('status-loading');
-                statusDisplay.innerHTML = 'LỖI KẾT NỐI MẠNG' + '<span class="status-label">Không thể truy cập Blynk Cloud</span>';
-            }
-        }
+  function turnOn() {
+    const message = new Paho.MQTT.Message("ON");
+    message.destinationName = topic;
+    client.send(message);
+    console.log("Sent: ON");
+  }
 
-        window.onload = function() {
-            fetchDeviceStatus();
-            setInterval(fetchDeviceStatus, updateInterval);
-        };
-    </script>
+  function turnOff() {
+    const message = new Paho.MQTT.Message("OFF");
+    message.destinationName = topic;
+    client.send(message);
+    console.log("Sent: OFF");
+  }
+</script>
+</body>
+</html>
