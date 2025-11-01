@@ -10,7 +10,15 @@
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
-    padding-top: 60px;
+    padding-top: 40px;
+  }
+  h2 { margin-bottom: 20px; }
+  .control-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 25px;
   }
   #btn {
     font-size: 24px;
@@ -20,34 +28,50 @@
     color: white;
     cursor: pointer;
     transition: 0.3s;
-    margin-bottom: 30px;
   }
-  .on { background-color: #00c853; }   /* Xanh khi ON */
-  .off { background-color: #555; }     /* Xám khi OFF */
-  #statusSection {
-    margin-top: 20px;
-  }
-  #circle {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-left: 15px;
-    vertical-align: middle;
-    background-color: #555;
-    box-shadow: 0 0 8px #222;
-  }
-  .circle-on { background-color: #00c853; box-shadow: 0 0 15px #00e676; }
-  .circle-off { background-color: #555; box-shadow: 0 0 5px #222; }
+  .on { background-color: #00c853; }
+  .off { background-color: #555; }
   #checkBtn {
     background-color: #2196f3;
     border: none;
     border-radius: 8px;
     color: white;
     font-size: 18px;
-    padding: 10px 25px;
+    padding: 12px 25px;
     cursor: pointer;
-    margin-top: 10px;
+  }
+  #statusSection { margin-top: 10px; }
+  #circle {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+    background-color: #555;
+    box-shadow: 0 0 8px #222;
+  }
+ .circle-on { background-color: #00c853 !important; box-shadow: 0 0 15px #00e676; }
+  .circle-off { background-color: #333 !important; box-shadow: 0 0 5px #111; }
+.circle-off {
+  background-color: #333 ;
+  box-shadow: 0 0 5px #111 ;
+}
+
+  #bepImage {
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    margin-top: 25px;
+    box-shadow: 0 0 15px #000;
+  }
+  #responseBox {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #fff;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: bold;
   }
 </style>
 </head>
@@ -55,63 +79,131 @@
 
 <h2>⚡ Aptomat Web Control</h2>
 
-<!-- Nút điều khiển ON/OFF -->
-<button id="btn" class="off" onclick="toggle()">OFF</button>
-
-<!-- Khu vực hiển thị trạng thái -->
-<div id="statusSection">
+<div class="control-section">
   <button id="checkBtn" onclick="getStatus()">Xem trạng thái</button>
+  <button id="btn" class="off" onclick="toggle()">OFF</button>
+</div>
+
+<div id="statusSection">
   <span id="circle" class="circle-off"></span>
   <span id="statusText">CB OFF</span>
+ 
 </div>
+
+<img id="bepImage" src="bep_off.jpg" alt="Hình bếp">
+
+<div id="responseBox">Phản hồi sẽ hiển thị ở đây</div>
 
 <script>
 const TOKEN = "rum78doJsOjCNQ6heXtKLS1WonPOhcH_"; 
 const API_BASE = "https://blynk.cloud/external/api";
 
-// Gửi lệnh ON/OFF
+// 🔘 Nhấn nút ON/OFF
 async function toggle() {
   const btn = document.getElementById("btn");
   const newState = btn.textContent === "OFF" ? 1 : 0;
-  await fetch(`${API_BASE}/update?token=${TOKEN}&V1=${newState}`);
-  updateButton(newState === 1);
-}
+  const responseBox = document.getElementById("responseBox");
 
-// Cập nhật nút điều khiển
-function updateButton(isOn) {
-  const btn = document.getElementById("btn");
-  if (isOn) {
-    btn.textContent = "ON";
-    btn.className = "on";
-  } else {
-    btn.textContent = "OFF";
-    btn.className = "off";
+  responseBox.textContent = "Đang gửi lệnh...";
+
+  try {
+    const res = await fetch(`${API_BASE}/update?token=${TOKEN}&V1=${newState}`);
+
+    if (res.ok) {
+      responseBox.textContent = "✅ Hợp lệ (200 OK)";
+      syncUI(newState === 1);
+    } else {
+      responseBox.textContent = "⚠ Không hợp lệ (" + res.status + ")";
+    }
+  } catch (e) {
+    responseBox.textContent = "❌ Lỗi kết nối!";
+    console.error(e);
   }
 }
 
-// Khi nhấn nút “Xem trạng thái”
+// 🔄 Khi nhấn “Xem trạng thái”
 async function getStatus() {
   try {
     const res = await fetch(`${API_BASE}/get?token=${TOKEN}&V1`);
     const value = await res.text();
     const isOn = value.trim() === "1";
     updateStatus(isOn);
+    updateImage(isOn);
+
+    const btn = document.getElementById("btn");
+    const btnIsOn = btn.textContent === "ON";
+    if (isOn !== btnIsOn) updateButton(isOn);
+
   } catch (e) {
     console.error("Lỗi đọc trạng thái:", e);
   }
 }
 
-// Cập nhật vòng tròn + chữ
+// ✅ Đồng bộ giao diện sau khi gửi lệnh
+function syncUI(isOn) {
+  updateButton(isOn);
+  updateStatus(isOn);
+  updateImage(isOn);
+}
+
+// 🟢 Cập nhật nút ON/OFF
+function updateButton(isOn) {
+  const btn = document.getElementById("btn");
+  if (isOn) {
+    btn.textContent = "ON";
+    btn.classList.remove("off");
+    btn.classList.add("on");
+  } else {
+    btn.textContent = "OFF";
+    btn.classList.remove("on");
+    btn.classList.add("off");
+  }
+}
+
+
+
+
+
+
+
+
+
+
+// 🔵 Cập nhật vòng tròn + chữ
 function updateStatus(isOn) {
   const circle = document.getElementById("circle");
   const text = document.getElementById("statusText");
+  circle.classList.remove("circle-on", "circle-off");
+
+  circle.classList.remove("circle-on","circle-off");
+  circle.classList.add(isOn ? "circle-on" : "circle-off");
+
+ 
   if (isOn) {
-    circle.className = "circle-on";
+    
+
+   
+
+
+
+
     text.textContent = "CB ON";
   } else {
-    circle.className = "circle-off";
+
+  
+
+
+
+
+    
     text.textContent = "CB OFF";
   }
+}
+
+// 🟠 Cập nhật hình bếp
+function updateImage(isOn) {
+  const img = document.getElementById("bepImage");
+  img.src = isOn ? "bep_on.jpg" : "bep_off.jpg";
 }
 </script>
 
