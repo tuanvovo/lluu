@@ -1,0 +1,305 @@
+<!doctype html>
+
+<html lang="vi">
+
+<head>
+
+
+<script>
+    // BẢO VỆ: Nếu chưa đăng nhập, chuyển hướng về login.html
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.replace('login.html'); 
+    }
+</script>
+
+
+<meta charset="utf-8" />
+
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<title>Demo Mobile App T@ Smart</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   
+
+</head>
+
+
+
+<body>
+
+    <script>
+  // 1. Nếu chưa login → quay về login
+  if (localStorage.getItem('isLoggedIn') !== 'true') {
+    window.location.replace('login.html');
+  }
+
+  // 2. Logout: chỉ dùng nút logout hiện tại
+  const logoutBtn = document.getElementById('logoutBtn');
+  if(logoutBtn){
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userEmail'); // nếu bạn lưu email
+      window.location.href = "login.html"; // quay lại login
+    });
+  }
+</script>
+
+
+<div class="wrap">
+
+  <div class="viewport">
+
+
+
+    <!-- Trang đăng nhập -->
+
+
+   
+
+      
+
+
+    <!-- Trang chính -->
+    <section id="page-home" class="page center" style="background:linear-gradient(180deg,#A8C9E4,#FFFFFF)">
+        <header class="top">
+        <div class="home-brand">
+            <div class="home-logo">T@</div>
+            <div class="home-title">Nhà của T@</div>
+        </div>
+        <div class="chip">Quản trị</div>
+    </header>
+
+    <main style="padding:0 6px 100px 6px">
+        <div class="control-card">
+            <div class="control-left">
+                <div class="control-title">Bếp Điện</div>
+                <div class="control-desc" style="margin-bottom: 12px;">
+                    Trạng thái: <span id="stove">Tắt</span>
+                </div>
+
+                <div class="control-actions-group">
+                    <div class="control-actions">
+                        <button id="btn-turn-on" class="small-btn on" onclick="turnOn()">MỞ</button>
+                        <button id="btn-turn-off" class="small-btn off" onclick="turnOff()">TẮT</button>
+                    </div>
+                    <div id="responseBox"></div>
+                </div>
+
+                <div class="status-control-row">
+                    <button onclick="getStatus()" class="small-btn view-status-btn off">Xem trạng thái Bếp</button>
+                    <div class="cb-display">
+                        <span>CB:</span>
+                        <div id="cb-status" class="cb-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="imgBep" class="control-thumb">
+                <img id="stove-image" src="img/bep_off.jpg" alt="Bếp Điện" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+        </div>
+
+        <div class="thumbs">
+            
+
+
+<a class="thumb" href="dk_cay.html"><div class="thumb-logo"><i class="fa-solid fa-water-ladder text-blue-500"></i></div> 
+               
+              
+              
+              <div class="img bg-tuoi"></div>
+                <h4>Tưới Cây</h4>
+                <p>Phòng khách</p>
+            </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div class="thumb" onclick="goto('rem')">
+                <div class="thumb-logo"><i class="fa-solid fa-house-chimney-window text-indigo-500"></i></div>
+                <div class="img bg-rem"></div>
+                <h4>Rèm Cửa</h4>
+                <p>Phòng ngủ Master</p>
+            </div>
+            <div class="thumb" onclick="goto('aptomat')">
+                <div class="thumb-logo"><i class="fa-solid fa-bolt text-yellow-500"></i></div>
+                <div class="img bg-apt"></div>
+                <h4>Áp-tô-mát</h4>
+                <p>Nguồn chính</p>
+            </div>
+            <div class="thumb" onclick="goto('quangcao')">
+                <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
+                <div class="img bg-prod"></div>
+                <h4>Quảng Cáo</h4>
+                <p>Sản phẩm</p>
+            </div>
+            <div class="thumb" onclick="goto('camera')">
+                <div class="thumb-logo"><i class="fa-solid fa-video text-gray-700"></i></div>
+                <div class="img bg-cam"></div>
+                <h4>Camera</h4>
+                <p>Sân thượng</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="bottombar">
+        <div class="navbtn">
+            <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> </div>
+        <div class="navbtn" onclick="goto('quangcao')">
+            <i class="fa-solid fa-video"></i> <span>Video</span> </div>
+        <div class="navbtn" onclick="logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Các trang khác -->
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section id="page-rem" class="page hidden">
+
+
+        <div class="sub-header">
+            <div class="back" onclick="back()"> 
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </div>
+               <h3>Rèm Cửa</h3> 
+        </div>
+
+
+        <div class="sub-card">
+            <p>Nội dung điều khiển Rèm Cửa...</p>
+            <p class="muted">Sử dụng nút to .big-toggle để dễ điều khiển.</p>
+        </div>
+    </section>
+
+
+
+
+   <section id="page-aptomat" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <h3>Áp-tô-mát</h3>
+    </div>
+    <div class="sub-card">
+        <p>Điều khiển nguồn điện chính.</p>
+        <button class="big-toggle" onclick="setApt(true)">BẬT ÁP TÔ MÁT</button>
+        <button class="big-toggle" style="margin-top: 10px;" onclick="setApt(false)">TẮT ÁP TÔ MÁT</button>
+    </div>
+</section>
+    <section id="page-quangcao" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <h3>Sản phẩm / Video</h3>
+    </div>
+    <div class="sub-card">
+        <p>Trang này hiển thị nội dung quảng cáo.</p>
+        <p class="muted">Bạn có thể nhúng video YouTube vào đây.</p>
+    </div>
+</section>
+
+   <section id="page-camera" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <h3>Camera</h3>
+    </div>
+    <div class="sub-card">
+        <div class="cam-screen">Không có video trực tiếp</div>
+        <p class="muted" style="margin-top: 10px;">Thêm luồng video của bạn vào đây.</p>
+    </div>
+</section>
+
+
+
+  </div>
+
+</div>
+
+
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
+
+

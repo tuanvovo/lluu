@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo Mobile App T@ Smart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="viewport">
+
+    <!-- Trang đăng nhập -->
+    <section id="page-login" class="page" style="background:linear-gradient(180deg,#10223f,#0b2a4a);color:#fff">
+      <div class="auth-card">
+        <div class="auth-top">
+          <div class="brand">
+            <div class="logo-drop">T@</div>
+            <div>
+              <div class="auth-title">T@</div>
+              <div class="auth-sub">Ứng dụng điều khiển nhà thông minh</div>
+            </div>
+          </div>
+          <div class="chip">Demo</div>
+        </div>
+
+        <div id="auth-slider" style="overflow:hidden;margin-top:12px;border-radius:12px">
+          <div id="auth-inner" style="display:flex;transition:transform .5s cubic-bezier(.2,.9,.2,1)">
+            <div style="min-width:100%;padding-right:8px">
+              <div class="field">
+                <input id="li-email" placeholder="Email hoặc username">
+              </div>
+              <div class="field">
+                <input id="li-pass" type="password" placeholder="Mật khẩu">
+              </div>
+              <button class="btn btn-primary w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition duration-150 shadow-md" id="btn-do-login">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>Đăng nhập
+              </button>
+              <div id="login-status" class="mt-4 text-center text-sm text-gray-200"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Firebase Logic -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDWHfbNKaWCHCu4PkmzScWWkfnQXYfvnI",
+    authDomain: "myloginapp-web.firebaseapp.com",
+    projectId: "myloginapp-web",
+    storageBucket: "myloginapp-web.firebasestorage.app",
+    messagingSenderId: "512830007983",
+    appId: "1:512830007983:web:18963568636309d0fc425a",
+    measurementId: "G-PCY2YSSRPT"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const btnLogin = document.getElementById("btn-do-login");
+  const statusBox = document.getElementById("login-status");
+
+  btnLogin.addEventListener("click", async () => {
+    const email = document.getElementById("li-email").value.trim();
+    const password = document.getElementById("li-pass").value.trim();
+
+    if (!email || password.length < 7) {
+      showStatus("❌ Email không hợp lệ hoặc mật khẩu quá ngắn (≥7 ký tự).", "text-red-400");
+      return;
+    }
+
+    btnLogin.disabled = true;
+    btnLogin.textContent = "Đang kiểm tra...";
+
+    try {
+
+
+
+
+    
+
+
+
+
+
+    // ...
+ const userCredential = await signInWithEmailAndPassword(auth, email, password);
+ const userEmail = userCredential.user.email; // Lấy email người dùng vừa đăng nhập
+ console.log("Đăng nhập thành công:", userEmail);
+
+ // Định nghĩa Admin và kiểm tra quyền
+ const ADMIN_EMAIL = 'test@gmail.com'; // <<< ĐÂY LÀ EMAIL ADMIN CỦA BẠN!
+const isAdminUser = (userEmail === ADMIN_EMAIL);
+
+ // Lưu trạng thái login VÀ QUYỀN ADMIN vào localStorage
+ localStorage.setItem('isLoggedIn', 'true');
+localStorage.setItem('userEmail', userEmail);
+ localStorage.setItem('isAdmin', isAdminUser ? 'true' : 'false'); // <<< DÒNG MỚI QUAN TRỌNG
+
+ // Chuyển vào home
+ window.location.href = "home.html";
+
+ } catch (error) {
+// ...
+
+
+
+
+
+      console.error("Xác thực thất bại:", error);
+      showStatus("❌ Email hoặc mật khẩu không đúng!", "text-red-400");
+    } finally {
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Đăng nhập";
+    }
+  });
+
+  function showStatus(text, colorClass) {
+    statusBox.textContent = text;
+    statusBox.className = `mt-4 text-center text-sm font-medium ${colorClass}`;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Điều Khiển Tưới Cây</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<style>
+/* GIỮ NGUYÊN CSS */
+html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
+.mobile-container {max-width:420px; margin:20px auto; border-radius:30px; background:#fff; box-shadow:0 0 15px rgba(0,0,0,0.2);}
+.sub-header {padding:15px 20px; display:flex; align-items:center; background:#c3e5ff; color:#004c8c; border-bottom-left-radius:30px; border-bottom-right-radius:30px;}
+.sub-header h3 {flex-grow:1; text-align:center; margin:0;}
+.back {cursor:pointer;}
+.main-card {padding:20px; margin:10px; border-radius:20px; background:#fff; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
+.image-container {display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;}
+.plant-image {width:60%; height:150px; object-fit:cover; border-radius:15px; transition:all 0.3s ease;}
+
+
+
+
+/* Nút điều khiển */
+/* Nút điều khiển nổi bật */
+.control-btn {
+    border-radius: 25px;                  /* Bo tròn đẹp */
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25); /* Bóng nổi bật */
+    color: white;
+    font-size: 16px;
+}
+
+/* Khi nhấn */
+.control-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* ON - màu xanh gradient */
+.control-btn[style*="background-color: #4CAF50"] {
+    background: linear-gradient(135deg, #4CAF50, #28a745);
+}
+
+/* OFF - màu xám gradient */
+.control-btn[style*="background-color: gray"] {
+    background: linear-gradient(135deg, #888888, #555555);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#nextScheduleText {
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4DA0FF, #0077CC);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+    transition: all 0.3s ease;
+}
+
+/* Khi hover nổi bật hơn */
+#nextScheduleText:hover {
+    transform: scale(1.05);
+    box-shadow: 0 7px 14px rgba(0,0,0,0.35);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.metric-card {width:48%; padding:15px; border-radius:20px; margin-bottom:15px; color:white; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+</style>
+</head>
+<body>
+<div class="mobile-container">
+  <div class="sub-header">
+    <div class="back" onclick="window.location.replace('home.html')">&#8592;</div>
+    <h3>Điều Khiển Tưới Cây</h3>
+  </div>
+
+  <div class="main-card">
+    <div class="image-container">
+      <img id="water-image" src="img/cay_off.jpg" alt="Cây" class="plant-image">
+      <div style="display:flex; flex-direction:column; gap:15px; width:20%; align-items:flex-end;">
+        <button id="waterBtn" class="control-btn" 
+                style="width:100%; padding:6px 10px; font-size:14px; background:gray;" 
+                onclick="toggleWater()">BẬT</button>
+                
+        <button id="checkStatusBtn" class="control-btn" 
+                style="width:100%; padding:6px 10px; font-size:14px; background:#004c8c;" 
+                onclick="getStatus()">XEM</button>
+
+        <p style="margin:0; font-size:12px; color:gray; text-align:right;">
+          Trạng thái: <span id="waterStatusText">ĐÃ TẮT</span>
+        </p>
+      </div>
+    </div>
+
+    <h3 style="color:#333; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:20px;">🎥 Video Mô Phỏng</h3>
+   
+   
+   <div style="background:#f0f0f0; height:150px; border-radius:15px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; overflow:hidden;">
+  <video id="waterVideo" width="100%" height="100%" muted loop style="object-fit:cover; border-radius:15px;">
+    <source src="video/lan.mp4" type="video/mp4">
+    Trình duyệt của bạn không hỗ trợ video.
+  </video>
+</div>
+
+
+
+
+
+
+    <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
+      <div class="metric-card" style="background: linear-gradient(135deg, #7dcaff, #2a94f5);">
+        <p style="margin:0;">Độ ẩm Đất 💧</p>
+        <h2 style="margin:5px 0 0;">65%</h2>
+      </div>
+
+      <div class="metric-card" style="background: linear-gradient(135deg, #ffc97d, #ff9800);">
+        <p style="margin:0;">Nhiệt độ 🌡️</p>
+        <h2 style="margin:5px 0 0;">28°C</h2>
+      </div>
+
+      <div class="metric-card" style="width:100%; background: linear-gradient(135deg, #a2ff7d, #4CAF50); text-align:center; cursor:pointer;" onclick="toggleSchedulePanel()">
+        <h3 style="margin:0 0 5px;">Lịch Trình Tự Động ⏱️</h3>
+        <p id="nextScheduleText" style="margin:0;">Đang Bật | Lần tới: --:--</p>
+      </div>
+    </div>
+
+    <div id="responseBox" style="margin-top:10px; text-align:center; font-size:12px; color:#888;"></div>
+
+  </div>
+</div>
+
+<div id="schedulePanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; background:#e0f7ff; border-radius:20px; padding:15px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999;">
+  
+  <h3 style="text-align:center; color:#006699;">Quản Lý Lịch Tưới</h3>
+  <div class="schedule-list" id="scheduleList"></div>
+  <div class="add-form" style="display:flex; gap:5px; margin-top:10px;">
+    <input type="time" id="timeInput">
+
+    <input type="number" id="durationInput" placeholder="Phút">
+
+    <button onclick="addSchedule()" style="padding:5px 10px; border-radius:5px; background:#0099cc; color:white; border:none; cursor:pointer;">Thêm</button>
+  </div>
+
+  <div style="text-align:center; margin-top:10px;">
+    <button onclick="sendSchedulesToEsp()" 
+            style="padding:5px 10px; border-radius:5px; background:#28a745; color:white; border:none; cursor:pointer;">
+        Gửi/Cập nhật Lịch
+    </button>
+    
+    <button onclick="clearAllSchedules()" 
+            style="padding:5px 10px; border-radius:5px; background:#f0ad4e; color:white; border:none; cursor:pointer; margin-left:10px;">
+        Xóa Hết
+    </button>
+    
+    <button onclick="closeSchedulePanel()" 
+            style="padding:5px 10px; border-radius:5px; background:#ff6600; color:white; border:none; cursor:pointer;">
+        Đóng
+    </button>
+  </div>
+</div>
+
+<script>
+// Địa chỉ Worker và PINs
+
+const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
+
+
+const VIRTUAL_PIN_ONOFF = "V1"; // Pin Bật/Tắt trực tiếp
+const VIRTUAL_PIN_SCHEDULE = "V2"; // Pin cho cấu hình lịch trình JSON
+const MAX_SLOTS = 6;
+
+
+/* ---------------- LOGIC ON/OFF VÀ KẾT NỐI WORKER ---------------- */
+
+/* ---------------- LOGIC ON/OFF VÀ KẾT NỐI WORKER ---------------- */
+
+// === ĐỌC CỜ QUYỀN TỪ LOCAL STORAGE ===
+const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
+const isUserAllowedToWrite = isAdmin; // Chỉ Admin được GHI
+
+console.log(`[QUYỀN TƯỚI CÂY] Bạn là Admin: ${isAdmin}. Được phép GHI lệnh: ${isUserAllowedToWrite}`);
+// =======================================
+
+let currentState = 0;
+
+
+
+// Cập nhật UI theo trạng thái
+function updateUI(state){
+    const waterStatusText = document.getElementById("waterStatusText");
+    const waterImage = document.getElementById("water-image");
+    const waterBtn = document.getElementById("waterBtn");
+
+    if(state===1){
+        waterStatusText.innerText='BẬT';
+        waterStatusText.style.color='#4CAF50';
+        waterImage.src='img/cay_on.jpg';
+        waterBtn.innerText='ON';
+        waterBtn.style.backgroundColor='#4CAF50';
+    } else {
+        waterStatusText.innerText='TẮT';
+        waterStatusText.style.color='gray';
+        waterImage.src='img/cay_off.jpg';
+        waterBtn.innerText='OFF';
+        waterBtn.style.backgroundColor='gray';
+    }
+    currentState = state;
+}
+
+// Gửi lệnh lên Worker (Hàm MỚI: phải có pin và value)
+async function sendCommand(pin, commandValue){
+    const responseBox = document.getElementById("responseBox");
+
+    if (!isUserAllowedToWrite) {
+        // Cho Khách thấy giao diện thay đổi (demo)
+        if (pin === VIRTUAL_PIN_ONOFF) {
+            updateUI(commandValue);
+        }
+        
+        responseBox.textContent = "❌ (Khách Demo bị chặn lệnh)";
+        responseBox.style.color = "red";
+        return; // CHẶN LỆNH GỬI ĐI
+    }
+    try{
+        // Điều chỉnh URL để chấp nhận pin
+
+  
+
+        const res = await fetch(`${WORKER_URL}?action=update&pin=${pin}&value=${commandValue}&device=cay`); 
+
+
+        if(res.ok){
+            responseBox.textContent = `✅ Lệnh gửi thành công (Pin ${pin}): ${commandValue}`;
+            responseBox.style.color = "green";
+            if (pin === VIRTUAL_PIN_ONOFF) {
+                updateUI(commandValue);
+            }
+        } else {
+            const errorText = await res.text();
+            responseBox.textContent = `❌ Lỗi kết nối: ${res.status}. ${errorText}`;
+            responseBox.style.color="red";
+        }
+    } catch (error){
+        responseBox.textContent = "⚠️ Lỗi: Không thể kết nối với Worker";
+        responseBox.style.color="orange";
+    }
+}
+
+// Nút bật/tắt thực tế (Đã sửa lại cú pháp gọi sendCommand)
+/*
+function toggleWater(){
+    if(currentState===1){
+        sendCommand(VIRTUAL_PIN_ONOFF, 0); // tắt
+    } else {
+        sendCommand(VIRTUAL_PIN_ONOFF, 1); // bật
+    }
+}
+    */
+
+
+
+function toggleWater(){
+    const waterVideo = document.querySelector("#waterVideo");
+    
+    // Tính toán trạng thái tiếp theo (0 hoặc 1)
+    const nextState = currentState === 1 ? 0 : 1; 
+
+    // 🔥 CẬP NHẬT GIAO DIỆN VÀ VIDEO NGAY LẬP TỨC (Dù là Admin hay Khách)
+    // Việc này làm cho nút phản hồi NHANH như demo
+    updateUI(nextState); 
+    if(nextState === 1) waterVideo.play();
+    else waterVideo.pause();
+
+    // Gọi lệnh gửi đi. Lệnh này sẽ bị chặn nếu là Khách (nhưng UI đã cập nhật rồi)
+    sendCommand(VIRTUAL_PIN_ONOFF, nextState); 
+}
+
+
+
+
+
+
+// Lấy trạng thái hiện tại từ Worker
+async function getStatus() {
+    const responseBox = document.getElementById("responseBox");
+    responseBox.textContent = "Đang tải trạng thái hiện tại...";
+    responseBox.style.color = "gray";
+
+    try {
+        // Đã sửa URL để chỉ dùng VIRTUAL_PIN_ONOFF (V1)
+
+        const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}&device=cay`); 
+          if(res.ok){
+            const rawValue = await res.text();
+            const cleanValue = rawValue.replace(/[^0-9]/g, '');
+            const state = cleanValue === '1' ? 1 : 0;
+            updateUI(state);
+            responseBox.textContent = `Đọc được: ${state}`;
+            responseBox.style.color="green";
+        } else {
+            responseBox.textContent = `❌ Lỗi đọc trạng thái: ${res.status}`;
+            responseBox.style.color="red";
+        }
+    } catch (error){
+        responseBox.textContent = "⚠️ Lỗi kết nối hoặc timeout";
+        responseBox.style.color="orange";
+    }
+}
+
+// Load trạng thái khi mở trang
+window.onload = getStatus;
+
+
+/* ---------------- LOGIC LỊCH TRÌNH TỰ ĐỘNG (6 SLOTS) ---------------- */
+
+let schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
+// let timerInterval; // Không cần thiết vì ESP xử lý hẹn giờ
+
+// --- 1. Khởi tạo/Chuẩn hóa 6 Slot ---
+function initializeSchedules() {
+    let newSchedules = [];
+    for (let i = 0; i < MAX_SLOTS; i++) {
+        const existing = schedules.find(s => s.id === (i + 1));
+        if (existing) {
+            newSchedules.push(existing);
+        } else {
+            newSchedules.push({ id: i + 1, hour: 0, min: 0, duration: 0, active: false });
+        }
+    }
+    schedules = newSchedules;
+    localStorage.setItem('schedules', JSON.stringify(schedules));
+}
+initializeSchedules();
+
+
+// --- 2. Render danh sách hẹn giờ ---
+function renderSchedules() {
+    const list = document.getElementById("scheduleList");
+    list.innerHTML = "";
+    
+    // Sắp xếp các slot đã active lên trên
+    const sortedSchedules = [...schedules].sort((a,b) => (b.active ? -1 : a.id - b.id)); // Sắp xếp active lên đầu
+
+    sortedSchedules.forEach((s) => {
+        const item = document.createElement("div");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.padding = "5px 0";
+        
+        if(s.active){
+            // Hiển thị lịch trình đang active
+            item.innerHTML = `<span>Slot ${s.id}: ${String(s.hour).padStart(2,'0')}:${String(s.min).padStart(2,'0')} (${s.duration} phút)</span>
+                <button onclick="deleteSchedule(${s.id})" style="background:#ff4444; color:white; border:none; border-radius:3px; cursor:pointer;">Xóa</button>`;
+        } else {
+            // Hiển thị slot trống
+            item.innerHTML = `<span style="color:gray;">Slot ${s.id}: (Trống)</span>`;
+        }
+        list.appendChild(item);
+    });
+}
+
+
+// --- 3. Thêm Hẹn giờ (Chỉ thêm vào slot RỖNG đầu tiên) ---
+function addSchedule() {
+
+    // 🔥 CHẶN KHÁCH THÊM LỊCH
+    if (!isUserAllowedToWrite) {
+        alert("❌ Bạn là Khách Demo. Không thể Thêm Lịch Trình Tự Động.");
+        return; 
+    }
+    const timeInput = document.getElementById("timeInput").value;
+    const duration = parseInt(document.getElementById("durationInput").value) || 1;
+    if (!timeInput) return alert("Chọn giờ!");
+    if (duration <= 0) return alert("Thời lượng phải lớn hơn 0!");
+    
+    const emptySlot = schedules.find(s => s.active === false);
+    
+    if (emptySlot) {
+        const [hour, min] = timeInput.split(":").map(Number);
+        emptySlot.hour = hour;
+        emptySlot.min = min;
+        emptySlot.duration = duration;
+        emptySlot.active = true;
+        
+        localStorage.setItem('schedules', JSON.stringify(schedules));
+       
+       
+        renderSchedules();
+        updateNextScheduleUI();
+       
+        document.getElementById("timeInput").value = "";
+        document.getElementById("durationInput").value = 1;
+        
+        // Gửi ngay sau khi thêm
+       // sendSchedulesToEsp();
+    } else {
+        alert("Đã đạt giới hạn tối đa 6 lần hẹn giờ!");
+    }
+}
+
+
+// --- 4. Xóa 1 lần hẹn giờ (Đặt slot về trạng thái RỖNG/Inactive) ---
+function deleteSchedule(id_to_delete) {
+
+    // 🔥 CHẶN KHÁCH XÓA LỊCH
+    if (!isUserAllowedToWrite) {
+        alert("❌ Bạn là Khách Demo. Không thể Xóa Lịch Trình.");
+        return; 
+    }
+    if(!confirm(`Bạn có chắc muốn xóa lịch trình Slot ${id_to_delete} này không?`)){
+        return;
+    }
+    const index = schedules.findIndex(s => s.id === id_to_delete);
+    if (index !== -1) {
+        schedules[index].hour = 0;
+        schedules[index].min = 0;
+        schedules[index].duration = 0;
+        schedules[index].active = false;
+        
+        localStorage.setItem('schedules', JSON.stringify(schedules));
+        renderSchedules();
+        updateNextScheduleUI();
+        
+        sendSchedulesToEsp(); 
+    }
+}
+
+
+// --- 5. Bổ sung nút XÓA HẾT ---
+function clearAllSchedules() {
+
+    // 🔥 CHẶN KHÁCH XÓA HẾT LỊCH
+    if (!isUserAllowedToWrite) {
+        alert("❌ Bạn là Khách Demo. Không thể Xóa Hết Lịch Trình.");
+        return; 
+    }
+    if(!confirm("Bạn có chắc chắn muốn XÓA HẾT tất cả 6 LỊCH TRÌNH?")){
+        return;
+    }
+    
+    schedules.forEach(s => {
+        s.hour = 0;
+        s.min = 0;
+        s.duration = 0;
+        s.active = false;
+    });
+
+    localStorage.setItem('schedules', JSON.stringify(schedules));
+    renderSchedules();
+    updateNextScheduleUI();
+    
+    sendSchedulesToEsp();
+}
+
+
+// --- 6. Gửi Lịch xuống ESP (Tạo và gửi chuỗi JSON qua V2) ---
+function sendSchedulesToEsp() {
+    const schedulesToSend = schedules
+        .map(s => ({
+            id: s.id, 
+            h: s.hour, 
+            m: s.min, 
+            d: s.duration,
+            a: s.active 
+        }));
+        
+    const jsonString = JSON.stringify(schedulesToSend);
+    
+    // Gửi chuỗi JSON qua VIRTUAL_PIN_SCHEDULE (V2)
+    sendCommand(VIRTUAL_PIN_SCHEDULE, jsonString);
+}
+
+
+// --- 7. Cập nhật UI nhỏ (Lịch trình gần nhất) ---
+function updateNextScheduleUI() {
+    const nextText = document.getElementById("nextScheduleText");
+    
+    // Chỉ lấy lịch đang active
+    const activeSchedules = schedules.filter(s => s.active); 
+
+    if (activeSchedules.length > 0) {
+        // Tìm lịch gần nhất trong tương lai (Tạm thời logic đơn giản: chỉ sắp xếp theo giờ/phút)
+        const upcoming = activeSchedules.sort((a,b)=>{
+            if(a.hour!==b.hour) return a.hour-b.hour;
+            return a.min-b.min;
+        })[0];
+        
+        nextText.textContent = `Đang Bật | Lần tới: ${String(upcoming.hour).padStart(2,'0')}:${String(upcoming.min).padStart(2,'0')}`;
+    } else {
+        nextText.textContent = `Đang TẮT | Chưa có hẹn`;
+    }
+}
+
+// Hiển thị/Đóng Panel
+function toggleSchedulePanel(){
+    const panel = document.getElementById("schedulePanel");
+    panel.style.display = panel.style.display==="none" ? "block" : "none";
+    renderSchedules();
+}
+function closeSchedulePanel(){
+    document.getElementById("schedulePanel").style.display="none";
+    updateNextScheduleUI();
+}
+
+// Khởi tạo trạng thái ban đầu
+updateNextScheduleUI();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Chỉ load 1 lần khi mở trang dk_cay
+if (!window.weatherLoaded && window.location.pathname.includes("dk_cay")) {
+    window.weatherLoaded = true; // đánh dấu đã load
+
+    const key = "1fdabbeeb08ef9825b4fa9897d233d19"; // Thay bằng API key thật của bạn
+    const city = "Da Nang";     // Tên thành phố
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&units=metric&lang=vi`)
+        .then(response => response.json())
+        .then(data => {
+            // Lấy tất cả thẻ .metric-card
+            const cards = document.querySelectorAll(".metric-card");
+            if (cards.length >= 2) {
+                // Giả sử thẻ đầu là Độ ẩm, thẻ thứ 2 là Nhiệt độ
+                cards[0].querySelector("h2").textContent = data.main.humidity + "%";
+                cards[1].querySelector("h2").textContent = data.main.temp + "°C";
+            }
+        })
+        .catch(err => console.error("Lỗi lấy thời tiết:", err));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

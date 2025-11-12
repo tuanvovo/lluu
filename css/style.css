@@ -1,0 +1,620 @@
+
+
+
+
+
+
+
+
+
+
+/* Trong thẻ <style> của dk_cay.html */
+/* Trong thẻ <style> của dk_cay.html */
+
+/* Đảm bảo style cho HTML và Body */
+html, body {
+    margin: 0 !important; /* Ép buộc loại bỏ margin */
+    padding: 0 !important;
+    min-height: 100vh; 
+}
+
+.mobile-container {
+    max-width: 420px;
+    
+    /* BƯỚC QUAN TRỌNG: ÉP BUỘC THÊM KHOẢNG CÁCH */
+    margin: 20px auto !important; /* Thêm !important để ghi đè mọi CSS bên ngoài */
+    
+    background-color: #ffffff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 30px; 
+    
+    padding: 0; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    height: auto; 
+    min-height: auto; 
+}
+
+/* RẤT QUAN TRỌNG: Đảm bảo body không có margin */
+body {
+    margin: 0; 
+    padding: 0;
+    background-color: #fcf6f0; /* Giữ màu nền ngoài khung */
+}
+
+
+
+
+
+/* Trong thẻ <style> của dk_cay.html */
+.main-card {
+    background-color: #ffffff;
+    border-radius: 30px; 
+    
+    /* BƯỚC QUAN TRỌNG: Điều chỉnh padding */
+    padding: 20px; /* Padding mặc định */
+    padding-top: 30px; /* Tăng padding trên để tạo khoảng cách giữa Header và Nội dung */
+    
+    /* Kéo lên một chút để che viền header và cách lề */
+    margin: -10px 10px 20px; 
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.small-btn.on {
+
+    background: linear-gradient(90deg,#06b6d4,#22d3ee); /* xanh ngọc tươi sáng */
+
+    color: #fff;
+
+    font-weight: 700;
+
+    box-shadow: 0 8px 20px rgba(6,182,212,0.25);
+
+    transition: transform 0.2s, box-shadow 0.2s;
+
+}
+
+.small-btn.on:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 12px 28px rgba(6,182,212,0.35);
+
+}
+
+
+
+/* Nút Tắt bếp - màu xám nhạt */
+
+.small-btn.off {
+
+    background: linear-gradient(90deg,#f3f4f6,#d1d5db);
+
+    color: #111;
+
+    font-weight: 700;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+
+    transition: transform 0.2s, box-shadow 0.2s;
+
+}
+
+.small-btn.off:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+
+}
+
+
+
+:root{
+
+    --bg:#fff8f3;
+
+    --card:#fff;
+
+    --muted:#6b7280;
+
+    --radius:18px;
+
+    --shadow: 0 18px 40px rgba(56, 55, 116, 0.12);
+
+    --accent:#FF9C33;
+
+    --accent-dark:#ff7a00;
+
+    --nav-h:76px;
+
+    --maxw:420px;
+
+}
+
+*{box-sizing:border-box}
+
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);-webkit-font-smoothing:antialiased}
+
+.wrap{max-width:var(--maxw);margin:0 auto;min-height:100vh;position:relative;overflow:hidden;background:linear-gradient(180deg,#FFF9F2,#FFF7ED);box-shadow:none}
+
+/* ... [GIỮ NGUYÊN PHẦN TRÊN CỦA BẠN] ... */
+
+/* --- CÁC THUỘC TÍNH CỐT LÕI CHO CHUYỂN TRANG --- */
+.viewport{position:relative;height:100vh;max-width:var(--maxw);margin:0 auto;overflow:hidden}
+
+.page{
+    position:absolute;
+    inset:0; /* tương đương top:0; left:0; bottom:0; right:0; */
+    padding:18px;
+    transition:transform .42s cubic-bezier(.2,.9,.2,1),opacity .28s ease;
+    will-change:transform,opacity;
+    overflow:auto;
+    background:var(--bg); /* Đảm bảo có nền */
+}
+
+/* LỚP ẨN TRANG (QUAN TRỌNG NHẤT) */
+.page.hidden{
+    /* Đảm bảo trang không chiếm bất kỳ không gian nào và không hiển thị */
+    opacity:0;
+    pointer-events:none;
+    display: none !important; /* Dùng !important để ghi đè mọi thứ */
+}
+.small-btn:hover {
+    transform: translateY(-2px); /* Đây là dòng tạo hiệu ứng nhúc nhích */
+    /* ... (và các dòng tạo bóng đổ) ... */
+}
+
+* Các trạng thái chuyển động */
+.page.enter-right{transform:translateX(100%)} 
+.page.enter-left{transform:translateX(-100%)}
+.page.center{transform:translateX(0)}
+
+
+
+
+
+/* auth */
+
+.auth-card{width:92%;max-width:420px;margin:68px auto;padding:22px;border-radius:22px;background:linear-gradient(180deg,#0f172a,#123254);color:#fff;box-shadow:var(--shadow)}
+
+.auth-top{display:flex;justify-content:space-between;align-items:center}
+
+.brand{display:flex;align-items:center;gap:12px}
+
+.logo-drop{width:54px;height:54px;border-radius:12px;background:radial-gradient(circle at 30% 20%, #ffd7a8,#ffa733);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px}
+
+.auth-title{font-size:20px;font-weight:800;margin:8px 0 0}
+
+.auth-sub{opacity:.9;color:rgba(255,255,255,.85);font-size:13px;margin-bottom:12px}
+
+.field{margin:10px 0}
+
+.field input{width:100%;padding:12px;border-radius:12px;border:0;background:rgba(255,255,255,0.06);color:#fff;font-size:15px}
+
+.btn{display:block;width:100%;padding:12px;border-radius:12px;border:0;font-weight:700;cursor:pointer}
+
+.btn-primary{background:linear-gradient(90deg,#ff7a00,#ff9c33);color:#fff;box-shadow:0 8px 18px rgba(255,136,34,0.18)}
+
+.btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.12)}
+
+.switch-row{display:flex;justify-content:center;gap:10px;margin-top:10px}
+
+.link{color:#ffd7a8;cursor:pointer;font-weight:700}
+
+/* home */
+
+header.top{display:flex;justify-content:space-between;align-items:center;padding:10px 6px 18px 6px}
+
+.home-brand{display:flex;gap:10px;align-items:center}
+
+.home-logo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#ffd7a8,#ffa733);box-shadow:0 8px 22px rgba(255,156,51,0.16);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+
+.home-title{font-weight:800}
+
+.chip{background:rgba(255,255,255,0.92);padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(16,24,40,0.06);font-weight:700}
+
+.control-card{margin:8px 0 14px;background:linear-gradient(180deg,#fff,#fff);padding:14px;border-radius:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+
+.control-left{flex:1}
+
+.control-title{font-weight:800;font-size:18px}
+
+.control-desc{color:var(--muted);font-size:13px}
+
+.control-thumb{width:120px;height:64px;border-radius:14px;background:linear-gradient(135deg,#ffd7a8,#ffa733);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;box-shadow:0 10px 28px rgba(255,166,66,0.14);font-size:18px}
+
+/* --- TĂNG KHOẢNG CÁCH NÚT BẬT/TẮT --- */
+
+.control-actions-group {
+
+    /* Đảm bảo nó không còn chiếm quá nhiều chỗ */
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    max-width: 200px;
+
+    margin-top: 10px;
+
+}
+
+
+
+.control-actions-group .control-actions {
+
+    display: flex;
+
+    gap: 30px; /* Khoảng cách giữa nút Bật và Tắt */
+
+}
+
+
+
+/* --- TRẠNG THÁI CB (Vòng tròn) --- */
+
+.cb-dot {
+
+    width: 16px; /* Kích thước vòng tròn */
+
+    height: 16px;
+
+    border-radius: 50%;
+
+    background-color: #777; /* Màu mặc định: Xám đậm (OFF) */
+
+    border: 2px solid #ccc; /* Thêm viền để dễ nhìn hơn */
+
+    transition: background-color 0.3s;
+
+}
+
+
+
+/* --- KHU VỰC HIỂN THỊ CB --- */
+
+.cb-display {
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+
+
+/* --- Bố cục cho hàng chứa Nút Xem Trạng thái và CB Status --- */
+
+.status-control-row {
+
+    display: flex;
+
+    align-items: center; /* Căn giữa dọc */
+
+    margin-top: 12px; /* Khoảng cách với khối bên trên */
+
+}
+
+
+
+/* --- Tinh chỉnh khoảng cách cho Nút Xem Trạng thái --- */
+/*
+.view-status-btn {
+
+    
+
+    margin-right: 15px;
+
+}
+*/
+
+.view-status-btn {
+    /* Đã có các style về padding/font ở câu trả lời trước */
+    margin-right: 15px; /* Khoảng cách với CB Status */
+    
+    /* STYLE MỚI CẦN THÊM VÀO */
+    background: linear-gradient(90deg, #ffffff, #f0f4f8); /* Gradient Trắng/Bạc rất nhạt */
+    color: #111;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(16, 24, 40, 0.1); /* Bóng đổ đẹp */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+
+/* --- Khoảng cách cho Text CB --- */
+
+.cb-display span {
+
+    font-size: 14px;
+
+    margin-right: 8px;
+
+}
+
+
+
+.small-btn{padding:8px 12px;border-radius:12px;border:0;background:linear-gradient(90deg,#fff,#fff);font-weight:700;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+
+.thumbs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px;padding-bottom:120px}
+
+.thumb{background:var(--card);border-radius:14px;padding:10px;box-shadow:var(--shadow);cursor:pointer;overflow:hidden;position:relative}
+
+.thumb .img{height:110px;border-radius:12px;background-size:cover;background-position:center}
+
+.thumb h4{margin:8px 0 6px;font-size:15px}
+
+.thumb p{color:var(--muted);font-size:13px;margin:0}
+
+.thumb:active{transform:translateY(2px)}
+
+.bottombar{position:fixed;left:0;right:0;bottom:14px;max-width:var(--maxw);margin:0 auto;padding:8px;display:flex;gap:8px;justify-content:space-around;pointer-events:none}
+
+.navbtn{pointer-events:auto;flex:1;padding:10px;border-radius:12px;background:linear-gradient(90deg,#fff,#fff);box-shadow:0 8px 20px rgba(16,24,40,0.06);text-align:center;font-weight:700}
+
+.bg-tuoi{background:linear-gradient(135deg,#CFFAFE,#06B6D4)}
+
+.bg-rem{background:linear-gradient(135deg,#E9D5FF,#7C3AED)}
+
+.bg-apt{background:linear-gradient(135deg,#FFF1C9,#FFD7A8)}
+
+.bg-prod{background:linear-gradient(135deg,#FFE0E9,#FF9CC7)}
+
+.bg-cam{background:linear-gradient(135deg,#FFD7A8,#FFA733)}
+
+/* Trong thẻ <style> của dk_cay.html */
+.sub-header {
+    margin: 0;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    background-color: #c3e5ff; 
+    color: #004c8c;
+    border-bottom-left-radius: 30px; 
+    border-bottom-right-radius: 30px;
+    
+    /* BƯỚC QUAN TRỌNG: Đảm bảo KHÔNG có position: fixed hoặc sticky */
+    position: relative; /* Hoặc position: static; (mặc định) */
+    z-index: 1; /* Để nó không bị nội dung khác che mất */
+}
+
+
+
+.back{background:rgba(255,255,255,0.9);padding:8px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+
+.sub-card{background:var(--card);padding:16px;border-radius:16px;box-shadow:var(--shadow)}
+
+.big-toggle{width:100%;padding:14px;border-radius:14px;border:0;font-weight:800;box-shadow:0 10px 28px rgba(16,24,40,0.08)}
+
+.cam-screen{background:#000;border-radius:12px;height:240px;display:flex;align-items:center;justify-content:center;color:#fff}
+
+.muted{color:var(--muted);font-size:13px}
+
+@media(min-width:540px){.wrap{border-radius:20px;box-shadow:0 20px 60px rgba(16,24,40,0.08);margin:20px auto}}
+
+/* small overlay logo style for thumbnails */
+
+.thumb-logo{
+
+    position:absolute;right:12px;top:12px;width:36px;height:36px;
+    border-radius:10px;
+    background:#FFFFFF;
+    display:flex;align-items:center;justify-content:center;
+    
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1)
+
+}
+
+
+
+
+
+
+
+
+
+/* Đảm bảo mọi page luôn có nền khi chuyển trang */
+.page {
+    /* NỀN CŨ MÀ BẠN KHÔNG THÍCH SẼ BỊ GHI ĐÈ BẰNG NỀN TRONG HTML INLINE */
+    min-height: 100vh;
+}
+
+
+
+/* --- Nền riêng cho từng nhóm trang --- */
+
+/* Giữ nguyên cho login và trang chính */
+
+
+/* Header (chứa nút mũi tên trở về) luôn nổi trên cùng */
+.sub-header {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  padding: 10px 0;
+}
+
+/* Nút mũi tên trở về */
+.back {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Khung nội dung chính trong trang con */
+.sub-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+
+
+/* 🌿 Nền & giao diện đẹp nhẹ cho các trang con */
+#page-tuoi,
+#page-rem,
+#page-aptomat,
+#page-quangcao,
+#page-camera {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+  min-height: 100vh;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 📘 Khung header có mũi tên trở về */
+.sub-header {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 10px 14px;
+  border-radius: 0 0 14px 14px;
+}
+
+/* 🎯 Nút mũi tên trở về */
+.sub-header .back {
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(16, 24, 40, 0.08);
+  transition: all 0.2s ease;
+}
+.sub-header .back:hover {
+  transform: scale(1.05);
+}
+
+/* 🧱 Thẻ nội dung chính của trang con */
+.sub-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+/* 💬 Tiêu đề trong header */
+.sub-header h3 {
+  font-weight: 800;
+  font-size: 18px;
+  color: #111;
+}
+
+/* ✨ Tạo hiệu ứng sáng cho toàn bộ vùng */
+#page-tuoi .sub-card,
+#page-rem .sub-card,
+#page-aptomat .sub-card,
+#page-quangcao .sub-card,
+#page-camera .sub-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
+}
+
+/* 🌈 Mỗi trang con có sắc nhẹ riêng biệt (rất nhẹ nhàng, không hồng) */
+/* --- GIAO DIỆN ĐẸP RIÊNG CHO CÁC TRANG CON --- */
+
+/* TƯỚI CÂY */
+#page-tuoi {
+  background: linear-gradient(180deg, #E0F7FA, #CFFAFE);
+}
+#page-tuoi .sub-header h3::before {
+  content: "💧 ";
+}
+#page-tuoi .sub-header h3 {
+  color: #0284C7;
+}
+
+/* RÈM CỬA */
+#page-rem {
+  background: linear-gradient(180deg, #EDE9FE, #DDD6FE);
+}
+#page-rem .sub-header h3::before {
+  content: "🪟 ";
+}
+#page-rem .sub-header h3 {
+  color: #7C3AED;
+}
+
+/* ÁP-TÔ-MÁT */
+#page-aptomat {
+  background: linear-gradient(180deg, #FFF8E1, #FFE082);
+}
+#page-aptomat .sub-header h3::before {
+  content: "⚡ ";
+}
+#page-aptomat .sub-header h3 {
+  color: #CA8A04;
+}
+
+/* QUẢNG CÁO */
+#page-quangcao {
+  background: linear-gradient(180deg, #FFE4E6, #FFDDE1);
+}
+#page-quangcao .sub-header h3::before {
+  content: "📺 ";
+}
+#page-quangcao .sub-header h3 {
+  color: #DB2777;
+}
+
+/* CAMERA */
+#page-camera {
+  background: linear-gradient(180deg, #F8FAFC, #E2E8F0);
+}
+#page-camera .sub-header h3::before {
+  content: "🎥 ";
+}
+#page-camera .sub-header h3 {
+  color: #1E40AF;
+}
+
+
+
+
+
