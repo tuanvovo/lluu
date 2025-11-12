@@ -45,8 +45,8 @@ console.log(`[QUYỀN GHI] Bạn là Admin: ${isAdmin}. Được phép GHI lện
 
 // HÀM ĐĂNG XUẤT MỚI: Dùng sessionStorage (ĐỒNG BỘ VỚI LOGIN.HTML)
 function logout(){ 
-
-   sessionStorage.clear(); // Xóa tất cả trạng thái phiên
+   localStorage.clear();
+   //sessionStorage.clear(); // Xóa tất cả trạng thái phiên
    // localStorage.removeItem('isLoggedIn'); // Xóa trạng thái cũ (đề phòng)
     window.location.replace('index.html'); // <<< SỬA TẠI ĐÂY (login.html -> index.html)
 
