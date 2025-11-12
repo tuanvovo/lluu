@@ -153,13 +153,13 @@ async function sendCommand(commandValue) {
     }
     // === ADMIN ĐƯỢC CHẠY FETCH ===
 
-    const actionText = commandValue === 1 ? "Mở Bếp" : "Tắt Bếp";
+    const actionText = commandValue === 1 ? "" : "";
 
     try {
         const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
 
         if (res.ok) {
-            responseBox.textContent = `✅ Lệnh ${actionText} gửi thành công.`;
+            responseBox.textContent = `${actionText}`;
             responseBox.style.color = "green";
         } else {
             const errorText = await res.text();
