@@ -147,7 +147,7 @@ async function sendCommand(commandValue) {
     // === KIỂM TRA QUYỀN GHI VÀ CHẶN KHÁCH ===
     if (!isUserAllowedToWrite) {
         // Đây là KHÁCH: Chỉ thấy Demo, CHẶN lệnh gửi đi
-        responseBox.textContent = "❌ (Demo)";
+        responseBox.textContent = "";
         responseBox.style.color = "red";
         return; // CHẶN LỆNH GỬI ĐI THẬT SỰ
     }
