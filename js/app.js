@@ -45,9 +45,12 @@ console.log(`[QUYỀN GHI] Bạn là Admin: ${isAdmin}. Được phép GHI lện
 
 // HÀM ĐĂNG XUẤT MỚI: Dùng sessionStorage (ĐỒNG BỘ VỚI LOGIN.HTML)
 function logout(){ 
-    sessionStorage.clear(); // Xóa tất cả trạng thái phiên
-    localStorage.removeItem('isLoggedIn'); // Xóa trạng thái cũ (đề phòng)
-    window.location.replace('login.html'); // Chuyển về login.html
+
+   sessionStorage.clear(); // Xóa tất cả trạng thái phiên
+   // localStorage.removeItem('isLoggedIn'); // Xóa trạng thái cũ (đề phòng)
+    window.location.replace('index.html'); // <<< SỬA TẠI ĐÂY (login.html -> index.html)
+
+    
 }
 
 function setApt(on){ 
@@ -237,7 +240,7 @@ window.onload = function() {
         btnLoginElement.onclick = ()=>{
             // LOGIC NÀY BỊ THAY THẾ HOÀN TOÀN BỞI CODE TRONG LOGIN.HTML 
             // KHÔNG CẦN CHẠY NỮA, NẾU CHẠY SẼ GÂY LỖI
-            alert('Lỗi: Logic Login đã được chuyển sang <script type="module"> trong login.html. Vui lòng kiểm tra lại!');
+            alert('Lỗi: Logic Login đã được chuyển sang <script type="module"> trong index.html. Vui lòng kiểm tra lại!');
         };
     }
     
