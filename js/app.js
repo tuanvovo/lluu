@@ -197,7 +197,7 @@ async function getStatus() {
            updateUI(state); 
            
            if(responseBox) {
-               responseBox.textContent = `✅`;
+               responseBox.textContent = ``;
              responseBox.style.color = "darkblue";
            }
         } else {
