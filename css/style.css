@@ -233,7 +233,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 .chip{background:rgba(255,255,255,0.92);padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(16,24,40,0.06);font-weight:700}
 
-.control-card{margin:8px 0 14px;background:linear-gradient(180deg,#fff,#fff);padding:14px;border-radius:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.control-card{margin:8px 0 14px;background: linear-gradient(180deg, #FDFBF7, #F7F3E9);padding:14px;border-radius:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 
 .control-left{flex:1}
 
