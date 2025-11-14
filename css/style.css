@@ -133,7 +133,7 @@ body {
 
     --bg:#fff8f3;
 
-   --card: #F7F3E9;
+     --card: #F7F7F8;
 
     --muted:#6b7280;
 
@@ -233,7 +233,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 .chip{background:rgba(255,255,255,0.92);padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(16,24,40,0.06);font-weight:700}
 
-.control-card{margin:8px 0 14px;background: linear-gradient(180deg, #FDFBF7, #F7F3E9);padding:14px;border-radius:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.control-card{margin:8px 0 14px;background: linear-gradient(180deg, #FAFAFA, #F2F2F3);padding:14px;border-radius:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 
 .control-left{flex:1}
 
@@ -488,7 +488,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 #page-aptomat,
 #page-quangcao,
 #page-camera {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+  background: linear-gradient(180deg, #FDFBF7, #F7F3E9) !important;
   min-height: 100vh;
   padding: 20px 0;
   display: flex;
@@ -612,8 +612,6 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 #page-camera .sub-header h3 {
   color: #1E40AF;
 }
-
-
 
 
 
