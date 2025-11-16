@@ -109,27 +109,122 @@ function back(){ showPage('home','right'); }
 // 🔥 3. LOGIC THIẾT BỊ (Đã bọc kiểm tra quyền GHI)
 
 // Hàm update giao diện UI theo trạng thái (Giữ nguyên)
-function updateUI(state) {
-    const stoveImg = document.getElementById("stove-image");
-    const stoveText = document.getElementById('stove');
+let aptomatState = 'off';
+let lastVideo = 0;
+
+
+
+
+
+
+
+
+
+// KHAI BÁO BIẾN CHO 4 VIDEO Ở ĐẦU FILE JS (Nếu cần)
+// let aptomatState = 'off'; // Đã có
+
+function updateUI(action) {
+
+
+  
+
+
+
+
+    
+    if (action === 1) action = "on";
+    if (action === 0) action = "off";
+
+
+    
+
+    const stoveText = document.getElementById("stove");
     const cbDot = document.getElementById("cb-status");
     const viewStatusBtn = document.querySelector(".view-status-btn");
-    
-    if (stoveText) stoveText.innerText = state === 1 ? 'Bật' : 'Tắt';
-    if (stoveImg) stoveImg.src = state === 1 ? "img/bep_on.jpg" : "img/bep_off.jpg";
 
-    if (cbDot) {
-        cbDot.style.backgroundColor = state === 1 ? "#22c55e" : "#777";
-        cbDot.style.boxShadow = state === 1 ? "0 0 8px #22c55e" : "none";
+    // LẤY 4 THẺ VIDEO ĐÃ TẢI SẴN
+    const videos = {
+        'on': document.getElementById("video-on"),
+        'off': document.getElementById("video-off"),
+        'on2': document.getElementById("video-on2"),
+        'off2': document.getElementById("video-off2")
+    };
+    
+    let targetVideoId = null; // ID của video cần chạy (on, off, on2, off2)
+
+    // LOGIC CHỌN VIDEO
+    if(action === 'on') {
+        if (aptomatState === 'off') {
+            targetVideoId = 'on'; // Gạt LÊN lần 1
+            aptomatState = 'on';
+        } else {
+            targetVideoId = 'on2'; // Gạt LÊN lần 2 (Video lặp)
+        }
+    }
+    else if(action === 'off') {
+        if (aptomatState === 'on') {
+            targetVideoId = 'off'; // Gạt XUỐNG lần 1
+            aptomatState = 'off';
+        } else {
+            targetVideoId = 'off2'; // Gạt XUỐNG lần 2 (Video lặp)
+        }
     }
 
+    // CHẠY VIDEO VÀ ẨN/HIỆN
+    if (targetVideoId) {
+        const targetVideoElement = videos[targetVideoId];
+        
+        // 1. Dừng và ẩn TẤT CẢ các video khác
+        for (const key in videos) {
+            if (key !== targetVideoId) {
+                videos[key].pause();
+                videos[key].currentTime = 0; // Đặt về đầu
+                videos[key].style.display = 'none';
+            }
+        }
+
+        // 2. Chạy video mục tiêu
+
+            
+targetVideoElement.style.display = 'block';
+targetVideoElement.currentTime = 0; // Đặt về đầu để chạy lại
+
+// 🔥 DÒNG CẦN THÊM: Đặt tốc độ phát video (Ví dụ: Phát nhanh gấp 2 lần)
+//targetVideoElement.playbackRate = 2; // 1.0 là tốc độ bình thường. 2.0 là gấp đôi.
+
+targetVideoElement.play();
+        
+
+
+      
+    }
+    
+    // Cập nhật TEXT, ĐÈN, NÚT (Giữ nguyên)
+    if (stoveText) {
+        stoveText.innerText = aptomatState === 'on' ? 'Bật' : 'Tắt';
+    }
+    // ... (Phần còn lại của hàm updateUI giữ nguyên)
+    // Ví dụ:
+    if (cbDot) {
+        cbDot.style.backgroundColor = aptomatState === 'on' ? "#22c55e" : "#777";
+        cbDot.style.boxShadow = aptomatState === 'on' ? "0 0 8px #22c55e" : "none";
+    }
+    
     if (viewStatusBtn) {
-        viewStatusBtn.style.background = state === 1 
-            ? "linear-gradient(90deg, #10b981, #22c55e)" 
-            : "linear-gradient(90deg, #9ca3af, #6b7280)";
-        viewStatusBtn.style.color = "#fff";
+        viewStatusBtn.style.background =
+            aptomatState === 'on'
+            ? "linear-gradient(90deg,#06b6d4,#22d3ee)"
+            : "linear-gradient(90deg,#9ca3af,#6b7280)";
     }
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -159,7 +254,7 @@ async function sendCommand(commandValue) {
         const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
 
         if (res.ok) {
-            responseBox.textContent = `${actionText}`;
+            responseBox.textContent = ` ${actionText}`;
             responseBox.style.color = "green";
         } else {
             const errorText = await res.text();
