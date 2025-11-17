@@ -251,8 +251,8 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 }
 
 #imgBep {
-    width: 200px;
-    height: 100px;
+    width: 250px;
+    height: 200px;
     border-radius: 14px;
    
     display: flex;
