@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="status-control-row">
-                    <button onclick="getStatus()" class="small-btn view-status-btn off">Xem trạng thái Bếp</button>
+                    <button onclick="getStatus()" class="small-btn view-status-btn off">Xem</button>
                     <div class="cb-display">
                         <span>CB:</span>
                         <div id="cb-status" class="cb-dot"></div>
@@ -108,24 +108,34 @@
                 </div>
             </div>
 
-            <div id="imgBep" class="control-thumb">
-                <img id="stove-image" src="img/bep_off.jpg" alt="Bếp Điện" style="width:100%; height:100%; object-fit:contain;">
-            </div>
+
+
+
+
+          <div id="imgBep" class="control-thumb">
+    <video id="video-on" src="img/aptomat_on.mp4" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
+    <video id="video-off" src="img/aptomat_off.mp4" style="display:block; width:100%; height:100%; object-fit:contain;"></video>
+    <video id="video-on2" src="img/aptomat_on2.mp4" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
+    <video id="video-off2" src="img/aptomat_off2.mp4" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
+</div>
+
+
+
+       
+       
         </div>
 
         <div class="thumbs">
             
 
-
-<a class="thumb" href="dk_cay.html"><div class="thumb-logo"><i class="fa-solid fa-water-ladder text-blue-500"></i></div> 
-               
-              
-              
-              <div class="img bg-tuoi"></div>
-                <h4>Tưới Cây</h4>
-                <p>Phòng khách</p>
-            </a>
-
+<a class="thumb" href="dk_cay.html">
+    <div class="thumb-logo">
+        <i class="fa-solid fa-water-ladder text-blue-500"></i>
+    </div> 
+    <div class="img bg-tuoi"></div>
+    <h4></h4>
+    <p>kiểu nhà</p>
+</a>
 
 
 
@@ -137,33 +147,44 @@
 
 
 
+<div class="thumb" onclick="goto('rem')">
+    <div class="thumb-logo">
+        <i class="fa-solid fa-house-chimney-window text-indigo-500"></i>
+    </div>
+    <div class="img-rem"></div>
+    <h4></h4>
+    <p>kiểu nhà</p>
+</div>
 
 
 
-            <div class="thumb" onclick="goto('rem')">
-                <div class="thumb-logo"><i class="fa-solid fa-house-chimney-window text-indigo-500"></i></div>
-                <div class="img bg-rem"></div>
-                <h4>Rèm Cửa</h4>
-                <p>Phòng ngủ Master</p>
-            </div>
             <div class="thumb" onclick="goto('aptomat')">
                 <div class="thumb-logo"><i class="fa-solid fa-bolt text-yellow-500"></i></div>
                 <div class="img bg-apt"></div>
-                <h4>Áp-tô-mát</h4>
+                <h4></h4>
                 <p>Nguồn chính</p>
             </div>
+
+
+
             <div class="thumb" onclick="goto('quangcao')">
                 <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
                 <div class="img bg-prod"></div>
-                <h4>Quảng Cáo</h4>
+                <h4></h4>
                 <p>Sản phẩm</p>
             </div>
+
+
+
             <div class="thumb" onclick="goto('camera')">
                 <div class="thumb-logo"><i class="fa-solid fa-video text-gray-700"></i></div>
                 <div class="img bg-cam"></div>
-                <h4>Camera</h4>
+                 <h4></h4>
                 <p>Sân thượng</p>
             </div>
+
+
+            
         </div>
     </main>
 
@@ -309,7 +330,10 @@
 
 <script src="js/app.js"></script>
 
+
+
+
+
+
 </body>
 </html>
-
-

@@ -233,7 +233,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 .chip{background:rgba(255,255,255,0.92);padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(16,24,40,0.06);font-weight:700}
 
-.control-card{margin:8px 0 14px;background:linear-gradient(180deg,#fff,#fff);padding:14px;border-radius:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.control-card{margin:8px 0 14px;background-color: #f7f9fb;padding:14px;border-radius:0px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 
 .control-left{flex:1}
 
@@ -241,7 +241,53 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 .control-desc{color:var(--muted);font-size:13px}
 
-.control-thumb{width:120px;height:64px;border-radius:14px;background:linear-gradient(135deg,#ffd7a8,#ffa733);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;box-shadow:0 10px 28px rgba(255,166,66,0.14);font-size:18px}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.control-thumb video {
+  width: 100%;   /* video lấp đầy chiều ngang khung */
+  height: 100%;  /* video lấp đầy chiều cao khung */
+  object-fit: cover; /* video tự co giãn, cắt nếu cần */
+   /* cho tròn góc giống khung          border-radius: 0px;   */
+  
+
+}
+
+#imgBep {
+    width: 300px;
+    height: 150px;
+    
+   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* video không tràn ra ngoài              border-radius: 0 !important; */
+    
+}
+
+#imgBep video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+   
+    background: transparent; /* tránh chớp vàng                  border-radius: 0px; */
+}
+
+
 
 /* --- TĂNG KHOẢNG CÁCH NÚT BẬT/TẮT --- */
 
@@ -355,13 +401,85 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .small-btn{padding:8px 12px;border-radius:12px;border:0;background:linear-gradient(90deg,#fff,#fff);font-weight:700;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
 
-.thumbs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px;padding-bottom:120px}
+.thumbs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px;padding-bottom:120px,}
 
-.thumb{background:var(--card);border-radius:14px;padding:10px;box-shadow:var(--shadow);cursor:pointer;overflow:hidden;position:relative}
 
-.thumb .img{height:110px;border-radius:12px;background-size:cover;background-position:center}
+
+
+
+
+
+
+
+.thumb {
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+
+
+.thumb .img{height:110px;border-radius:0px;background-size:cover;background-position:center}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .thumb h4{margin:8px 0 6px;font-size:15px}
 
@@ -369,19 +487,100 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 .thumb:active{transform:translateY(2px)}
 
-.bottombar{position:fixed;left:0;right:0;bottom:14px;max-width:var(--maxw);margin:0 auto;padding:8px;display:flex;gap:8px;justify-content:space-around;pointer-events:none}
+
+
+
+.bottombar{ position: relative;left:0;right:0;bottom:14px;max-width:var(--maxw);margin:0 auto;padding:8px;display:flex;gap:8px;justify-content:space-around;pointer-events:none}
+
+
+
 
 .navbtn{pointer-events:auto;flex:1;padding:10px;border-radius:12px;background:linear-gradient(90deg,#fff,#fff);box-shadow:0 8px 20px rgba(16,24,40,0.06);text-align:center;font-weight:700}
 
-.bg-tuoi{background:linear-gradient(135deg,#CFFAFE,#06B6D4)}
 
-.bg-rem{background:linear-gradient(135deg,#E9D5FF,#7C3AED)}
 
-.bg-apt{background:linear-gradient(135deg,#FFF1C9,#FFD7A8)}
 
-.bg-prod{background:linear-gradient(135deg,#FFE0E9,#FF9CC7)}
 
-.bg-cam{background:linear-gradient(135deg,#FFD7A8,#FFA733)}
+.bg-tuoi {
+    width: 172.5px;
+    height: 110px;
+    background-image: url("../img/bep3.jpg"); /* đổi sang ảnh bếp3 */
+    background-size: cover;      /* ảnh phủ đầy khung */
+    background-position: center; /* căn giữa ảnh */
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+
+
+.img-rem {
+    width: 172.5px;     /* chiều ngang bạn muốn */
+    height: 110px;      /* chiều cao bạn muốn */
+
+    background-image: url("../img/bep2.jpg");
+    background-size: cover;         /* ảnh ôm kín khung */
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: transparent !important;
+}
+
+
+
+.bg-apt{
+    width: 172.5px;     /* chiều ngang bạn muốn */
+    height: 110px;      /* chiều cao bạn muốn */
+
+    background-image: url("../img/bepA.jpg");
+    background-size: cover;         /* ảnh ôm kín khung */
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: transparent !important;
+}
+
+
+
+
+
+
+.bg-prod{
+    width: 172.5px;     /* chiều ngang bạn muốn */
+    height: 110px;      /* chiều cao bạn muốn */
+
+    background-image: url("../img/hinh2.jpg");
+    background-size: cover;         /* ảnh ôm kín khung */
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 6px;
+    overflow: hidden;
+    
+}
+
+
+
+
+
+
+.bg-cam{
+    width: 172.5px;     /* chiều ngang bạn muốn */
+    height: 110px;      /* chiều cao bạn muốn */
+
+    background-image: url("../img/phongkhach1.jpg");
+    background-size: cover;         /* ảnh ôm kín khung */
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 6px;
+    overflow: hidden;
+    
+}
 
 /* Trong thẻ <style> của dk_cay.html */
 .sub-header {
@@ -418,11 +617,10 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 .thumb-logo{
 
     position:absolute;right:12px;top:12px;width:36px;height:36px;
-    border-radius:10px;
-    background:#FFFFFF;
+   
     display:flex;align-items:center;justify-content:center;
     
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1)
+   
 
 }
 
@@ -530,12 +728,10 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 /* 🧱 Thẻ nội dung chính của trang con */
 .sub-card {
-  width: 100%;
-  max-width: 420px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
-  padding: 20px;
+  background: transparent; /* bỏ màu trắng */
+  box-shadow: none; /* hoặc giữ nếu muốn bóng mờ */
+  border-radius: 0; /* nếu muốn bỏ bo góc */
+  padding: 20px; /* vẫn giữ khoảng cách nội dung */
 }
 
 /* 💬 Tiêu đề trong header */
@@ -613,8 +809,3 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 #page-camera .sub-header h3 {
   color: #1E40AF;
 }
-
-
-
-
-
