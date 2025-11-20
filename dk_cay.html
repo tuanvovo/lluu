@@ -20,13 +20,16 @@
 <style>
 /* GIỮ NGUYÊN CSS */
 html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
-.mobile-container {max-width:420px; margin:20px auto; border-radius:30px; background:#fff; box-shadow:0 0 15px rgba(0,0,0,0.2);}
-.sub-header {padding:15px 20px; display:flex; align-items:center; background:#c3e5ff; color:#004c8c; border-bottom-left-radius:30px; border-bottom-right-radius:30px;}
+
+
+
+.mobile-container {max-width:420px; margin:20px auto; border-radius:0px; background:#fff; box-shadow:0 0 15px rgba(0,0,0,0.2);}
+.sub-header {padding:15px 20px; display:flex; align-items:center; background:#c3e5ff; color:#004c8c; border-bottom-left-radius:0px; border-bottom-right-radius:00px;}
 .sub-header h3 {flex-grow:1; text-align:center; margin:0;}
 .back {cursor:pointer;}
-.main-card {padding:20px; margin:10px; border-radius:20px; background:#fff; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
+.main-card {padding:20px; margin:10px; border-radius:0px; background:#fff; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
 .image-container {display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;}
-.plant-image {width:60%; height:150px; object-fit:cover; border-radius:15px; transition:all 0.3s ease;}
+.plant-image {width:60%; height:150px; object-fit:cover; border-radius:0px; transition:all 0.3s ease;}
 
 
 
@@ -73,7 +76,7 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 
-
+/* thanh xanh hen gio*/
 
 #nextScheduleText {
     font-weight: bold;
@@ -81,7 +84,7 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
     color: white;
     text-align: center;
     padding: 10px 0;
-    border-radius: 20px;
+    border-radius: 5px;
     background: linear-gradient(135deg, #4DA0FF, #0077CC);
     box-shadow: 0 5px 12px rgba(0,0,0,0.25);
     transition: all 0.3s ease;
@@ -105,7 +108,7 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 
-.metric-card {width:48%; padding:15px; border-radius:20px; margin-bottom:15px; color:white; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+.metric-card {width:48%; padding:15px; border-radius:0px; margin-bottom:15px; color:white; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.15);}
 </style>
 </head>
 <body>
@@ -115,62 +118,156 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
     <h3>Điều Khiển Tưới Cây</h3>
   </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
   <div class="main-card">
-    <div class="image-container">
-      <img id="water-image" src="img/cay_off.jpg" alt="Cây" class="plant-image">
-      <div style="display:flex; flex-direction:column; gap:15px; width:20%; align-items:flex-end;">
-        <button id="waterBtn" class="control-btn" 
-                style="width:100%; padding:6px 10px; font-size:14px; background:gray;" 
-                onclick="toggleWater()">BẬT</button>
-                
-        <button id="checkStatusBtn" class="control-btn" 
-                style="width:100%; padding:6px 10px; font-size:14px; background:#004c8c;" 
-                onclick="getStatus()">XEM</button>
 
-        <p style="margin:0; font-size:12px; color:gray; text-align:right;">
-          Trạng thái: <span id="waterStatusText">ĐÃ TẮT</span>
-        </p>
-      </div>
+
+
+
+
+
+
+
+
+    
+    <div class="image-container" style="justify-content: space-around; align-items:center; gap: 15px; margin-bottom: 25px;">
+        <div class="video-display-container">
+            <video id="waterVideo" width="100%" height="100%" muted loop style="object-fit:cover; border-radius:0px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <source src="video/lan.mp4" type="video/mp4">
+                Trình duyệt của bạn không hỗ trợ video.
+            </video>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:15px; width:30%; align-items:flex-end;">
+             
+            <button id="waterBtn" class="control-btn" 
+                    style="width:100%; padding:8px 10px; font-size:16px; background:gray; height: 50px;" 
+                    onclick="toggleWater()">OFF</button>
+                    
+            <button id="checkStatusBtn" class="control-btn" 
+                    style="width:100%; padding:8px 10px; font-size:16px; background:#004c8c; height: 50px;" 
+                    onclick="getStatus()">XEM</button>
+
+            <p style="margin:0; font-size:14px; color:gray; text-align:right;">
+                Trạng thái: <span id="waterStatusText" style="font-weight: bold;">ĐÃ TẮT</span>
+            </p>
+        </div>
+
+
+
+
+
+     </div>
+
+
+
+
+
+    
+    <h3 style="color:#333; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:20px;">Thông số & Ảnh Cố Định</h3>
+    
+    <div style="display:flex; justify-content:center; margin-bottom: 25px; padding-top: 10px;">
+        <img id="water-image" src="img/tuoi1.jpg" alt="Cây" class="plant-image" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0px;">
     </div>
-
-    <h3 style="color:#333; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:20px;">🎥 Video Mô Phỏng</h3>
-   
-   
-   <div style="background:#f0f0f0; height:150px; border-radius:15px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; overflow:hidden;">
-  <video id="waterVideo" width="100%" height="100%" muted loop style="object-fit:cover; border-radius:15px;">
-    <source src="video/lan.mp4" type="video/mp4">
-    Trình duyệt của bạn không hỗ trợ video.
-  </video>
-</div>
-
-
-
-
-
-
     <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
-      <div class="metric-card" style="background: linear-gradient(135deg, #7dcaff, #2a94f5);">
-        <p style="margin:0;">Độ ẩm Đất 💧</p>
-        <h2 style="margin:5px 0 0;">65%</h2>
-      </div>
+        </div>
+   
 
-      <div class="metric-card" style="background: linear-gradient(135deg, #ffc97d, #ff9800);">
-        <p style="margin:0;">Nhiệt độ 🌡️</p>
-        <h2 style="margin:5px 0 0;">28°C</h2>
-      </div>
 
-      <div class="metric-card" style="width:100%; background: linear-gradient(135deg, #a2ff7d, #4CAF50); text-align:center; cursor:pointer;" onclick="toggleSchedulePanel()">
-        <h3 style="margin:0 0 5px;">Lịch Trình Tự Động ⏱️</h3>
-        <p id="nextScheduleText" style="margin:0;">Đang Bật | Lần tới: --:--</p>
-      </div>
-    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
+            <div class="metric-card" style="background: linear-gradient(135deg, #7dcaff, #2a94f5);">
+               <p style="margin:0;">Độ ẩm Đất 💧</p>
+               <h2 style="margin:5px 0 0;">65%</h2>
+            </div>
+
+           <div class="metric-card" style="background: linear-gradient(135deg, #ffc97d, #ff9800);">
+            <p style="margin:0;">Nhiệt độ 🌡️</p>
+            <h2 style="margin:5px 0 0;">28°C</h2>
+           </div>
+
+          <div class="metric-card" style="width:100%; background: linear-gradient(135deg, #a2ff7d, #4CAF50); text-align:center; cursor:pointer;" onclick="toggleSchedulePanel()">
+             <h3 style="margin:0 0 5px;">Lịch Trình Tự Động ⏱️</h3>
+             <p id="nextScheduleText" style="margin:0;">Đang Bật | Lần tới: --:--</p>
+            </div>
+        </div>
 
     <div id="responseBox" style="margin-top:10px; text-align:center; font-size:12px; color:#888;"></div>
 
   </div>
+
+
+
+
+
+
+  
 </div>
 
-<div id="schedulePanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; background:#e0f7ff; border-radius:20px; padding:15px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999;">
+<div id="schedulePanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; background:#e0f7ff; border-radius:0px; padding:15px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999;">
   
   <h3 style="text-align:center; color:#006699;">Quản Lý Lịch Tưới</h3>
   <div class="schedule-list" id="scheduleList"></div>
@@ -179,22 +276,22 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
     <input type="number" id="durationInput" placeholder="Phút">
 
-    <button onclick="addSchedule()" style="padding:5px 10px; border-radius:5px; background:#0099cc; color:white; border:none; cursor:pointer;">Thêm</button>
+    <button onclick="addSchedule()" style="padding:5px 10px; border-radius:0px; background:#0099cc; color:white; border:none; cursor:pointer;">Thêm</button>
   </div>
 
   <div style="text-align:center; margin-top:10px;">
     <button onclick="sendSchedulesToEsp()" 
-            style="padding:5px 10px; border-radius:5px; background:#28a745; color:white; border:none; cursor:pointer;">
+            style="padding:5px 10px; border-radius:0px; background:#28a745; color:white; border:none; cursor:pointer;">
         Gửi/Cập nhật Lịch
     </button>
     
     <button onclick="clearAllSchedules()" 
-            style="padding:5px 10px; border-radius:5px; background:#f0ad4e; color:white; border:none; cursor:pointer; margin-left:10px;">
+            style="padding:5px 10px; border-radius:0px; background:#f0ad4e; color:white; border:none; cursor:pointer; margin-left:10px;">
         Xóa Hết
     </button>
     
     <button onclick="closeSchedulePanel()" 
-            style="padding:5px 10px; border-radius:5px; background:#ff6600; color:white; border:none; cursor:pointer;">
+            style="padding:5px 10px; border-radius:0px; background:#ff6600; color:white; border:none; cursor:pointer;">
         Đóng
     </button>
   </div>
@@ -235,13 +332,13 @@ function updateUI(state){
     if(state===1){
         waterStatusText.innerText='BẬT';
         waterStatusText.style.color='#4CAF50';
-        waterImage.src='img/cay_on.jpg';
+        //waterImage.src='img/cay_on.jpg';
         waterBtn.innerText='ON';
         waterBtn.style.backgroundColor='#4CAF50';
     } else {
         waterStatusText.innerText='TẮT';
         waterStatusText.style.color='gray';
-        waterImage.src='img/cay_off.jpg';
+        //waterImage.src='img/cay_off.jpg';
         waterBtn.innerText='OFF';
         waterBtn.style.backgroundColor='gray';
     }
@@ -391,7 +488,7 @@ function renderSchedules() {
         if(s.active){
             // Hiển thị lịch trình đang active
             item.innerHTML = `<span>Slot ${s.id}: ${String(s.hour).padStart(2,'0')}:${String(s.min).padStart(2,'0')} (${s.duration} phút)</span>
-                <button onclick="deleteSchedule(${s.id})" style="background:#ff4444; color:white; border:none; border-radius:3px; cursor:pointer;">Xóa</button>`;
+                <button onclick="deleteSchedule(${s.id})" style="background:#ff4444; color:white; border:none; border-radius:0px; cursor:pointer;">Xóa</button>`;
         } else {
             // Hiển thị slot trống
             item.innerHTML = `<span style="color:gray;">Slot ${s.id}: (Trống)</span>`;
