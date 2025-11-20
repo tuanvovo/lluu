@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -24,7 +28,22 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 .mobile-container {max-width:420px; margin:20px auto; border-radius:0px; background:#fff; box-shadow:0 0 15px rgba(0,0,0,0.2);}
-.sub-header {padding:15px 20px; display:flex; align-items:center; background:#c3e5ff; color:#004c8c; border-bottom-left-radius:0px; border-bottom-right-radius:00px;}
+
+
+
+.sub-header {
+    padding:15px 20px; 
+    display:flex; 
+    align-items:center; 
+    /* 🔥 ĐÃ SỬA: Dùng màu Tím làm chủ đạo, chuyển dần sang Trắng/Rất nhạt */
+    /* 90deg nghĩa là chuyển màu từ Trái sang Phải */
+ background: #CFE3EE;
+    color:#333; /* Chuyển màu chữ sang Đen đậm để dễ đọc trên nền sáng */
+    
+    border-radius: 0;
+}
+
+
 .sub-header h3 {flex-grow:1; text-align:center; margin:0;}
 .back {cursor:pointer;}
 .main-card {padding:20px; margin:10px; border-radius:0px; background:#fff; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
@@ -34,18 +53,50 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                              */
+/*-----------------------------------------------------------------------                                                             */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*==================================================================                                                            */
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                              */
+
 /* Nút điều khiển */
 /* Nút điều khiển nổi bật */
 .control-btn {
-    border-radius: 25px;                  /* Bo tròn đẹp */
+    border-radius: 0px;                  /* Bo tròn đẹp */
     font-weight: bold;
     cursor: pointer;
     padding: 10px 16px;
     transition: all 0.3s ease;
     box-shadow: 0 6px 12px rgba(0,0,0,0.25); /* Bóng nổi bật */
     color: white;
-    font-size: 16px;
+    font-size: 12px;
 }
+
+
+
+
 
 /* Khi nhấn */
 .control-btn:active {
@@ -109,6 +160,10 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 .metric-card {width:48%; padding:15px; border-radius:0px; margin-bottom:15px; color:white; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+
+
+
+
 </style>
 </head>
 <body>
@@ -175,14 +230,14 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
             </video>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:15px; width:30%; align-items:flex-end;">
+        <div style="display:flex; flex-direction:column; gap:16px; width:15%; align-items:flex-end;">
              
             <button id="waterBtn" class="control-btn" 
-                    style="width:100%; padding:8px 10px; font-size:16px; background:gray; height: 50px;" 
+                    style="width:100%; padding:8px 10px; font-size:12px; background:gray; height: 40px;" 
                     onclick="toggleWater()">OFF</button>
                     
             <button id="checkStatusBtn" class="control-btn" 
-                    style="width:100%; padding:8px 10px; font-size:16px; background:#004c8c; height: 50px;" 
+                    style="width:100%; padding:8px 10px; font-size:12px; background:#004c8c; height: 40px;" 
                     onclick="getStatus()">XEM</button>
 
             <p style="margin:0; font-size:14px; color:gray; text-align:right;">
@@ -239,17 +294,17 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
         <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
-            <div class="metric-card" style="background: linear-gradient(135deg, #7dcaff, #2a94f5);">
-               <p style="margin:0;">Độ ẩm Đất 💧</p>
+           <div class="metric-card" 
+     style="background: linear-gradient(135deg, #bebccf, #fefffe); color: #333; box-shadow:0 6px 12px rgba(128, 200, 208, 0.25);">     <p style="margin:0;">Độ ẩm Đất 💧</p>
                <h2 style="margin:5px 0 0;">65%</h2>
             </div>
 
-           <div class="metric-card" style="background: linear-gradient(135deg, #ffc97d, #ff9800);">
+           <div class="metric-card" style="background: linear-gradient(135deg, #f3c27d, #fac17b);">
             <p style="margin:0;">Nhiệt độ 🌡️</p>
             <h2 style="margin:5px 0 0;">28°C</h2>
            </div>
 
-          <div class="metric-card" style="width:100%; background: linear-gradient(135deg, #a2ff7d, #4CAF50); text-align:center; cursor:pointer;" onclick="toggleSchedulePanel()">
+          <div class="metric-card" style="width:100%; background: linear-gradient(135deg, #bebccf, #90a090); text-align:center; cursor:pointer;" onclick="toggleSchedulePanel()">
              <h3 style="margin:0 0 5px;">Lịch Trình Tự Động ⏱️</h3>
              <p id="nextScheduleText" style="margin:0;">Đang Bật | Lần tới: --:--</p>
             </div>
@@ -692,3 +747,24 @@ if (!window.weatherLoaded && window.location.pathname.includes("dk_cay")) {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
