@@ -16,7 +16,11 @@ const pages = {
     rem: document.getElementById('page-rem'),
     aptomat: document.getElementById('page-aptomat'),
     quangcao: document.getElementById('page-quangcao'),
-    camera: document.getElementById('page-camera')
+    camera: document.getElementById('page-camera'),
+    light: document.getElementById('page-light')
+
+
+
 };
 let current = 'home'; 
 let currentStoveState = false;
@@ -100,7 +104,10 @@ function goto(name){
     else if(name === 'aptomat') showPage('aptomat','left');
     else if(name === 'quangcao') showPage('quangcao','left');
     else if(name === 'camera') showPage('camera','left');
+    else if(name === 'light') showPage('light','left');
 }
+
+
 
 function back(){ showPage('home','right'); }
 
