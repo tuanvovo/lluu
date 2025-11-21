@@ -128,7 +128,17 @@ function updateUI(action) {
 
   
 
+    if(action === 'on' || action === 1) { // Thêm 1 để xử lý trạng thái từ getStatus()
+        // ... (logic chọn video on/on2) ...
+        aptomatState = 'on'; 
+    }
+    else if(action === 'off' || action === 0) { // Thêm 0 để xử lý trạng thái từ getStatus()
+        // ... (logic chọn video off/off2) ...
+        aptomatState = 'off';
+    }
 
+    // 🔥 DÒNG MỚI: LƯU TRẠNG THÁI VÀO LOCAL STORAGE
+    localStorage.setItem('AptomatState', aptomatState === 'on' ? '1' : '0');
 
 
     
@@ -309,6 +319,22 @@ async function getStatus() {
     }
 }
 
+//-------------------------------------------------------------
+// Thêm hàm này vào js/app.js
+// Thêm hàm này vào js/app.js
+function loadHomeInitialState() {
+    // Đọc trạng thái đã lưu (mặc định là 0 = Tắt)
+    const savedState = localStorage.getItem('AptomatState') || '0';
+    
+    // Gán trạng thái và hiển thị video on2/off2
+    const initialAction = (savedState === '1') ? 1 : 0; 
+    
+    // Hàm updateUI sẽ tự động chọn video lặp on2/off2
+    updateUI(initialAction); 
+}
+
+// Gọi hàm này khi trang Home tải xong (thay vì getStatus)
+
 
 // -----------------------------------------------------------
 
@@ -316,12 +342,12 @@ async function getStatus() {
 document.addEventListener('DOMContentLoaded', () => {
     
     if (document.getElementById('page-home')) {
-        getStatus(); 
+       // getStatus(); khi login xong no kg ra worker load 
     }
 
 });
 
-// ... HÀM MÃ HÓA CẦN THIẾT CHO LOGIN (Giữ nguyên) ...
+// ... HaM MÃ HÓA CẦN THIẾT CHO LOGIN (Giữ nguyên) ...
 function encodeCredentials(username, password) {
     return btoa(`${username}:${password}`); 
 }
@@ -353,6 +379,10 @@ window.onload = function() {
         const e = document.getElementById(id);
         if(e) e.addEventListener('keydown', ev=>{ if(ev.key==='Enter') document.getElementById('btn-do-login').click(); });
     });
+    if (document.getElementById('page-home')) {
+        loadHomeInitialState(); // GỌI HÀM DÙNG LOCAL STORAGE
+    }
+
 };
 
 
