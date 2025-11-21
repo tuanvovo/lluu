@@ -48,35 +48,6 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 
-
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                              */
-/*-----------------------------------------------------------------------                                                             */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*==================================================================                                                            */
-
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                              */
-
 /* Nút điều khiển */
 /* Nút điều khiển nổi bật */
 .control-btn {
@@ -111,18 +82,6 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* thanh xanh hen gio*/
 
 #nextScheduleText {
@@ -145,16 +104,6 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
 
-
-
-
-
-
-
-
-
-
-
 .metric-card {width:48%; padding:15px; border-radius:0px; margin-bottom:15px; color:white; font-weight:bold; box-shadow:0 4px 8px rgba(0,0,0,0.15);}
 
 
@@ -170,51 +119,7 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
   </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
   <div class="main-card">
-
-
-
-
-
-
-
 
 
     
@@ -260,46 +165,18 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
      </div>
 
 
-
-
-
+    <h3 style="color:#333; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:20px;">Thông số & Video Cố Định</h3>
     
-    <h3 style="color:#333; border-bottom:2px solid #eee; padding-bottom:5px; margin-top:20px;">Thông số & Ảnh Cố Định</h3>
-    
-    <div style="display:flex; justify-content:center; margin-bottom: 25px; padding-top: 10px;">
-        <img id="water-image" src="img/tuoi1.jpg" alt="Cây" class="plant-image" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0px;">
-    </div>
+   <div style="display:flex; justify-content:center; margin-bottom: 25px; padding-top: 10px;">
+    <video width="100%" height="180px" autoplay loop controls 
+           style="width: 100%; object-fit: cover;">
+        <source src="img/hoanui.mp4" type="video/mp4">
+        Trình duyệt của bạn không hỗ trợ video.
+    </video>
+</div>
     <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
         </div>
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
         <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
            <div class="metric-card" 
@@ -321,10 +198,6 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
     <div id="responseBox" style="margin-top:10px; text-align:center; font-size:12px; color:#888;"></div>
 
   </div>
-
-
-
-
 
 
   
@@ -712,20 +585,6 @@ function closeSchedulePanel(){
 // Khởi tạo trạng thái ban đầu
 updateNextScheduleUI();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Chỉ load 1 lần khi mở trang dk_cay
 if (!window.weatherLoaded && window.location.pathname.includes("dk_cay")) {
     window.weatherLoaded = true; // đánh dấu đã load
@@ -747,36 +606,8 @@ if (!window.weatherLoaded && window.location.pathname.includes("dk_cay")) {
         .catch(err => console.error("Lỗi lấy thời tiết:", err));
 }
 
-
-
-
-
-
-
-
-
-
-
-
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
