@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -223,13 +219,24 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
     
     <div class="image-container" style="justify-content: space-around; align-items:center; gap: 15px; margin-bottom: 25px;">
-        <div class="video-display-container">
+       
+
+
+
+
+           <div class="video-display-container">
             <video id="waterVideo" width="100%" height="100%" muted loop style="object-fit:cover; border-radius:0px;
                 box-shadow: 0 4px 10px rgba(0,0,0,0.1);"preload="auto">
                 <source src="video/lan.mp4" type="video/mp4">
                 Trình duyệt của bạn không hỗ trợ video.
             </video>
         </div>
+
+
+
+
+
+           
 
         <div style="display:flex; flex-direction:column; gap:16px; width:15%; align-items:flex-end;">
              
@@ -491,6 +498,12 @@ async function getStatus() {
             updateUI(state);
             responseBox.textContent = `Đọc được: ${state}`;
             responseBox.style.color="green";
+            if (state === 1) {
+                waterVideo.play();
+            } else {
+                waterVideo.pause();
+            }
+
         } else {
             responseBox.textContent = `❌ Lỗi đọc trạng thái: ${res.status}`;
             responseBox.style.color="red";
@@ -502,7 +515,7 @@ async function getStatus() {
 }
 
 // Load trạng thái khi mở trang
-window.onload = getStatus;
+//window.onload = getStatus;
 
 
 /* ---------------- LOGIC LỊCH TRÌNH TỰ ĐỘNG (6 SLOTS) ---------------- */
@@ -748,8 +761,6 @@ if (!window.weatherLoaded && window.location.pathname.includes("dk_cay")) {
 </script>
 </body>
 </html>
-
-
 
 
 
