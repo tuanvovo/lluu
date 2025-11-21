@@ -582,6 +582,21 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
     
 }
 
+
+   .bg-light{
+    width: 172.5px;     /* chiều ngang bạn muốn */
+    height: 110px;      /* chiều cao bạn muốn */
+
+    background-image: url("../img/nhan.jpg");
+    background-size: cover;         /* ảnh ôm kín khung */
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: 6px;
+    overflow: hidden;
+    
+}
+
 /* Trong thẻ <style> của dk_cay.html */
 .sub-header {
     margin: 0;
