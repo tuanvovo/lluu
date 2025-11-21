@@ -113,10 +113,11 @@
 
 
           <div id="imgBep" class="control-thumb">
-    <video id="video-on" src="img/aptomat_on.mp4"muted preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
-    <video id="video-off" src="img/aptomat_off.mp4" muted preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;"></video>
-    <video id="video-on2" src="img/aptomat_on2.mp4" muted preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
-    <video id="video-off2" src="img/aptomat_off2.mp4" muted preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
+    <video id="video-on" src="img/aptomat_on.mp4" muted  preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
+    <video id="video-off" src="img/aptomat_off.mp4" muted  preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;"></video>
+    <video id="video-on2" src="img/aptomat_on2.mp4"muted  preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
+   
+    <video id="video-off2" src="img/aptomat_off2.mp4"muted  preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
 </div>
 
 
@@ -182,6 +183,14 @@
                  <h4></h4>
                 <p>Sân thượng</p>
             </div>
+
+
+            <div class="thumb" onclick="goto('light')">
+    <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
+    <div class="img bg-light"></div>
+    <h4></h4>
+    <p>Điều khiển Đèn</p>
+</div>
 
 
             
@@ -307,6 +316,9 @@
     </div>
 </section>
 
+
+
+
    <section id="page-camera" class="page hidden">
     <div class="sub-header">
         <div class="back" onclick="back()">
@@ -315,10 +327,61 @@
         <h3>Camera</h3>
     </div>
     <div class="sub-card">
-        <div class="cam-screen">Không có video trực tiếp</div>
+         
+        <div class="cam-screen"><video width="100%" controls autoplay loop muted>
+            <source src="img/nhavuon.mp4" type="video/mp4">
+            Trình duyệt của bạn không hỗ trợ thẻ video.
+        </video></div>
         <p class="muted" style="margin-top: 10px;">Thêm luồng video của bạn vào đây.</p>
     </div>
 </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section id="page-quangcao" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <h3>Sản phẩm / Video</h3>
+    </div>
+    <div class="sub-card">
+        <p>Trang này hiển thị nội dung quảng cáo.</p>
+        <p class="muted">Bạn có thể nhúng video YouTube vào đây.</p>
+    </div>
+</section>
+
+
+<section id="page-light" class="page hidden" style="background-color: #FFFFFF;">
+    <div class="sub-header">
+        <div class="back" onclick="back()"> 
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <h3>Điều khiển Đèn</h3> 
+    </div>
+    <div class="sub-card">
+       <p>Trang này hiển thị nội dung quảng cáo.</p>
+        <p class="muted">Bạn có thể nhúng video YouTube vào đây.</p>
+    </div>
+</section>
+
 
 
 
