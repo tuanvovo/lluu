@@ -17,12 +17,11 @@ const pages = {
     aptomat: document.getElementById('page-aptomat'),
     quangcao: document.getElementById('page-quangcao'),
     camera: document.getElementById('page-camera'),
-    light: document.getElementById('page-light')
-
-
-
+    light: document.getElementById('page-light'),
+    'page-detail': document.getElementById('page-detail') // 🔥 THÊM TRANG 3 VÀO ĐÂY
 };
-let current = 'home'; 
+let current = 'home';
+
 let currentStoveState = false;
 
 // === KHAI BÁO QUYỀN GHI TỪ SESSION ===
@@ -346,13 +345,20 @@ function loadHomeInitialState() {
 // -----------------------------------------------------------
 
 // ... KHỐI GÁN SỰ KIỆN (Giữ nguyên) ...
+// 🔥 4. CLICK PHÓNG TO / THU NHỎ ẢNH TRONG REM
 document.addEventListener('DOMContentLoaded', () => {
-    
-    if (document.getElementById('page-home')) {
-       // getStatus(); khi login xong no kg ra worker load 
-    }
+    // Lấy tất cả ảnh trong #page-rem
+    const remImages = document.querySelectorAll('#page-rem .thumb img');
 
+    remImages.forEach(img => {
+        img.addEventListener('click', function() {
+            img.classList.toggle('expanded'); // bật / tắt class expanded
+        });
+    });
 });
+
+
+
 
 // ... HaM MÃ HÓA CẦN THIẾT CHO LOGIN (Giữ nguyên) ...
 function encodeCredentials(username, password) {
@@ -494,3 +500,42 @@ function updateWaterUI(state) {
         waterImage.src = 'images/cay_off.jpg';
     }
 }
+// Thay thế khối GÁN SỰ KIỆN CLICK ảnh cũ (Nếu có)
+
+
+// HÀM CHUYỂN TỪ TRANG 2 SANG TRANG 3 (Ảnh Nhỏ -> Ảnh Lớn)
+function goToDetailPage(imgElement) {
+    const parentThumb = imgElement.closest('.thumb');
+
+    // Lấy dữ liệu
+    const name = parentThumb.getAttribute('data-name');
+    const desc = parentThumb.getAttribute('data-desc');
+    const imgSrc = imgElement.src;
+
+    // Cập nhật nội dung vào Trang 3
+    document.getElementById('detail-plant-name').textContent = name;
+    document.getElementById('detail-image').src = imgSrc;
+    document.getElementById('detail-description').textContent = desc;
+
+    // Thực hiện chuyển trang dứt khoát (slide từ phải sang trái)
+    showPage('page-detail', 'left'); 
+}
+
+// HÀM TẢI ẢNH TỪ TRANG 3
+function downloadDetailPageImage() {
+    const imgElement = document.getElementById('detail-image');
+    const name = document.getElementById('detail-plant-name').textContent;
+
+    if (!imgElement || !imgElement.src) return;
+
+    const link = document.createElement('a');
+    link.href = imgElement.src; 
+    const fileName = name.replace(/\s/g, '_') + '.jpg';
+    link.download = fileName; 
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// KHỐI CLICK ẢNH CŨ (BỊ VÔ HIỆU HÓA) CÓ THỂ ĐƯỢC XÓA HOẶC BỎ QUA.
