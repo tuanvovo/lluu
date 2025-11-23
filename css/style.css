@@ -435,20 +435,49 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 
 
-
-
-
 .thumb {
-    padding: 0 !important;
-    background: transparent !important;
+    /* ... */
+    background: #ffffff; 
+    border-radius: 0;
+    /* XÓA: box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); */ 
+    /* ... */
 }
-
 
 
 .thumb .img{height:110px;border-radius:0px;background-size:cover;background-position:center}
 
 
+/* ------------------------------------------------------------------- */
+/* KHẮC PHỤC TRIỆT ĐỂ LỖI MÀU BÁM DÍNH KHI QUAY VỀ (RESET STATE)     */
+/* ------------------------------------------------------------------- */
 
+/* Nhắm vào tất cả các phần tử có thể click trong trang ảnh nhỏ */
+.thumb, 
+.thumb img,
+.thumb:active, 
+.thumb:focus,
+.thumb:focus-visible, /* Dùng focus-visible để chặn viền xanh */
+.thumb a,
+.thumb a:visited,
+.thumb a:active {
+    /* 1. Xóa tất cả các loại viền, đường viền, và bóng đổ mặc định của trình duyệt */
+    outline: none !important;
+    border: none !important; 
+    box-shadow: none !important;
+    
+    /* 2. Đảm bảo màu sắc không bị thay đổi (loại bỏ màu đỏ/tím của liên kết) */
+    color: inherit !important; 
+    background-color: transparent !important; 
+    
+    /* 3. Đảm bảo độ mờ và hiệu ứng không bị giữ lại */
+    opacity: 1 !important; 
+    transform: none !important; 
+}
+
+/* Buộc thẻ bao ngoài không có hành vi link đã ghé thăm */
+a.thumb:visited {
+    color: inherit !important;
+}
 
 
 
@@ -698,10 +727,11 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 /* 🌿 Nền & giao diện đẹp nhẹ cho các trang con */
 #page-tuoi,
-#page-rem,
+
 #page-aptomat,
 #page-quangcao,
-#page-camera {
+#page-camera,
+#page-light {
   background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
   min-height: 100vh;
   padding: 20px 0;
@@ -709,6 +739,282 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
   flex-direction: column;
   align-items: center;
 }
+
+
+
+
+
+
+
+
+
+#page-rem {
+  background:linear-gradient(180deg,#A8C9E4,#FFFFFF);
+   
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#page-rem .thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+#page-rem .thumb {
+    width: 48%;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#page-rem .row2 {
+    margin-top: 25px; /* khoảng cách giữa hàng 1 và hàng 2 */
+}
+
+#page-rem .thumb img {
+    width: 100%;
+    border-radius: 0px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Thêm vào css/style.css */
+
+/* Modal (Khối nền tối chung) */
+
+
+/* Ẩn Modal */
+.hidden-modal {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Wrapper chứa nội dung (Ảnh + Mô tả) */
+
+
+
+
+/* Khối chi tiết bên dưới ảnh */
+.modal-detail-box {
+    width: 100%;
+    padding: 15px;
+    background: #fff;
+    margin-top: 10px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: #333;
+}
+
+.modal-detail-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 1.2em;
+    font-weight: 800;
+}
+.modal-detail-box p {
+    font-size: 0.95em;
+    color: var(--muted);
+}
+/* Đảm bảo nút download đã được định nghĩa trong CSS (như câu trả lời trước) */
+
+
+
+
+
+
+/* Màu nền cho Trang Chi Tiết (Màu nền thứ ba) */
+#page-detail {
+    background-color: #334455; /* Ví dụ: Xám Xanh Đậm (Màu 3 Tùy chọn) */
+    min-height: 100vh;
+}
+
+
+
+/* Style cho khối nội dung */
+
+
+ /* ... (CSS cho nút Tải ảnh) ... */
+
+
+
+/* Khi phóng to full */
+
+
+
+
+/* Khối nền tối khi ảnh phóng to */
+.overlay-expanded {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85); /* Nền tối mờ */
+    z-index: 999;
+    pointer-events: all; /* Cho phép tương tác */
+    display: none; /* Mặc định ẩn */
+}
+
+/* Khối chứa ảnh và thông tin chi tiết, nằm trong overlay */
+.expanded-content-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95vw;
+    max-width: 400px; /* Giới hạn kích thước tổng thể */
+    max-height: 95vh;
+    z-index: 1000;
+    display: none; /* Mặc định ẩn */
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
+}
+
+/* Hiển thị khối khi có ảnh phóng to */
+#page-rem .thumb.active .overlay-expanded, 
+#page-rem .thumb.active .expanded-content-wrapper {
+    display: flex; /* Dùng flex cho wrapper */
+}
+
+/* B. Sửa lại quy tắc phóng to cho ảnh (để nó nằm trong wrapper) */
+
+#page-rem .thumb img.expanded {
+    position: static; /* Quan trọng: Đặt lại thành static để nằm trong flow của wrapper */
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    height: auto;
+    max-height: 70vh; /* Giới hạn chiều cao ảnh */
+    object-fit: contain;
+    z-index: 1000;
+   /* border: 5px solid white;*/
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    cursor: zoom-out;
+    border-radius: 0px;
+}
+
+/* C. Sửa lại khối thông tin chi tiết */
+
+.detail-box {
+    position: static; /* Quan trọng: Đặt lại thành static */
+    width: 100%;
+    margin-top: 10px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: #333;
+    max-width: 100%;
+}
+
+
+
+
+
+
+
+
+/* Thumb chỉ trong page-rem */
+
+/* Màu nền 3: TRANG CHI TIẾT ẢNH LỚN */
+#page-detail {
+    background-color: #334455; /* 🔥 MÀU NỀN TÙY CHỌN: Ví dụ Xám Xanh Đậm */
+    min-height: 100vh;
+}
+
+/* Style cho ảnh lớn trong trang chi tiết */
+#page-detail .full-width-image {
+    width: 100%;
+    max-height: 50vh; 
+    object-fit: contain;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Style cho khối nội dung */
+#page-detail .detail-content {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* background chỉ cho REM */
+#page-rem .bg-bep3 {
+    background-image: url('D:/MOBIE_WEB/img/bep3.jpg');
+}
+
+#page-rem .bg-bepA {
+    background-image: url('D:/MOBIE_WEB/img/bepA.jpg');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* 📘 Khung header có mũi tên trở về */
 .sub-header {
@@ -758,7 +1064,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 /* ✨ Tạo hiệu ứng sáng cho toàn bộ vùng */
 #page-tuoi .sub-card,
-#page-rem .sub-card,
+
 #page-aptomat .sub-card,
 #page-quangcao .sub-card,
 #page-camera .sub-card {
@@ -782,15 +1088,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 }
 
 /* RÈM CỬA */
-#page-rem {
-  background: linear-gradient(180deg, #EDE9FE, #DDD6FE);
-}
-#page-rem .sub-header h3::before {
-  content: "🪟 ";
-}
-#page-rem .sub-header h3 {
-  color: #7C3AED;
-}
+
 
 /* ÁP-TÔ-MÁT */
 #page-aptomat {
