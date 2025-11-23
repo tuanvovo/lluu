@@ -111,16 +111,12 @@
 
 
 
-
-      
 <div id="imgBep" class="control-thumb">
     <video id="video-on" src="img/aptomat_on.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
     <video id="video-off" src="img/aptomat_off.mp4" preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;"></video>
     <video id="video-on2" src="img/aptomat_on2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
     <video id="video-off2" src="img/aptomat_off2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;"></video>
 </div>
-
-
 
 
        
@@ -136,7 +132,7 @@
     </div> 
     <div class="img bg-tuoi"></div>
     <h4></h4>
-    <p>kiểu nhà</p>
+    <p>Kiểu </p>
 </a>
 
 
@@ -155,7 +151,7 @@
     </div>
     <div class="img-rem"></div>
     <h4></h4>
-    <p>kiểu nhà</p>
+    <p>kiểu</p>
 </div>
 
 
@@ -173,7 +169,7 @@
                 <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
                 <div class="img bg-prod"></div>
                 <h4></h4>
-                <p>Sản phẩm</p>
+                <p>Kiểu</p>
             </div>
 
 
@@ -265,28 +261,117 @@
 
 
 
+<section id="page-rem" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="back()"> 
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </div>
+        <h3>Các loại cây thuốc</h3> 
+    </div>
 
-
-
-
-
-
-    <section id="page-rem" class="page hidden">
-
-
-        <div class="sub-header">
-            <div class="back" onclick="back()"> 
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <main style="padding:0 6px 100px 6px">
+        <div class="thumbs">
+            
+            <div class="thumb" 
+                 data-name="Cây Chay" 
+                 data-desc="Mô tả công dụng Cây Chay: Chữa các bệnh về răng miệng, đau nhức xương khớp và có thể dùng làm thuốc bổ.">
+                <img src="img/caychay.jpg" alt="Cây Chay" onclick="goToDetailPage(this)"/>
+                <p>Kiểu Cây Chay</p>
             </div>
-               <h3>Rèm Cửa</h3> 
+
+            <div class="thumb" 
+                 data-name="Hoa thiên lý" 
+                 data-desc="Mô tả công dụng Hoa Thiên Lý: Dùng để an thần, chữa mất ngủ và bồi bổ cơ thể.">
+                <img src="img/thienly.jpg" alt="Hoa thiên lý" onclick="goToDetailPage(this)"/>
+                <p>Hoa thiên lý</p>
+            </div>
+            
+            <div class="thumb" 
+                 data-name="Hà thủ ô" 
+                 data-desc="Mô tả công dụng Hà Thủ Ô: Có tác dụng bổ máu, trị suy nhược thần kinh, và làm đen tóc.">
+                <img src="img/hathuo.jpg" alt="Hà thủ ô" onclick="goToDetailPage(this)"/>
+                <p>Hà thủ ô</p>
+            </div>
+            
+            <div class="thumb" 
+                 data-name="Đan sâm" 
+                 data-desc="Mô tả công dụng Đan Sâm: Được dùng để hoạt huyết, trục ứ, trị kinh nguyệt không đều và các bệnh tim mạch.">
+                <img src="img/dan_sam.jpg" alt="Đan sâm" onclick="goToDetailPage(this)"/>
+                <p>Đan sâm</p>
+            </div>
+            
+            <div class="thumb" 
+                 data-name="Cây ráy gai" 
+                 data-desc="Mô tả công dụng Cây Ráy Gai: Thường dùng để chữa phong thấp, đau nhức xương khớp. (Cẩn thận khi dùng, cần chế biến kỹ).">
+                <img src="img/ray_gai.jpg" alt="Cây ráy gai" onclick="goToDetailPage(this)"/>
+                <p>Cây ráy gai</p>
+            </div>
+
+            <div class="thumb" 
+                 data-name="Cây mật gấu" 
+                 data-desc="Mô tả công dụng Cây Mật Gấu: Giúp thanh nhiệt, giải độc, hỗ trợ tiêu hóa và gan mật.">
+                <img src="img/matgau.jpg" alt="Cây mật gấu" onclick="goToDetailPage(this)"/>
+                <p>Cây mật gấu</p>
+            </div>
+            
+            <div class="thumb" 
+                 data-name="Sâm cau" 
+                 data-desc="Mô tả công dụng Sâm Cau: Dùng để ôn thận, tráng dương, điều trị đau lưng mỏi gối và các chứng suy nhược.">
+                <img src="img/samcau.jpg" alt="Sâm cau" onclick="goToDetailPage(this)"/>
+                <p>Sâm cau</p>
+            </div>
+
+            <div class="thumb" 
+                 data-name="Cà gai leo" 
+                 data-desc="Mô tả công dụng Cà Gai Leo: Được dùng để giải độc gan, hỗ trợ điều trị viêm gan B và tăng cường chức năng gan.">
+                <img src="img/ca_gai_leo.jpg" alt="Cà gai leo"onclick="goToDetailPage(this)"/>
+                <p>Cà gai leo</p>
+            </div>
+
         </div>
+    </main>
+    
+   
+</section>
 
 
-        <div class="sub-card">
-            <p>Nội dung điều khiển Rèm Cửa...</p>
-            <p class="muted">Sử dụng nút to .big-toggle để dễ điều khiển.</p>
+
+
+
+
+<section id="page-detail" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="showPage('rem', 'right')"> 
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
         </div>
-    </section>
+        <h3 id="detail-plant-name"></h3> 
+    </div>
+
+    <main style="padding: 20px 20px 100px 20px;">
+        <div class="detail-container">
+            <img id="detail-image" src="" alt="Cây thuốc chi tiết" class="full-width-image" />
+
+            <div class="detail-content">
+                <h4 class="content-title">Công Dụng và Mô Tả</h4>
+                <p id="detail-description">Nội dung mô tả chi tiết sẽ được chèn vào đây.</p>
+                <button class="download-btn" onclick="downloadDetailPageImage()">Tải ảnh</button>
+            </div>
+        </div>
+    </main>
+</section>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -356,21 +441,9 @@
 
 
 
-<section id="page-quangcao" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="back()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </div>
-        <h3>Sản phẩm / Video</h3>
-    </div>
-    <div class="sub-card">
-        <p>Trang này hiển thị nội dung quảng cáo.</p>
-        <p class="muted">Bạn có thể nhúng video YouTube vào đây.</p>
-    </div>
-</section>
 
 
-<section id="page-light" class="page hidden" style="background-color: #FFFFFF;">
+<section id="page-light" class="page hidden">
     <div class="sub-header">
         <div class="back" onclick="back()"> 
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
