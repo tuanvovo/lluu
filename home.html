@@ -110,20 +110,12 @@
 
 
 
+   <video id="video-on" src="img/aptomat_on.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline webkit-playsinline muted></video>
+<video id="video-off" src="img/aptomat_off.mp4" preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;" playsinline webkit-playsinline muted></video>
+<video id="video-on2" src="img/aptomat_on2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline webkit-playsinline muted></video>
+<video id="video-off2" src="img/aptomat_off2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline webkit-playsinline muted></video>
 
 
-
-
-            
-
-   <div id="imgBep" class="control-thumb">
-
-   
-    <video id="video-on" src="img/aptomat_on.mp4" preload="auto" playsinline webkit-playsinline muted style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
-    <video id="video-off" src="img/aptomat_off.mp4" preload="auto" playsinline webkit-playsinline muted style="display:block; width:100%; height:100%; object-fit:contain;" playsinline></video>
-    <video id="video-on2" src="img/aptomat_on2.mp4" preload="auto" playsinline webkit-playsinline muted style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
-    <video id="video-off2" src="img/aptomat_off2.mp4" preload="auto" playsinline webkit-playsinline muted style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
-</div>
 
        
        
@@ -151,7 +143,7 @@
 
 
 
-<div class="thumb" onclick="goto('rem')">
+<div class="thumb" onclick="goto('page-rem')">
     <div class="thumb-logo">
         <i class="fa-solid fa-house-chimney-window text-indigo-500"></i>
     </div>
@@ -162,7 +154,7 @@
 
 
 
-            <div class="thumb" onclick="goto('aptomat')">
+            <div class="thumb" onclick="goto('page-aptomat')">
                 <div class="thumb-logo"><i class="fa-solid fa-bolt text-yellow-500"></i></div>
                 <div class="img bg-apt"></div>
                 <h4></h4>
@@ -171,7 +163,7 @@
 
 
 
-            <div class="thumb" onclick="goto('quangcao')">
+            <div class="thumb" onclick="goto('page-quangcao')">
                 <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
                 <div class="img bg-prod"></div>
                 <h4></h4>
@@ -180,7 +172,7 @@
 
 
 
-            <div class="thumb" onclick="goto('camera')">
+            <div class="thumb" onclick="goto('page-camera')">
                 <div class="thumb-logo"><i class="fa-solid fa-video text-gray-700"></i></div>
                 <div class="img bg-cam"></div>
                  <h4></h4>
@@ -188,7 +180,7 @@
             </div>
 
 
-            <div class="thumb" onclick="goto('light')">
+            <div class="thumb" onclick="goto('page-light')">
     <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
     <div class="img bg-light"></div>
     <h4></h4>
@@ -203,7 +195,7 @@
     <div class="bottombar">
         <div class="navbtn">
             <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> </div>
-        <div class="navbtn" onclick="goto('quangcao')">
+        <div class="navbtn" onclick="goto('page-quangcao')">
             <i class="fa-solid fa-video"></i> <span>Video</span> </div>
         <div class="navbtn" onclick="logout()">
             <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> </div>
@@ -349,7 +341,7 @@
 
 <section id="page-detail" class="page hidden">
     <div class="sub-header">
-        <div class="back" onclick="showPage('rem', 'right')"> 
+        <div class="back" onclick="showPage('page-rem', 'right')"> 
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 18l-6-6 6-6"/>
             </svg>
