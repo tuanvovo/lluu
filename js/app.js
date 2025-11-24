@@ -11,18 +11,24 @@ const BLYNK_TOKEN_CAY = 'TOKEN_CỦA_DỰ_ÁN_TƯỚI_CÂY';
 const BLYNK_TOKEN_BEP = 'TOKEN_CỦA_DỰ_ÁN_BẾP'; // Nếu Worker không xử lý
 
 // Cần khai báo các trang để hàm SPA hoạt động trong home.html
-const pages = {
-    home: document.getElementById('page-home'),
-    rem: document.getElementById('page-rem'),
-    aptomat: document.getElementById('page-aptomat'),
-    quangcao: document.getElementById('page-quangcao'),
-    camera: document.getElementById('page-camera'),
-    light: document.getElementById('page-light'),
-    'page-detail': document.getElementById('page-detail') // 🔥 THÊM TRANG 3 VÀO ĐÂY
-};
-let current = 'home';
+// js/app.js - KHAI BÁO HẰNG SỐ VÀ BIẾN CHUNG
+// ... (các hằng số khác)
 
+// ✅ SỬA ĐÚNG: Dùng ID HTML đầy đủ
+const pages = {
+ 'page-home': document.getElementById('page-home'), // Dùng ID HTML
+ 'page-rem': document.getElementById('page-rem'),
+ 'page-aptomat': document.getElementById('page-aptomat'),
+ 'page-quangcao': document.getElementById('page-quangcao'),
+ 'page-camera': document.getElementById('page-camera'),
+ 'page-light': document.getElementById('page-light'),
+ 'page-detail': document.getElementById('page-detail') 
+};
+let current = 'page-home';
+ 
 let currentStoveState = false;
+
+// ...
 
 // === KHAI BÁO QUYỀN GHI TỪ SESSION ===
 
@@ -98,17 +104,17 @@ function showPage(id, direction='left'){
 }
 
 function goto(name){
-    if(name === 'home') showPage('home','right');
-    else if(name === 'rem') showPage('rem','left');
-    else if(name === 'aptomat') showPage('aptomat','left');
-    else if(name === 'quangcao') showPage('quangcao','left');
-    else if(name === 'camera') showPage('camera','left');
-    else if(name === 'light') showPage('light','left');
+// name: là tên ngắn được truyền từ HTML, chuyển thành ID đầy đủ trước khi gọi showPage
+ if(name === 'page-home') showPage('page-home','right');
+ else if(name === 'page-rem') showPage('page-rem','left');
+ else if(name === 'page-aptomat') showPage('page-aptomat','left');
+ else if(name === 'page-quangcao') showPage('page-quangcao','left');
+ else if(name === 'page-camera') showPage('page-camera','left');
+ else if(name === 'page-light') showPage('page-light','left');
 }
 
 
-
-function back(){ showPage('home','right'); }
+function back(){ showPage('page-home','right'); }
 
 // -----------------------------------------------------------
 
@@ -129,94 +135,98 @@ let lastVideo = 0;
 // KHAI BÁO BIẾN CHO 4 VIDEO Ở ĐẦU FILE JS (Nếu cần)
 // let aptomatState = 'off'; // Đã có
 
-
-
 function updateUI(action) {
 
-    // 1. CHUẨN HÓA ACTION (Nếu đầu vào là số 1/0)
-    // Phải thực hiện trước mọi logic khác
+
+  
+
+    if(action === 'on' || action === 1) { // Thêm 1 để xử lý trạng thái từ getStatus()
+        // ... (logic chọn video on/on2) ...
+        aptomatState = 'on'; 
+    }
+    else if(action === 'off' || action === 0) { // Thêm 0 để xử lý trạng thái từ getStatus()
+        // ... (logic chọn video off/off2) ...
+        aptomatState = 'off';
+    }
+
+    // 🔥 DÒNG MỚI: LƯU TRẠNG THÁI VÀO LOCAL STORAGE
+    localStorage.setItem('AptomatState', aptomatState === 'on' ? '1' : '0');
+
+
+    
     if (action === 1) action = "on";
     if (action === 0) action = "off";
 
-    // Khai báo lại các biến cục bộ
+
+    
+
+    const stoveText = document.getElementById("stove");
+    const cbDot = document.getElementById("cb-status");
+    const viewStatusBtn = document.querySelector(".view-status-btn");
+
+    // LẤY 4 THẺ VIDEO ĐÃ TẢI SẴN
     const videos = {
         'on': document.getElementById("video-on"),
         'off': document.getElementById("video-off"),
         'on2': document.getElementById("video-on2"),
         'off2': document.getElementById("video-off2")
     };
-    let targetVideoId = null;
+    
+    let targetVideoId = null; // ID của video cần chạy (on, off, on2, off2)
 
-    
-    // --- KHỐI LOGIC QUYẾT ĐỊNH VIDEO VÀ CẬP NHẬT TRẠNG THÁI ---
-    
-    // LƯU Ý: Biến aptomatState phải được khai báo toàn cục (ví dụ: let aptomatState = 'off';)
-    
-    if (action === 'on') {
+    // LOGIC CHỌN VIDEO
+    if(action === 'on') {
         if (aptomatState === 'off') {
-            // Trường hợp 1: Tắt -> Bật (Chuyển đổi trạng thái)
-            targetVideoId = 'on'; 
-            aptomatState = 'on'; 
-        } else { 
-            // Trường hợp 2: Bật -> Bật (Video lặp)
-            targetVideoId = 'on2'; 
-        }
-    }
-    else if (action === 'off') {
-        if (aptomatState === 'on') {
-            // Trường hợp 3: Bật -> Tắt (Chuyển đổi trạng thái)
-            targetVideoId = 'off'; 
-            aptomatState = 'off'; 
+            targetVideoId = 'on'; // Gạt LÊN lần 1
+            aptomatState = 'on';
         } else {
-            // Trường hợp 4: Tắt -> Tắt (Video lặp)
-            targetVideoId = 'off2'; 
+            targetVideoId = 'on2'; // Gạt LÊN lần 2 (Video lặp)
+        }
+    }
+    else if(action === 'off') {
+        if (aptomatState === 'on') {
+            targetVideoId = 'off'; // Gạt XUỐNG lần 1
+            aptomatState = 'off';
+        } else {
+            targetVideoId = 'off2'; // Gạt XUỐNG lần 2 (Video lặp)
         }
     }
 
-    // 🔥 DÒNG MỚI: LƯU TRẠNG THÁI VÀO LOCAL STORAGE
-    localStorage.setItem('AptomatState', aptomatState === 'on' ? '1' : '0');
-
-    
-    // --- KHỐI CHẠY VIDEO VÀ ẨN/HIỆN (FIX LỖI NHẢY HÌNH) ---
-    
+    // CHẠY VIDEO VÀ ẨN/HIỆN
     if (targetVideoId) {
         const targetVideoElement = videos[targetVideoId];
         
-        // 1. NGĂN CHẶN NHẢY HÌNH KHI NHẤN LẶP LẠI (Quan trọng)
-        if ((targetVideoId === 'on2' || targetVideoId === 'off2') && 
-             targetVideoElement.style.display === 'block') {
-            return; // ✅ Thoát hàm nếu video lặp đang chạy
-        }
-
-        // 2. Dừng và ẩn TẤT CẢ các video khác (Cho chuyển đổi thật sự)
+        // 1. Dừng và ẩn TẤT CẢ các video khác
         for (const key in videos) {
             if (key !== targetVideoId) {
                 videos[key].pause();
-                videos[key].currentTime = 0; 
+                videos[key].currentTime = 0; // Đặt về đầu
                 videos[key].style.display = 'none';
             }
         }
 
-        // 3. CHUẨN BỊ VÀ PHÁT VIDEO MỤC TIÊU (Tối ưu cho iOS)
-        
-        // 🔥 QUAN TRỌNG: Buộc trình duyệt iOS tải lại/chuẩn bị video
-        targetVideoElement.load(); 
-        
-        targetVideoElement.currentTime = 0; 
-        targetVideoElement.style.display = 'block'; // Hiển thị video
+        // 2. Chạy video mục tiêu
 
-        targetVideoElement.play(); 
+            
+targetVideoElement.style.display = 'block';
+targetVideoElement.currentTime = 0; // Đặt về đầu để chạy lại
+
+// 🔥 DÒNG CẦN THÊM: Đặt tốc độ phát video (Ví dụ: Phát nhanh gấp 2 lần)
+//targetVideoElement.playbackRate = 2; // 1.0 là tốc độ bình thường. 2.0 là gấp đôi.
+
+targetVideoElement.play();
+        
+
+
+      
     }
-
-    // --- Cập nhật TEXT, ĐÈN, NÚT (Giữ nguyên) ---
-    const stoveText = document.getElementById("stove");
-    const cbDot = document.getElementById("cb-status");
-    const viewStatusBtn = document.querySelector(".view-status-btn");
     
+    // Cập nhật TEXT, ĐÈN, NÚT (Giữ nguyên)
     if (stoveText) {
         stoveText.innerText = aptomatState === 'on' ? 'Bật' : 'Tắt';
     }
-    
+    // ... (Phần còn lại của hàm updateUI giữ nguyên)
+    // Ví dụ:
     if (cbDot) {
         cbDot.style.backgroundColor = aptomatState === 'on' ? "#22c55e" : "#777";
         cbDot.style.boxShadow = aptomatState === 'on' ? "0 0 8px #22c55e" : "none";
@@ -244,41 +254,98 @@ function updateUI(action) {
 
 
 
-// Gửi lệnh bật/tắt đến ESP (BẾP) - CHỈ CHẠY KHI LÀ ADMIN
-// Gửi lệnh bật/tắt đến ESP (BẾP) - CHỈ CHẠY KHI LÀ ADMIN
-async function sendCommand(commandValue) {
-    const responseBox = document.getElementById("responseBox");
 
-    // 1. Cập nhật giao diện ngay lập tức cho cả Admin và Khách (tạo cảm giác nhanh)
-    updateUI(commandValue); 
-    
-    // === KIỂM TRA QUYỀN GHI VÀ CHẶN KHÁCH ===
-    if (!isUserAllowedToWrite) {
-        // Đây là KHÁCH: Chỉ thấy Demo, CHẶN lệnh gửi đi
-        responseBox.textContent = "";
-        responseBox.style.color = "red";
-        return; // CHẶN LỆNH GỬI ĐI THẬT SỰ
-    }
-    // === ADMIN ĐƯỢC CHẠY FETCH ===
 
-    const actionText = commandValue === 1 ? "" : "";
 
-    try {
-        const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
 
-        if (res.ok) {
-            responseBox.textContent = ` ${actionText}`;
-            responseBox.style.color = "green";
-        } else {
-            const errorText = await res.text();
-            responseBox.textContent = `❌ LỖI KẾT NỐI: ${res.status}. ${errorText}`;
-            responseBox.style.color = "red";
-        }
 
-    } catch (error) {
-        // ... (Logic xử lý lỗi) ...
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let isSending = false;
+function disableButtons(val){
+  document.getElementById('btn-turn-on').disabled = val;
+  document.getElementById('btn-turn-off').disabled = val;
 }
+
+async function sendCommand(commandValue){
+  if(isSending) return;   // chặn spam
+  isSending = true;
+  disableButtons(true);
+  updateUI(commandValue); // optimistic update
+
+  try {
+    const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`, { method: 'GET' });
+    if(!res.ok) {
+      // rollback nếu lỗi
+      const prev = localStorage.getItem('AptomatState') === '1' ? 1 : 0;
+      updateUI(prev);
+      document.getElementById('responseBox').textContent = `❌ Lỗi: ${res.status}`;
+    } else {
+      // lưu trạng thái server trả về (nếu cần)
+      localStorage.setItem('AptomatState', commandValue === 1 ? '1' : '0');
+    }
+  } catch(err) {
+    // rollback & thông báo
+    const prev = localStorage.getItem('AptomatState') === '1' ? 1 : 0;
+    updateUI(prev);
+    document.getElementById('responseBox').textContent = `⚠️ Lỗi kết nối`;
+  } finally {
+    isSending = false;
+    disableButtons(false);
+  }
+}
+
+
+async function fetchWithRetry(url, tries = 3, delay = 500) {
+  for(let i=0;i<tries;i++){
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+      // else continue to retry
+    } catch(e){
+      // ignore, will retry
+    }
+    await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+  }
+  throw new Error('Fetch failed after retries');
+}
+
+
+setInterval(()=> {
+  if(!isSending) getStatus(); // tránh xung đột khi đang gửi
+}, 10000); // mỗi 10s (tùy chỉnh)
+
+
+
+
+
+document.addEventListener('visibilitychange', () => {
+  const vids = document.querySelectorAll('#imgBep video');
+  if(document.hidden) {
+    vids.forEach(v=> { v.pause(); });
+  } else {
+    // không auto play tất cả; chỉ play video đang hiển thị nếu muốn
+  }
+});
+
+
+
+
+
+
 
 
 
