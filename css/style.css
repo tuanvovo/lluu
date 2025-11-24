@@ -153,14 +153,14 @@ body {
 
 *{box-sizing:border-box}
 
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);-webkit-font-smoothing:antialiased}
+html,body{height:calc(var(--vh, 1vh) * 100);margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);-webkit-font-smoothing:antialiased}
 
-.wrap{max-width:var(--maxw);margin:0 auto;min-height:100vh;position:relative;overflow:hidden;background:linear-gradient(180deg,#FFF9F2,#FFF7ED);box-shadow:none}
+.wrap{max-width:var(--maxw);margin:0 auto;min-height:calc(var(--vh, 1vh) * 100);position:relative;overflow:hidden;background:linear-gradient(180deg,#FFF9F2,#FFF7ED);box-shadow:none}
 
 /* ... [GIỮ NGUYÊN PHẦN TRÊN CỦA BẠN] ... */
 
 /* --- CÁC THUỘC TÍNH CỐT LÕI CHO CHUYỂN TRANG --- */
-.viewport{position:relative;height:100vh;max-width:var(--maxw);margin:0 auto;overflow:hidden}
+.viewport{position:relative;height:calc(var(--vh, 1vh) * 100);max-width:var(--maxw);margin:0 auto;overflow:hidden}
 
 .page{
     position:absolute;
@@ -733,7 +733,7 @@ a.thumb:visited {
 #page-camera,
 #page-light {
   background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
-  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
   padding: 20px 0;
   display: flex;
   flex-direction: column;
