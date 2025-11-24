@@ -66,19 +66,18 @@ html, body {
 /* Các video trong imgBep */
 #imgBep {
     width: 100%;
-    height: 150px; /* hoặc auto nếu muốn co giãn */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    max-width: 420px;
+    height: auto; /* không cứng 150px */
+    display: block;
+    margin: 0 auto;
 }
-
 #imgBep video {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    background: transparent;
+    height: auto;
+    object-fit: contain;
+    display: block;
 }
+
 
 /* --- JS để fix iPhone viewport --- */
 
