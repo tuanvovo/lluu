@@ -207,21 +207,14 @@ function updateUI(action) {
 
         // 2. Chạy video mục tiêu
 
-
-
-
-
-///const targetVideoElement = videos[targetVideoId];
+            
 targetVideoElement.style.display = 'block';
-targetVideoElement.currentTime = 0;
-targetVideoElement.playbackRate = 1; // hoặc 2 nếu muốn nhanh
-targetVideoElement.play();
-
+targetVideoElement.currentTime = 0; // Đặt về đầu để chạy lại
 
 // 🔥 DÒNG CẦN THÊM: Đặt tốc độ phát video (Ví dụ: Phát nhanh gấp 2 lần)
 //targetVideoElement.playbackRate = 2; // 1.0 là tốc độ bình thường. 2.0 là gấp đôi.
 
-
+targetVideoElement.play();
         
 
 
@@ -260,99 +253,41 @@ targetVideoElement.play();
 
 
 
+// Gửi lệnh bật/tắt đến ESP (BẾP) - CHỈ CHẠY KHI LÀ ADMIN
+// Gửi lệnh bật/tắt đến ESP (BẾP) - CHỈ CHẠY KHI LÀ ADMIN
+async function sendCommand(commandValue) {
+    const responseBox = document.getElementById("responseBox");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let isSending = false;
-function disableButtons(val){
-  document.getElementById('btn-turn-on').disabled = val;
-  document.getElementById('btn-turn-off').disabled = val;
-}
-
-async function sendCommand(commandValue){
-  if(isSending) return;   // chặn spam
-  isSending = true;
-  disableButtons(true);
-  updateUI(commandValue); // optimistic update
-
-  try {
-    const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`, { method: 'GET' });
-    if(!res.ok) {
-      // rollback nếu lỗi
-      const prev = localStorage.getItem('AptomatState') === '1' ? 1 : 0;
-      updateUI(prev);
-      document.getElementById('responseBox').textContent = `❌ Lỗi: ${res.status}`;
-    } else {
-      // lưu trạng thái server trả về (nếu cần)
-      localStorage.setItem('AptomatState', commandValue === 1 ? '1' : '0');
+    // 1. Cập nhật giao diện ngay lập tức cho cả Admin và Khách (tạo cảm giác nhanh)
+    updateUI(commandValue); 
+    
+    // === KIỂM TRA QUYỀN GHI VÀ CHẶN KHÁCH ===
+    if (!isUserAllowedToWrite) {
+        // Đây là KHÁCH: Chỉ thấy Demo, CHẶN lệnh gửi đi
+        responseBox.textContent = "";
+        responseBox.style.color = "red";
+        return; // CHẶN LỆNH GỬI ĐI THẬT SỰ
     }
-  } catch(err) {
-    // rollback & thông báo
-    const prev = localStorage.getItem('AptomatState') === '1' ? 1 : 0;
-    updateUI(prev);
-    document.getElementById('responseBox').textContent = `⚠️ Lỗi kết nối`;
-  } finally {
-    isSending = false;
-    disableButtons(false);
-  }
-}
+    // === ADMIN ĐƯỢC CHẠY FETCH ===
 
+    const actionText = commandValue === 1 ? "" : "";
 
-async function fetchWithRetry(url, tries = 3, delay = 500) {
-  for(let i=0;i<tries;i++){
     try {
-      const res = await fetch(url);
-      if (res.ok) return res;
-      // else continue to retry
-    } catch(e){
-      // ignore, will retry
+        const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
+
+        if (res.ok) {
+            responseBox.textContent = ` ${actionText}`;
+            responseBox.style.color = "green";
+        } else {
+            const errorText = await res.text();
+            responseBox.textContent = `❌ LỖI KẾT NỐI: ${res.status}. ${errorText}`;
+            responseBox.style.color = "red";
+        }
+
+    } catch (error) {
+        // ... (Logic xử lý lỗi) ...
     }
-    await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
-  }
-  throw new Error('Fetch failed after retries');
 }
-
-
-setInterval(()=> {
-  if(!isSending) getStatus(); // tránh xung đột khi đang gửi
-}, 10000); // mỗi 10s (tùy chỉnh)
-
-
-
-
-
-document.addEventListener('visibilitychange', () => {
-  const vids = document.querySelectorAll('#imgBep video');
-  if(document.hidden) {
-    vids.forEach(v=> { v.pause(); });
-  } else {
-    // không auto play tất cả; chỉ play video đang hiển thị nếu muốn
-  }
-});
-
-
-
-
-
-
 
 
 
