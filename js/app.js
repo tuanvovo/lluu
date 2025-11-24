@@ -203,7 +203,7 @@ function updateUI(action) {
 
             
               targetVideoElement.currentTime = 0; // Đặt về đầu để chạy lại
-               targetVideoElement.load();
+             
                 targetVideoElement.style.display = 'block';
 
               // 🔥 DÒNG CẦN THÊM: Đặt tốc độ phát video (Ví dụ: Phát nhanh gấp 2 lần)
