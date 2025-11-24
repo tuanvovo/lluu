@@ -6,17 +6,106 @@
 
 
 
-
-
-/* Trong thẻ <style> của dk_cay.html */
-/* Trong thẻ <style> của dk_cay.html */
-
-/* Đảm bảo style cho HTML và Body */
+/* --- Reset cơ bản --- */
 html, body {
-    margin: 0 !important; /* Ép buộc loại bỏ margin */
+    margin: 0 !important;
     padding: 0 !important;
-    min-height: 100vh; 
+    font-family: Inter, system-ui, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+    background: var(--bg, #fff8f3);
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
 }
+
+
+/* --- Header cố định trên cùng --- */
+.sub-header {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 10px 14px;
+    border-radius: 0 0 14px 14px;
+}
+
+/* Nút trở về */
+.sub-header .back {
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(16,24,40,0.08);
+    transition: all 0.2s ease;
+}
+.sub-header .back:hover {
+    transform: scale(1.05);
+}
+
+/* Sub-card trong trang con */
+.sub-card {
+    background: transparent; /* hoặc #fff nếu muốn */
+    box-shadow: none;
+    border-radius: 0;
+    padding: 20px;
+}
+
+/* Các page con */
+#page-tuoi { background: linear-gradient(180deg, #E0F7FA, #CFFAFE); }
+#page-aptomat { background: linear-gradient(180deg, #FFF8E1, #FFE082); }
+#page-quangcao { background: linear-gradient(180deg, #FFE4E6, #FFDDE1); }
+#page-camera { background: linear-gradient(180deg, #F8FAFC, #E2E8F0); }
+#page-rem { background: linear-gradient(180deg,#A8C9E4,#FFFFFF); }
+
+/* Các video trong imgBep */
+#imgBep {
+    width: 100%;
+    height: 150px; /* hoặc auto nếu muốn co giãn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#imgBep video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: transparent;
+}
+
+/* --- JS để fix iPhone viewport --- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .mobile-container {
     max-width: 420px;
@@ -155,8 +244,6 @@ body {
 
 html,body{height:calc(var(--vh, 1vh) * 100);margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);-webkit-font-smoothing:antialiased}
 
-.wrap{max-width:var(--maxw);margin:0 auto;min-height:calc(var(--vh, 1vh) * 100);position:relative;overflow:hidden;background:linear-gradient(180deg,#FFF9F2,#FFF7ED);box-shadow:none}
-
 /* ... [GIỮ NGUYÊN PHẦN TRÊN CỦA BẠN] ... */
 
 /* --- CÁC THUỘC TÍNH CỐT LÕI CHO CHUYỂN TRANG --- */
@@ -267,25 +354,7 @@ header.top{display:flex;justify-content:space-between;align-items:center;padding
 
 }
 
-#imgBep {
-    width: 300px;
-    height: 150px;
-    
-   
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden; /* video không tràn ra ngoài              border-radius: 0 !important; */
-    
-}
 
-#imgBep video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-   
-    background: transparent; /* tránh chớp vàng                  border-radius: 0px; */
-}
 
 
 
@@ -626,27 +695,10 @@ a.thumb:visited {
     
 }
 
-/* Trong thẻ <style> của dk_cay.html */
-.sub-header {
-    margin: 0;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    background-color: #c3e5ff; 
-    color: #004c8c;
-    border-bottom-left-radius: 30px; 
-    border-bottom-right-radius: 30px;
-    
-    /* BƯỚC QUAN TRỌNG: Đảm bảo KHÔNG có position: fixed hoặc sticky */
-    position: relative; /* Hoặc position: static; (mặc định) */
-    z-index: 1; /* Để nó không bị nội dung khác che mất */
-}
 
 
 
 .back{background:rgba(255,255,255,0.9);padding:8px;border-radius:10px;cursor:pointer;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
-
-.sub-card{background:var(--card);padding:16px;border-radius:16px;box-shadow:var(--shadow)}
 
 .big-toggle{width:100%;padding:14px;border-radius:14px;border:0;font-weight:800;box-shadow:0 10px 28px rgba(16,24,40,0.08)}
 
@@ -689,20 +741,6 @@ a.thumb:visited {
 /* Giữ nguyên cho login và trang chính */
 
 
-/* Header (chứa nút mũi tên trở về) luôn nổi trên cùng */
-.sub-header {
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #fff;
-  padding: 10px 0;
-}
 
 /* Nút mũi tên trở về */
 .back {
@@ -714,14 +752,7 @@ a.thumb:visited {
 }
 
 /* Khung nội dung chính trong trang con */
-.sub-card {
-  width: 100%;
-  max-width: 420px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-}
+
 
 
 
@@ -1016,44 +1047,10 @@ a.thumb:visited {
 
 
 
-/* 📘 Khung header có mũi tên trở về */
-.sub-header {
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 10px 14px;
-  border-radius: 0 0 14px 14px;
-}
 
-/* 🎯 Nút mũi tên trở về */
-.sub-header .back {
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(16, 24, 40, 0.08);
-  transition: all 0.2s ease;
-}
-.sub-header .back:hover {
-  transform: scale(1.05);
-}
 
 /* 🧱 Thẻ nội dung chính của trang con */
-.sub-card {
-  background: transparent; /* bỏ màu trắng */
-  box-shadow: none; /* hoặc giữ nếu muốn bóng mờ */
-  border-radius: 0; /* nếu muốn bỏ bo góc */
-  padding: 20px; /* vẫn giữ khoảng cách nội dung */
-}
+
 
 /* 💬 Tiêu đề trong header */
 .sub-header h3 {
@@ -1062,19 +1059,6 @@ a.thumb:visited {
   color: #111;
 }
 
-/* ✨ Tạo hiệu ứng sáng cho toàn bộ vùng */
-#page-tuoi .sub-card,
-
-#page-aptomat .sub-card,
-#page-quangcao .sub-card,
-#page-camera .sub-card {
-  background: #fff;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
-}
-
-/* 🌈 Mỗi trang con có sắc nhẹ riêng biệt (rất nhẹ nhàng, không hồng) */
-/* --- GIAO DIỆN ĐẸP RIÊNG CHO CÁC TRANG CON --- */
 
 /* TƯỚI CÂY */
 #page-tuoi {
