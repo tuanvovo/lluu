@@ -207,14 +207,21 @@ function updateUI(action) {
 
         // 2. Chạy video mục tiêu
 
-            
+
+
+
+
+///const targetVideoElement = videos[targetVideoId];
 targetVideoElement.style.display = 'block';
-targetVideoElement.currentTime = 0; // Đặt về đầu để chạy lại
+targetVideoElement.currentTime = 0;
+targetVideoElement.playbackRate = 1; // hoặc 2 nếu muốn nhanh
+targetVideoElement.play();
+
 
 // 🔥 DÒNG CẦN THÊM: Đặt tốc độ phát video (Ví dụ: Phát nhanh gấp 2 lần)
 //targetVideoElement.playbackRate = 2; // 1.0 là tốc độ bình thường. 2.0 là gấp đôi.
 
-targetVideoElement.play();
+
         
 
 
