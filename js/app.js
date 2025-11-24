@@ -129,99 +129,94 @@ let lastVideo = 0;
 // KHAI BÁO BIẾN CHO 4 VIDEO Ở ĐẦU FILE JS (Nếu cần)
 // let aptomatState = 'off'; // Đã có
 
+
+
 function updateUI(action) {
 
-
-  
-
-    if(action === 'on' || action === 1) { // Thêm 1 để xử lý trạng thái từ getStatus()
-        // ... (logic chọn video on/on2) ...
-        aptomatState = 'on'; 
-    }
-    else if(action === 'off' || action === 0) { // Thêm 0 để xử lý trạng thái từ getStatus()
-        // ... (logic chọn video off/off2) ...
-        aptomatState = 'off';
-    }
-
-    // 🔥 DÒNG MỚI: LƯU TRẠNG THÁI VÀO LOCAL STORAGE
-    localStorage.setItem('AptomatState', aptomatState === 'on' ? '1' : '0');
-
-
-    
+    // 1. CHUẨN HÓA ACTION (Nếu đầu vào là số 1/0)
+    // Phải thực hiện trước mọi logic khác
     if (action === 1) action = "on";
     if (action === 0) action = "off";
 
-
-    
-
-    const stoveText = document.getElementById("stove");
-    const cbDot = document.getElementById("cb-status");
-    const viewStatusBtn = document.querySelector(".view-status-btn");
-
-    // LẤY 4 THẺ VIDEO ĐÃ TẢI SẴN
+    // Khai báo lại các biến cục bộ
     const videos = {
         'on': document.getElementById("video-on"),
         'off': document.getElementById("video-off"),
         'on2': document.getElementById("video-on2"),
         'off2': document.getElementById("video-off2")
     };
+    let targetVideoId = null;
+
     
-    let targetVideoId = null; // ID của video cần chạy (on, off, on2, off2)
-
-    // LOGIC CHỌN VIDEO
-    if(action === 'on') {
+    // --- KHỐI LOGIC QUYẾT ĐỊNH VIDEO VÀ CẬP NHẬT TRẠNG THÁI ---
+    
+    // LƯU Ý: Biến aptomatState phải được khai báo toàn cục (ví dụ: let aptomatState = 'off';)
+    
+    if (action === 'on') {
         if (aptomatState === 'off') {
-            targetVideoId = 'on'; // Gạt LÊN lần 1
-            aptomatState = 'on';
-        } else {
-            targetVideoId = 'on2'; // Gạt LÊN lần 2 (Video lặp)
+            // Trường hợp 1: Tắt -> Bật (Chuyển đổi trạng thái)
+            targetVideoId = 'on'; 
+            aptomatState = 'on'; 
+        } else { 
+            // Trường hợp 2: Bật -> Bật (Video lặp)
+            targetVideoId = 'on2'; 
         }
     }
-    else if(action === 'off') {
+    else if (action === 'off') {
         if (aptomatState === 'on') {
-            targetVideoId = 'off'; // Gạt XUỐNG lần 1
-            aptomatState = 'off';
+            // Trường hợp 3: Bật -> Tắt (Chuyển đổi trạng thái)
+            targetVideoId = 'off'; 
+            aptomatState = 'off'; 
         } else {
-            targetVideoId = 'off2'; // Gạt XUỐNG lần 2 (Video lặp)
+            // Trường hợp 4: Tắt -> Tắt (Video lặp)
+            targetVideoId = 'off2'; 
         }
     }
 
-    // CHẠY VIDEO VÀ ẨN/HIỆN
+    // 🔥 DÒNG MỚI: LƯU TRẠNG THÁI VÀO LOCAL STORAGE
+    localStorage.setItem('AptomatState', aptomatState === 'on' ? '1' : '0');
+
+    
+    // --- KHỐI CHẠY VIDEO VÀ ẨN/HIỆN (FIX LỖI NHẢY HÌNH) ---
+    
     if (targetVideoId) {
         const targetVideoElement = videos[targetVideoId];
         
-        // 1. Dừng và ẩn TẤT CẢ các video khác
+        // 1. NGĂN CHẶN NHẢY HÌNH KHI NHẤN LẶP LẠI (Quan trọng)
+        if ((targetVideoId === 'on2' || targetVideoId === 'off2') && 
+             targetVideoElement.style.display === 'block') {
+            return; // ✅ Thoát hàm nếu video lặp đang chạy
+        }
+
+        // 2. Dừng và ẩn TẤT CẢ các video khác (Cho chuyển đổi thật sự)
         for (const key in videos) {
             if (key !== targetVideoId) {
                 videos[key].pause();
-                videos[key].currentTime = 0; // Đặt về đầu
+                videos[key].currentTime = 0; 
                 videos[key].style.display = 'none';
             }
         }
 
-        // 2. Chạy video mục tiêu
-
-            
-              targetVideoElement.currentTime = 0; // Đặt về đầu để chạy lại
-             
-                targetVideoElement.style.display = 'block';
-
-              // 🔥 DÒNG CẦN THÊM: Đặt tốc độ phát video (Ví dụ: Phát nhanh gấp 2 lần)
-              //targetVideoElement.playbackRate = 2; // 1.0 là tốc độ bình thường. 2.0 là gấp đôi.
-
-              targetVideoElement.play();
+        // 3. CHUẨN BỊ VÀ PHÁT VIDEO MỤC TIÊU (Tối ưu cho iOS)
         
+        // 🔥 QUAN TRỌNG: Buộc trình duyệt iOS tải lại/chuẩn bị video
+        targetVideoElement.load(); 
+        
+        targetVideoElement.currentTime = 0; 
+        targetVideoElement.style.display = 'block'; // Hiển thị video
 
-
-      
+        targetVideoElement.play(); 
     }
+
+    // --- Cập nhật TEXT, ĐÈN, NÚT (Giữ nguyên) ---
+    const stoveText = document.getElementById("stove");
+    const cbDot = document.getElementById("cb-status");
+    const viewStatusBtn = document.querySelector(".view-status-btn");
     
-    // Cập nhật TEXT, ĐÈN, NÚT (Giữ nguyên)
     if (stoveText) {
         stoveText.innerText = aptomatState === 'on' ? 'Bật' : 'Tắt';
     }
-    // ... (Phần còn lại của hàm updateUI giữ nguyên)
-    // Ví dụ:
+    
     if (cbDot) {
         cbDot.style.backgroundColor = aptomatState === 'on' ? "#22c55e" : "#777";
         cbDot.style.boxShadow = aptomatState === 'on' ? "0 0 8px #22c55e" : "none";
@@ -234,6 +229,7 @@ function updateUI(action) {
             : "linear-gradient(90deg,#9ca3af,#6b7280)";
     }
 }
+
 
 
 
