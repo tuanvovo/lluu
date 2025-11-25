@@ -468,6 +468,22 @@
 
 
 
+<script>
+    // ✅ THÊM ĐOẠN NÀY ĐỂ BẮT TRƯỜNG HỢP QUAY LẠI TỪ dk_cay.html trên iOS
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Khi trang được khôi phục từ bộ nhớ đệm (Back/Forward Cache) của iOS
+            // Chúng ta buộc phải chạy lại logic khôi phục giao diện (giống như nhấn ON/OFF)
+            console.log("iOS BFCache detected. Forcing state reload...");
+            
+            // Đảm bảo hàm đã được tải trước khi gọi
+            if (typeof loadHomeInitialState === 'function') {
+                loadHomeInitialState(); 
+            }
+        }
+    });
+</script>
+
 <script src="js/app.js"></script>
 
 
