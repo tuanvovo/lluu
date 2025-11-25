@@ -172,25 +172,40 @@ function updateUI(action) {
         'off2': document.getElementById("video-off2")
     };
     
+
+
     let targetVideoId = null; // ID của video cần chạy (on, off, on2, off2)
 
-    // LOGIC CHỌN VIDEO
-    if(action === 'on') {
+ // 🔥 BẮT ĐẦU KHỐI LOGIC CHỌN VIDEO ĐÃ CẢI TIẾN 🔥
+    if (action === 1 || action === 0) {
+        // Trường hợp khôi phục trạng thái (từ getStatus hoặc loadHomeInitialState)
+            if (action === 1) {
+                 targetVideoId = 'on2'; 
+                 aptomatState = 'on';
+            } else { // action === 0
+                 targetVideoId = 'off2'; 
+                 aptomatState = 'off';
+            }
+     }
+     else if(action === 'on') {
         if (aptomatState === 'off') {
-            targetVideoId = 'on'; // Gạt LÊN lần 1
-            aptomatState = 'on';
+             targetVideoId = 'on'; // Gạt LÊN lần 1
+             aptomatState = 'on';
         } else {
-            targetVideoId = 'on2'; // Gạt LÊN lần 2 (Video lặp)
+             targetVideoId = 'on2'; // Gạt LÊN lần 2 (Video lặp)
         }
     }
     else if(action === 'off') {
-        if (aptomatState === 'on') {
-            targetVideoId = 'off'; // Gạt XUỐNG lần 1
-            aptomatState = 'off';
-        } else {
+       if (aptomatState === 'on') {
+          targetVideoId = 'off'; // Gạt XUỐNG lần 1
+          aptomatState = 'off';
+       } else {
             targetVideoId = 'off2'; // Gạt XUỐNG lần 2 (Video lặp)
-        }
+       }
     }
+
+
+ 
 
     // CHẠY VIDEO VÀ ẨN/HIỆN
     if (targetVideoId) {
