@@ -111,15 +111,14 @@
 
 
 
-
+<div id="imgBep" class="control-thumb">
    <div id="imgBep" class="control-thumb">
-    <video id="video-on" src="img/aptomat_on.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline loop></video>
-    <video id="video-off" src="img/aptomat_off.mp4" preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;" playsinline loop></video>
+    <video id="video-on" src="img/aptomat_on.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
+    <video id="video-off" src="img/aptomat_off.mp4" preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;" playsinline></video>
     <video id="video-on2" src="img/aptomat_on2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
     <video id="video-off2" src="img/aptomat_off2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
 </div>
-
-
+</div>
 
 
        
@@ -177,12 +176,15 @@
 
 
 
-            <div class="thumb" onclick="goto('page-camera')">
-                <div class="thumb-logo"><i class="fa-solid fa-video text-gray-700"></i></div>
-                <div class="img bg-cam"></div>
-                 <h4></h4>
-                <p>Sân thượng</p>
-            </div>
+           
+
+          <a class="thumb" href="https://alfred.camera/" target="_blank">
+ <div class="thumb-logo"><i class="fa-solid fa-video text-gray-700"></i></div>
+ <div class="img bg-cam"></div>
+<h4></h4>
+ <p>Sân thượng</p>
+</a>
+
 
 
             <div class="thumb" onclick="goto('page-light')">
@@ -408,24 +410,28 @@
 
 
 
-   <section id="page-camera" class="page hidden">
+ <section id="page-camera" class="page hidden">
     <div class="sub-header">
         <div class="back" onclick="back()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </div>
-        <h3>Camera</h3>
+        <h3>Camera Sân Thượng</h3>
     </div>
-    <div class="sub-card">
-         
-        <div class="cam-screen"><video width="100%" controls autoplay loop muted>
-            <source src="img/nhavuon.mp4" type="video/mp4">
-            Trình duyệt của bạn không hỗ trợ thẻ video.
-        </video></div>
-        <p class="muted" style="margin-top: 10px;">Thêm luồng video của bạn vào đây.</p>
+    <div class="sub-card" style="height: auto; padding: 0 10px 10px 10px;"> 
+        <iframe 
+            src="https://alfred.camera/" 
+            id="alfred-viewer"
+            style="width: 100%; height: 80vh; border: 1px solid #ccc; border-radius: 8px; overflow: hidden;" 
+            title="Alfred Camera Viewer"
+        >
+            Trình duyệt của bạn không hỗ trợ iframe.
+        </iframe>
+
+        <p class="muted" style="margin-top: 10px; text-align: center;">
+            💡 Vui lòng đăng nhập vào tài khoản Google Alfred của bạn.
+        </p>
     </div>
 </section>
-
-
 
 
 
@@ -467,22 +473,6 @@
 </div>
 
 
-
-<script>
-    // ✅ THÊM ĐOẠN NÀY ĐỂ BẮT TRƯỜNG HỢP QUAY LẠI TỪ dk_cay.html trên iOS
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            // Khi trang được khôi phục từ bộ nhớ đệm (Back/Forward Cache) của iOS
-            // Chúng ta buộc phải chạy lại logic khôi phục giao diện (giống như nhấn ON/OFF)
-            console.log("iOS BFCache detected. Forcing state reload...");
-            
-            // Đảm bảo hàm đã được tải trước khi gọi
-            if (typeof loadHomeInitialState === 'function') {
-                loadHomeInitialState(); 
-            }
-        }
-    });
-</script>
 
 <script src="js/app.js"></script>
 
