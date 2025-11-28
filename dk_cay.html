@@ -294,7 +294,7 @@ async function sendCommand(pin, commandValue){
 
   
 
-      //  const res = await fetch(`${WORKER_URL}?action=update&pin=${pin}&value=${commandValue}&device=cay`); 
+    
  const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
 
         if(res.ok){
@@ -357,8 +357,8 @@ async function getStatus() {
     try {
         // Đã sửa URL để chỉ dùng VIRTUAL_PIN_ONOFF (V0)
 
-      //  const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}&device=cay`); 
-         const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
+          const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}`);
+        
           if(res.ok){
             const rawValue = await res.text();
             const cleanValue = rawValue.replace(/[^0-9]/g, '');
