@@ -294,8 +294,8 @@ async function sendCommand(pin, commandValue){
 
   
 
-        const res = await fetch(`${WORKER_URL}?action=update&pin=${pin}&value=${commandValue}&device=cay`); 
-
+      //  const res = await fetch(`${WORKER_URL}?action=update&pin=${pin}&value=${commandValue}&device=cay`); 
+ const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
 
         if(res.ok){
             responseBox.textContent = `✅ Lệnh gửi thành công (Pin ${pin}): ${commandValue}`;
