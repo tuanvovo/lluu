@@ -130,14 +130,20 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 
 
            <div class="video-display-container">
-            <video id="waterVideo" width="100%" height="100%" muted loop style="object-fit:cover; border-radius:0px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);"preload="auto" playsinline>
-                <source src="video/lan.mp4" type="video/mp4">
-                Trình duyệt của bạn không hỗ trợ video.
-            </video>
-           </div>
-        
-         <div style="display:flex; flex-direction:column; gap:16px; width:15%; align-items:flex-end;">
+              <video id="waterVideo" width="100%" height="100%" muted loop style="object-fit:cover; border-radius:0px;
+                 box-shadow: 0 4px 10px rgba(0,0,0,0.1);"preload="auto" playsinline>
+                 <source src="video/lan.mp4" type="video/mp4">
+                 Trình duyệt của bạn không hỗ trợ video.
+             </video>
+          </div>
+
+
+
+
+
+           
+
+        <div style="display:flex; flex-direction:column; gap:16px; width:15%; align-items:flex-end;">
              
             <button id="waterBtn" class="control-btn" 
                     style="width:100%; padding:8px 10px; font-size:12px; background:gray; height: 40px;" 
@@ -167,6 +173,14 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
     <source src="img/hoanui.mp4" type="video/mp4">
     Trình duyệt của bạn không hỗ trợ video.
 </video>
+
+
+
+
+
+
+
+
 </div>
     <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
         </div>
@@ -293,9 +307,8 @@ async function sendCommand(pin, commandValue){
         // Điều chỉnh URL để chấp nhận pin
 
   
-
-    
- const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
+        const res = await fetch(`${WORKER_URL}?action=update&pin=${pin}&value=${commandValue}`);
+      
 
         if(res.ok){
             responseBox.textContent = `✅ Lệnh gửi thành công (Pin ${pin}): ${commandValue}`;
@@ -356,9 +369,8 @@ async function getStatus() {
 
     try {
         // Đã sửa URL để chỉ dùng VIRTUAL_PIN_ONOFF (V0)
-
-          const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}`);
-        
+        const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}`); 
+       
           if(res.ok){
             const rawValue = await res.text();
             const cleanValue = rawValue.replace(/[^0-9]/g, '');
