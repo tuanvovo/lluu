@@ -233,7 +233,7 @@ html, body {margin:0; padding:0; min-height:100vh; background:#fcf6f0;}
 const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
 
 
-const VIRTUAL_PIN_ONOFF = "V1"; // Pin Bật/Tắt trực tiếp
+const VIRTUAL_PIN_ONOFF = "V0"; // Pin Bật/Tắt trực tiếp
 const VIRTUAL_PIN_SCHEDULE = "V2"; // Pin cho cấu hình lịch trình JSON
 const MAX_SLOTS = 6;
 
@@ -355,9 +355,10 @@ async function getStatus() {
     responseBox.style.color = "gray";
 
     try {
-        // Đã sửa URL để chỉ dùng VIRTUAL_PIN_ONOFF (V1)
+        // Đã sửa URL để chỉ dùng VIRTUAL_PIN_ONOFF (V0)
 
-        const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}&device=cay`); 
+      //  const res = await fetch(`${WORKER_URL}?action=get&pin=${VIRTUAL_PIN_ONOFF}&device=cay`); 
+         const res = await fetch(`${WORKER_URL}?action=update&pin=${VIRTUAL_PIN}&value=${commandValue}`);
           if(res.ok){
             const rawValue = await res.text();
             const cleanValue = rawValue.replace(/[^0-9]/g, '');
