@@ -485,34 +485,33 @@
   </div>
 
 </div>
-<div id="telegramPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999;">
-  <div style="background:#fff; padding:20px; margin:15% auto; width:300px; border-radius:12px; text-align:center;">
-    <h3>📩 Quản lý Telegram</h3>
-    
-    <input id="tg_id" placeholder="Nhập Telegram Chat ID" style="width:90%; padding:8px; margin:10px 0;">
 
-    <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-      <button onclick="saveTelegramId()" style="background:#28a745; color:white; border:none; padding:8px 15px; border-radius:5px;">Lưu & Bật</button>
-      <button onclick="disconnectTelegram()" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:5px;">Hủy kết nối</button>
-      <button onclick="closeTelegramPopup()" style="background:#6c757d; color:white; border:none; padding:8px 15px; border-radius:5px;">Đóng</button>
+<div id="telegramPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
+  <div style="background:#fff; padding:25px; width:320px; border-radius:15px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin: 20% auto;">
+    <h3 style="margin-top:0; color:#333;">📩 Quản lý Telegram</h3>
+    
+    <input id="tg_id" type="text" placeholder="Nhập Telegram Chat ID" 
+           style="width:90%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px; font-size:16px;">
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button onclick="saveTelegramId()" style="background:#28a745; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; flex:1;">Lưu & Bật</button>
+      <button onclick="disconnectTelegram()" style="background:#dc3545; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; flex:1;">Hủy</button>
     </div>
-    <br>
-    <button onclick="testTelegram()" style="width:100%; padding:8px;">🔔 Thử chuông</button>
+    
+    <button onclick="testTelegram()" style="width:100%; margin-top:15px; padding:10px; background:#f8f9fa; border:1px solid #ddd; border-radius:5px; cursor:pointer;">🔔 Thử chuông</button>
+    <button onclick="closeTelegramPopup()" style="width:100%; margin-top:10px; background:none; border:none; color:#666; cursor:pointer; text-decoration:underline;">Đóng cửa sổ</button>
   </div>
 </div>
 
 
-
 <script>
-
+// Mở Popup khi bấm nút chuông trên màn hình Home
 function openTelegramLink() {
     const chatId = localStorage.getItem("telegram_chat_id");
-
-    if (!chatId) {
-        showTelegramPopup();
-    } else {
-        sendTelegramTest("🔔 Chuông Telegram đã được kích hoạt!");
-        alert("✅ Telegram đã liên kết");
+    // Luôn mở Popup để người dùng có thể chọn "Hủy" hoặc "Lưu mới"
+    showTelegramPopup();
+    if (chatId) {
+        document.getElementById("tg_id").value = chatId;
     }
 }
 
@@ -523,51 +522,63 @@ function showTelegramPopup(){
 function closeTelegramPopup(){
     document.getElementById("telegramPopup").style.display = "none";
 }
+
+// Hàm HỦY KẾT NỐI (Làm Worker im lặng)
 function disconnectTelegram() {
     if (confirm("Bạn có chắc muốn Hủy nhận thông báo Telegram không?")) {
-        // 1. Xóa ID ở máy cá nhân
         localStorage.removeItem("telegram_chat_id");
+        document.getElementById("tg_id").value = "";
         
-        // 2. Gửi lệnh OFF lên Cloudflare Worker (Ghi vào ngăn tủ KV)
-        // Lưu ý: Bạn dùng URL của Worker blynk-token-proxy
+        // Gửi lệnh OFF lên Worker để khóa báo thức 1 phút
         fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=OFF")
         .then(() => {
-            alert("❌ Đã hủy kết nối Telegram.\nWorker sẽ không làm phiền bạn nữa.");
+            alert("❌ Đã hủy kết nối Telegram thành công!");
             closeTelegramPopup();
         })
-        .catch(err => alert("Lỗi khi ngắt kết nối: " + err));
+        .catch(err => alert("Lỗi kết nối Server: " + err));
     }
 }
 
-
-// Cập nhật lại hàm saveTelegramId để khi lưu là tự động BẬT lại
+// Hàm LƯU & BẬT
 function saveTelegramId(){
     const id = document.getElementById("tg_id").value.trim();
     if(!id){
-        alert("❌ Chưa nhập Telegram ID");
+        alert("❌ Bạn chưa nhập Telegram ID");
         return;
     }
+    
     localStorage.setItem("telegram_chat_id", id);
     
-    // Ghi lệnh ON lên Cloudflare để kích hoạt lại Worker
+    // Gửi lệnh ON lên Worker để kích hoạt lại báo thức 1 phút
     fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=ON")
     .then(() => {
-        sendTelegramTest("✅ Đã kết nối lại Telegram thành công!");
-        alert("✅ Đã liên kết & Bật thông báo!");
+        sendTelegramTest("✅ Thông báo Telegram đã được KÍCH HOẠT!");
+        alert("✅ Đã lưu ID và BẬT thông báo!");
         closeTelegramPopup();
-    });
+    })
+    .catch(err => alert("Lỗi kết nối Server: " + err));
 }
+
 function testTelegram(){
     const id = localStorage.getItem("telegram_chat_id");
     if(!id){
-        alert("⚠️ Chưa lưu Telegram ID");
+        alert("⚠️ Vui lòng Lưu ID trước khi thử chuông");
         return;
     }
-    sendTelegramTest("🔔 Test chuông Telegram thành công!");
+    sendTelegramTest("🔔 Chúc mừng! Chuông Telegram hoạt động tốt!");
 }
 
-
-    
+function sendTelegramTest(text){
+    fetch("https://telegram-bell.tanthanhlttb123.workers.dev/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chat_id: localStorage.getItem("telegram_chat_id"),
+            message: text
+        })
+    })
+    .catch(err => console.error("Lỗi Telegram:", err));
+}
 </script>
 
 <script src="js/app.js"></script>
