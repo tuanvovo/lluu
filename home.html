@@ -486,86 +486,68 @@
 
 </div>
 
-<div id="telegramPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:#fff; padding:25px; width:320px; border-radius:15px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin: 20% auto;">
-    <h3 style="margin-top:0; color:#333;">📩 Quản lý Telegram</h3>
-    
-    <input id="tg_id" type="text" placeholder="Nhập Telegram Chat ID" 
-           style="width:90%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px; font-size:16px;">
-
-    <div style="display: flex; gap: 10px; justify-content: center;">
-      <button onclick="saveTelegramId()" style="background:#28a745; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; flex:1;">Lưu & Bật</button>
-      <button onclick="disconnectTelegram()" style="background:#dc3545; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; flex:1;">Hủy</button>
+<div id="telegramPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10000; display:none; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:25px; width:300px; border-radius:15px; text-align:center; position:relative; margin:auto; top:25%;">
+        <h3 style="margin-top:0; color:#333; font-weight:bold;">📩 Quản lý Telegram</h3>
+        <input id="tg_id" type="text" placeholder="Nhập Telegram Chat ID" 
+               style="width:90%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px;">
+        
+        <div style="display: flex; gap: 8px; justify-content: center;">
+            <button onclick="saveTelegramId()" style="background:#28a745; color:white; border:none; padding:10px; border-radius:5px; flex:1;">Lưu & Bật</button>
+            <button onclick="disconnectTelegram()" style="background:#dc3545; color:white; border:none; padding:10px; border-radius:5px; flex:1;">Hủy</button>
+        </div>
+        
+        <button onclick="testTelegram()" style="width:100%; margin-top:10px; padding:10px; background:#f0f2f5; border-radius:5px;">🔔 Thử chuông</button>
+        <button onclick="closeTelegramPopup()" style="width:100%; margin-top:10px; background:none; border:none; color:blue; text-decoration:underline;">Đóng</button>
     </div>
-    
-    <button onclick="testTelegram()" style="width:100%; margin-top:15px; padding:10px; background:#f8f9fa; border:1px solid #ddd; border-radius:5px; cursor:pointer;">🔔 Thử chuông</button>
-    <button onclick="closeTelegramPopup()" style="width:100%; margin-top:10px; background:none; border:none; color:#666; cursor:pointer; text-decoration:underline;">Đóng cửa sổ</button>
-  </div>
 </div>
 
-
 <script>
-// Mở Popup khi bấm nút chuông trên màn hình Home
-function openTelegramLink() {
-    const chatId = localStorage.getItem("telegram_chat_id");
-    // Luôn mở Popup để người dùng có thể chọn "Hủy" hoặc "Lưu mới"
-    showTelegramPopup();
-    if (chatId) {
-        document.getElementById("tg_id").value = chatId;
-    }
-}
-
+// Sửa lại hàm hiển thị để không bị lỗi display
 function showTelegramPopup(){
-    document.getElementById("telegramPopup").style.display = "block";
+    document.getElementById("telegramPopup").style.display = "flex"; // Dùng flex để căn giữa
 }
 
 function closeTelegramPopup(){
     document.getElementById("telegramPopup").style.display = "none";
 }
 
-// Hàm HỦY KẾT NỐI (Làm Worker im lặng)
-function disconnectTelegram() {
-    if (confirm("Bạn có chắc muốn Hủy nhận thông báo Telegram không?")) {
-        localStorage.removeItem("telegram_chat_id");
-        document.getElementById("tg_id").value = "";
-        
-        // Gửi lệnh OFF lên Worker để khóa báo thức 1 phút
-        fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=OFF")
-        .then(() => {
-            alert("❌ Đã hủy kết nối Telegram thành công!");
-            closeTelegramPopup();
-        })
-        .catch(err => alert("Lỗi kết nối Server: " + err));
+function openTelegramLink() {
+    const chatId = localStorage.getItem("telegram_chat_id");
+    showTelegramPopup();
+    if (chatId) {
+        document.getElementById("tg_id").value = chatId;
     }
 }
 
-// Hàm LƯU & BẬT
+function disconnectTelegram() {
+    if (confirm("Hủy nhận thông báo Telegram?")) {
+        localStorage.removeItem("telegram_chat_id");
+        document.getElementById("tg_id").value = "";
+        fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=OFF")
+        .then(() => {
+            alert("❌ Đã hủy kết nối!");
+            closeTelegramPopup();
+        });
+    }
+}
+
 function saveTelegramId(){
     const id = document.getElementById("tg_id").value.trim();
-    if(!id){
-        alert("❌ Bạn chưa nhập Telegram ID");
-        return;
-    }
-    
+    if(!id) return alert("❌ Chưa nhập ID");
     localStorage.setItem("telegram_chat_id", id);
-    
-    // Gửi lệnh ON lên Worker để kích hoạt lại báo thức 1 phút
     fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=ON")
     .then(() => {
-        sendTelegramTest("✅ Thông báo Telegram đã được KÍCH HOẠT!");
-        alert("✅ Đã lưu ID và BẬT thông báo!");
+        sendTelegramTest("✅ Đã kích hoạt thông báo!");
+        alert("✅ Đã lưu và BẬT!");
         closeTelegramPopup();
-    })
-    .catch(err => alert("Lỗi kết nối Server: " + err));
+    });
 }
 
 function testTelegram(){
     const id = localStorage.getItem("telegram_chat_id");
-    if(!id){
-        alert("⚠️ Vui lòng Lưu ID trước khi thử chuông");
-        return;
-    }
-    sendTelegramTest("🔔 Chúc mừng! Chuông Telegram hoạt động tốt!");
+    if(!id) return alert("⚠️ Chưa lưu ID");
+    sendTelegramTest("🔔 Test chuông thành công!");
 }
 
 function sendTelegramTest(text){
@@ -576,8 +558,7 @@ function sendTelegramTest(text){
             chat_id: localStorage.getItem("telegram_chat_id"),
             message: text
         })
-    })
-    .catch(err => console.error("Lỗi Telegram:", err));
+    });
 }
 </script>
 
