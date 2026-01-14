@@ -542,22 +542,36 @@ function clearAllSchedules() {
 
 
 // --- 6. Gửi Lịch xuống ESP (Tạo và gửi chuỗi JSON qua V2) ---
-function sendSchedulesToEsp() {
-    const schedulesToSend = schedules
-        .map(s => ({
-            id: s.id, 
-            h: s.hour, 
-            m: s.min, 
-            d: s.duration,
-            a: s.active 
-        }));
-        
-    const jsonString = JSON.stringify(schedulesToSend);
+async function sendSchedulesToEsp() {
+    const schedulesToSend = schedules.map(s => ({
+        id: s.id, 
+        h: s.hour, 
+        m: s.min, 
+        d: s.duration,
+        a: s.active 
+    }));
     
-    // Gửi chuỗi JSON qua VIRTUAL_PIN_SCHEDULE (V2)
-    sendCommand(VIRTUAL_PIN_SCHEDULE, jsonString);
-}
+    const jsonString = JSON.stringify(schedulesToSend);
 
+    // 1. Gửi lệnh cho ESP qua Blynk (V2)
+    sendCommand(VIRTUAL_PIN_SCHEDULE, jsonString);
+
+    // 2. GỬI LỊCH LÊN CLOUDFLARE ĐỂ BÁO TELEGRAM
+    try {
+        await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: "SAVE_LICH_TUOI",
+                device: "cay_lan",
+                data: schedulesToSend // Gửi mảng 6 slot hẹn giờ
+            })
+        });
+        console.log("✅ Đã đồng bộ lịch tưới lên Cloudflare");
+    } catch (e) {
+        console.error("❌ Lỗi đồng bộ Cloudflare", e);
+    }
+}
 
 // --- 7. Cập nhật UI nhỏ (Lịch trình gần nhất) ---
 function updateNextScheduleUI() {
