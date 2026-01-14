@@ -206,32 +206,14 @@
         </div>
     </main>
 
-   <div class="bottombar">
-    <div class="navbtn" onclick="goto('page-home')">
-        <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> 
+    <div class="bottombar">
+        <div class="navbtn">
+            <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> </div>
+        <div class="navbtn" onclick="goto('page-quangcao')">
+            <i class="fa-solid fa-video"></i> <span>Video</span> </div>
+        <div class="navbtn" onclick="logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> </div>
     </div>
-    <div class="navbtn" onclick="goto('page-quangcao')">
-        <i class="fa-solid fa-video"></i> <span>Video</span> 
-    </div>
-    <div class="navbtn" onclick="openTelegramLink()">
-        <i class="fa-solid fa-bell"></i> <span>Thông báo</span> 
-    </div>
-    <div class="navbtn" onclick="logout()">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> 
-    </div>
-</div>
-
-<div id="telegramPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
-    <div style="background:#fff; padding:20px; width:280px; border-radius:15px; text-align:center; margin: auto; position: relative; top: 25%;">
-        <h3 style="margin-bottom:15px; color:#333;">📩 Cài đặt Telegram</h3>
-        <input id="tg_id" type="text" placeholder="Nhập Chat ID" style="width:90%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px;">
-        <div style="display:flex; gap:10px;">
-            <button onclick="saveTelegramId()" style="flex:1; background:#28a745; color:#fff; border:none; padding:10px; border-radius:8px;">Bật</button>
-            <button onclick="disconnectTelegram()" style="flex:1; background:#dc3545; color:#fff; border:none; padding:10px; border-radius:8px;">Hủy</button>
-        </div>
-        <button onclick="closeTelegramPopup()" style="margin-top:15px; background:none; border:none; color:#666; text-decoration:underline;">Đóng</button>
-    </div>
-</div>
 </section>
 
 
@@ -497,42 +479,7 @@
 
 </div>
 
-<script>
-function openTelegramLink() {
-    const savedId = localStorage.getItem("telegram_chat_id");
-    if (savedId) document.getElementById("tg_id").value = savedId;
-    document.getElementById("telegramPopup").style.display = "flex";
-}
 
-function closeTelegramPopup() {
-    document.getElementById("telegramPopup").style.display = "none";
-}
-
-function saveTelegramId() {
-    const id = document.getElementById("tg_id").value.trim();
-    if (!id) return alert("Vui lòng nhập ID!");
-    
-    localStorage.setItem("telegram_chat_id", id);
-    // Gửi lệnh ON lên Worker
-    fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=ON")
-    .then(() => {
-        alert("✅ Đã bật thông báo Telegram!");
-        closeTelegramPopup();
-    });
-}
-
-function disconnectTelegram() {
-    if (confirm("Xác nhận hủy nhận thông báo?")) {
-        localStorage.removeItem("telegram_chat_id");
-        // Gửi lệnh OFF lên Worker
-        fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=OFF")
-        .then(() => {
-            alert("❌ Đã hủy thông báo!");
-            closeTelegramPopup();
-        });
-    }
-}
-</script>
 
 <script src="js/app.js"></script>
 
