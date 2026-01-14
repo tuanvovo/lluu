@@ -1,40 +1,33 @@
-
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-
-
-  <script>
-    // BẢO VỆ: Nếu chưa đăng nhập, chuyển hướng về index.html
-    // (Đảm bảo đã nhúng thư viện Firebase nếu bạn dùng nó)
-
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        // *** ĐÃ SỬA: login.html -> index.html ***
-        window.location.replace('index.html'); 
-    }
-</script>    
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Điều khiển đèn</title>
-
-<style>
-/* ======= KHUNG MOBILE GIỐNG HOME ======= */
+    <script>
+        // (Đảm bảo đã nhúng thư viện Firebase nếu bạn dùng nó)
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            // *** ĐÃ SỬA: login.html -> index.html ***
+            window.location.replace('index.html');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều khiển đèn</title>
+    <style>
+    /* ======= KHUNG MOBILE GIỐNG HOME ======= */
 .mobile-container {
     width: 100%;
     max-width: 390px;
     margin: 0 auto;
-    background: linear-gradient(180deg,#ecebf0,#dcecff);
+    background: linear-gradient(180deg, #ecebf0, #dcecff);
     min-height: 100vh;
     padding: 12px;
 }
 
-
 .img {
-    background-size: cover;        /* phủ đều, không méo */
-    background-position: center;   /* canh giữa */
-    background-repeat: no-repeat;  /* không lặp */
+    background-size: cover; /* phủ đều, không méo */
+    background-position: center; /* canh giữa */
+    background-repeat: no-repeat; /* không lặp */
 }
+
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -53,63 +46,68 @@ body {
     width: 38px;
     height: 38px;
     border-radius: 14px;
-    background: rgba(255,255,255,0.55);
+    background: rgba(255, 255, 255, 0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     margin-right: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
     font-size: 18px;
 }
+
 .disabled-banner {
     opacity: 0.5; /* Mờ đi */
     cursor: not-allowed !important; /* Biểu tượng không cho phép */
 }
+
 .header h2 {
     margin: 0;
     font-size: 22px;
     font-weight: 700;
     color: #003366;
 }
+
 /* GRID */
 .rooms-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 14px;
 }
+
 .room-card {
-    background: rgba(255,255,255,0.9);      /* TRONG MỜ → ảnh đẹp hơn nhiều */
-    backdrop-filter: blur(5px);            /* mờ nền (glass UI) */
+    background: rgba(255, 255, 255, 0.9); /* TRONG MỜ → ảnh đẹp hơn nhiều */
+    backdrop-filter: blur(5px); /* mờ nền (glass UI) */
     border-radius: 0px;
     border: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
-
 .room-card.is-on {
     /* Nền trắng hoàn toàn */
-    background: white; 
+    background: white;
     /* Đổ bóng lớn hơn và có màu xanh nhẹ */
-    box-shadow: 0 10px 30px rgba(0, 150, 255, 0.4), 0 0 15px rgba(0, 150, 255, 0.2); 
+    box-shadow: 0 10px 30px rgba(0, 150, 255, 0.4), 0 0 15px rgba(0, 150, 255, 0.2);
     /* Hơi đẩy lên phía trước */
-    transform: translateY(-2px); 
+    transform: translateY(-2px);
 }
 
 /* Thêm hiệu ứng khi thẻ được chạm/nhấp vào */
 .room-card:active {
     transform: translateY(2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.20);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.20);
 }
+
 /* ẢNH CAO HƠN */
 .room-img {
-    height: 120px;                 /* tăng chiều cao → không cắt ảnh */
+    height: 120px; /* tăng chiều cao → không cắt ảnh */
     background-size: cover;
     background-position: center;
     border-bottom: none;
 }
+
 /* TÊN PHÒNG + NÚT CHUNG 1 HÀNG */
 .room-footer {
     display: flex;
@@ -117,6 +115,7 @@ body {
     align-items: center;
     padding: 12px;
 }
+
 .room-title {
     font-weight: 300;
     color: #003366;
@@ -136,12 +135,18 @@ body {
 }
 
 /* Trạng thái nút */
-.btn-onstate { background: #4CAF50; } /* xanh */
-.btn-offstate { background: #7a7aa7; } /* xám đậm */
+.btn-onstate {
+    background: #4CAF50;
+} /* xanh */
 
-.bottom-banner2 {
+.btn-offstate {
+    background: #7a7aa7;
+} /* xám đậm */
+
+/* BANNER DƯỚI */
+.bottom-banner2, .bottom-banner {
     margin-top: 28px;
-    background: linear-gradient(90deg,#393a3b,#56CCF2);
+    background: linear-gradient(90deg, #393a3b, #56CCF2);
     padding: 16px;
     color: white;
     border-radius: 0px;
@@ -149,216 +154,190 @@ body {
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.22);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
 }
-.bottom-banner {
-    margin-top: 28px;
-    background: linear-gradient(90deg,#393a3b,#56CCF2);
-    padding: 16px;
-    color: white;
-    border-radius: 0px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.22);
-}
-/* POPUP */
+
 /* POPUP */
 #scheduleModal {
-position: fixed;
-inset: 0;
-background: rgba(0,0,0,0.55);
-display: none;
-justify-content: center;
-align-items: center;
-z-index: 999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
 }
 
 .modal-box {
-background: white;
-/* 🔥 SỬA: Tăng max-width để chiếm gần hết chiều ngang của mobile-container (390px) */
-width: 95%; /* 88% cũ hơi bé */
-max-width: 370px; /* 360px cũ hơi bé */
-
-border-radius: 12px; /* Thêm border-radius cho modal-box */
-padding: 20px; /* Giảm padding một chút để gọn hơn */
-box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+    background: white;
+    /* 🔥 SỬA: Tăng max-width để chiếm gần hết chiều ngang của mobile-container (390px) */
+    width: 95%; /* 88% cũ hơi bé */
+    max-width: 370px; /* 360px cũ hơi bé */
+    border-radius: 12px; /* Thêm border-radius cho modal-box */
+    padding: 20px; /* Giảm padding một chút để gọn hơn */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
-/* Tìm và thay thế CSS cho .btn-save và .btn-delete */
+/* NÚT LƯU */
+.btn-save {
+    width: 100%;
+    /* 🔥 SỬA: Giảm padding chung để nút nhỏ gọn hơn */
+    padding: 8px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
 
-.btn-save{
-width: 100%;
-/* 🔥 SỬA: Giảm padding chung để nút nhỏ gọn hơn */
-padding: 8px; 
-background: #4CAF50;
-color: white;
-border: none;
-border-radius: 12px;
-font-size: 16px;
-margin-bottom: 10px;
-cursor: pointer;
+/* NÚT XÓA */
+.btn-delete {
+    width: 100%;
+    /* 🔥 SỬA: Giảm padding để đồng nhất với btn-save */
+    padding: 8px;
+    background: #E53935;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
 }
-.btn-delete{
-width: 100%;
-/* 🔥 SỬA: Giảm padding để đồng nhất với btn-save */
-padding: 8px;
-background: #E53935;
-color: white;
-border: none;
-border-radius: 12px;
-font-size: 16px;
-cursor: pointer;
-}
-</style>
+        /* [Xem phần 2. Phong cách CSS] */
+    </style>
 </head>
-
 <body>
+    <div class="mobile-container">
+        <div class="header">
+            <div class="back-btn" onclick="history.back()">⬅</div>
+            <h2>Điều khiển Đèn</h2>
+        </div>
 
-<div class="mobile-container">
+        <div class="rooms-grid">
+            <div class="room-card" data-room="Phòng khách" data-room-id="1" data-on="img/phongkhach_on.jpg" data-off="img/phongkhach_off.jpg">
+                <div class="room-img"></div>
+                <div class="room-footer">
+                    <div class="room-title">Phòng khách</div>
+                    <button class="btn-toggle btn-offstate">OFF</button>
+                </div>
+            </div>
 
-<div class="header">
-    <div class="back-btn" onclick="history.back()">⬅</div>
-    <h2>Điều khiển Đèn</h2>
-</div>
+            <div class="room-card" data-room="Phòng bếp" data-room-id="2" data-on="img/phongbep_on.jpg" data-off="img/phongbep_off.jpg">
+                <div class="room-img"></div>
+                <div class="room-footer">
+                    <div class="room-title">Phòng bếp</div>
+                    <button class="btn-toggle btn-offstate">OFF</button>
+                </div>
+            </div>
 
-<div class="rooms-grid">
+            <div class="room-card" data-room="Phòng đọc" data-room-id="3" data-on="img/phongdoc_on.jpg" data-off="img/phongdoc_off.jpg">
+                <div class="room-img"></div>
+                <div class="room-footer">
+                    <div class="room-title">Phòng đọc</div>
+                    <button class="btn-toggle btn-offstate">OFF</button>
+                </div>
+            </div>
 
-    <!-- TEMPLATE PHÒNG -->
-    <div class="room-card" data-room="Phòng khách" data-room-id="1" data-on="img/phongkhach_on.jpg" data-off="img/phongkhach_off.jpg">
-        <div class="room-img"></div>
-        <div class="room-footer">
-            <div class="room-title">Phòng khách</div>
-            <button class="btn-toggle btn-offstate">OFF</button>
+            <div class="room-card" data-room="Phòng ngủ" data-room-id="4" data-on="img/phongngu_on.jpg" data-off="img/phongngu_off.jpg">
+                <div class="room-img"></div>
+                <div class="room-footer">
+                    <div class="room-title">Phòng ngủ</div>
+                    <button class="btn-toggle btn-offstate">OFF</button>
+                </div>
+            </div>
+
+            <div class="room-card" data-room="Phòng tắm" data-room-id="5" data-on="img/phongtam_on.jpg" data-off="img/phongtam_off.jpg">
+                <div class="room-img"></div>
+                <div class="room-footer">
+                    <div class="room-title">Phòng tắm</div>
+                    <button class="btn-toggle btn-offstate">OFF</button>
+                </div>
+            </div>
+
+            <div class="room-card" data-room="Đèn sân nhà" data-room-id="6" data-on="img/denvuong_on.jpg" data-off="img/denvuong_off.jpg">
+                <div class="room-img"></div>
+                <div class="room-footer">
+                    <div class="room-title">Đèn sân nhà</div>
+                    <button class="btn-toggle btn-offstate">OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-banner2" onclick="getAllStatus()">Xem trạng thái các Đèn</div>
+        <div id="statusMessageBox" style="text-align:center; margin-top:10px; font-size:14px; color:#333;"></div>
+        
+        <div class="bottom-banner" id="openSchedule">Hẹn giờ cho các phòng</div>
+        
+        <div class="bottom-banner password-update-header" onclick="togglePasswordForm()">
+            Cập nhật Tên/Mật khẩu
+        </div>
+        <div id="passwordUpdateForm" style="display:none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.85); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <label for="newUsername" style="font-weight: 600; color: #003366; display: block; margin-bottom: 5px;">Username/Tên đăng nhập mới:</label>
+            <input type="text" id="newUsername" placeholder="Nhập tên mới (tối đa 32 ký tự)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px;">
+            <label for="newPassword" style="font-weight: 600; color: #003366; display: block; margin-bottom: 5px;">Password/Mật khẩu mới:</label>
+            <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới (tối đa 32 ký tự)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px;">
+            <button id="sendNewCredentials" style="width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                Gửi Cập nhật Mật khẩu
+            </button>
+            <div id="passwordStatusMessage" style="text-align: center; margin-top: 10px; font-size: 14px; color: #333;"></div>
+        </div>
+        
+        <div style="height: 30px;"></div>
+    </div>
+
+    <div id="scheduleModal">
+        <div class="modal-box">
+            <h3>Hẹn giờ cho phòng</h3>
+            <label>Chọn phòng:</label>
+            <select id="roomSelect" style="width:100%; padding:10px; border-radius:12px;">
+                <option>Phòng khách</option>
+                <option>Phòng bếp</option>
+                <option>Phòng đọc</option>
+                <option>Phòng ngủ</option>
+                <option>Phòng tắm</option>
+                <option>Đèn sân nhà</option>
+            </select>
+            <br><br>
+            <label>Giờ bật:</label>
+            <input type="time" id="timeOn" style="width:100%; padding:10px; border-radius:12px;">
+            <br><br>
+            <label>Giờ tắt:</label>
+            <input type="time" id="timeOff" style="width:100%; padding:10px; border-radius:12px;">
+            <br><br>
+            <button class="btn-save" onclick="saveSchedule()">Lưu hẹn giờ</button>
+            <button class="btn-save" onclick="viewSchedule()">Xem hẹn giờ</button>
+            <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
+                <button class="btn-delete" style="flex: 1;" onclick="deleteSingleSchedule()">
+                    Xóa (1 Phòng)
+                </button>
+                <button class="btn-delete" style="flex: 1; background: #f44336;" onclick="deleteAllSchedules()">
+                    Xóa TẤT CẢ
+                </button>
+            </div>
+            <button id="sendAllSchedulesInModal" style="width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 12px; font-size: 16px; margin-bottom: 10px; cursor: pointer;">
+                Gửi TẤT CẢ LỊCH
+            </button>
+            <button class="close-btn" onclick="closeModal()" style="width: 100%; padding: 8px; background: #6c757d; color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer;">
+                Đóng
+            </button>
         </div>
     </div>
 
-    <div class="room-card" data-room="Phòng bếp"data-room-id="2" data-on="img/phongbep_on.jpg" data-off="img/phongbep_off.jpg">
-        <div class="room-img"></div>
-        <div class="room-footer">
-            <div class="room-title">Phòng bếp</div>
-            <button class="btn-toggle btn-offstate">OFF</button>
+    <div id="viewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); justify-content:center; align-items:center; z-index:999;">
+        <div style="background:white; width:88%; max-width:360px; padding:22px; border-radius: 12px;">
+            <h3>Danh sách hẹn giờ</h3>
+            <ul id="viewList"></ul>
+            <button class="btn-save" onclick="closeView()">Đóng</button>
         </div>
     </div>
-
-    <div class="room-card" data-room="Phòng đọc"data-room-id="3" data-on="img/phongdoc_on.jpg" data-off="img/phongdoc_off.jpg">
-        <div class="room-img"></div>
-        <div class="room-footer">
-            <div class="room-title">Phòng đọc</div>
-            <button class="btn-toggle btn-offstate">OFF</button>
-        </div>
-    </div>
-
-    <div class="room-card" data-room="Phòng ngủ" data-room-id="4" data-on="img/phongngu_on.jpg" data-off="img/phongngu_off.jpg">
-        <div class="room-img"></div>
-        <div class="room-footer">
-            <div class="room-title">Phòng ngủ</div>
-            <button class="btn-toggle btn-offstate">OFF</button>
-        </div>
-    </div>
-
-    <div class="room-card" data-room="Phòng tắm" data-room-id="5" data-on="img/phongtam_on.jpg" data-off="img/phongtam_off.jpg">
-        <div class="room-img"></div>
-        <div class="room-footer">
-            <div class="room-title">Phòng tắm</div>
-            <button class="btn-toggle btn-offstate">OFF</button>
-        </div>
-    </div>
-
-    <div class="room-card" data-room="Đèn sân nhà" data-room-id="6" data-on="img/denvuong_on.jpg" data-off="img/denvuong_off.jpg">
-        <div class="room-img"></div>
-        <div class="room-footer">
-            <div class="room-title">Đèn sân nhà</div>
-            <button class="btn-toggle btn-offstate">OFF</button>
-        </div>
-    </div>
-
-</div>
-
-
-
- 
-<div class="bottom-banner2" onclick="getAllStatus()">Xem trạng thái các Đèn</div>
-
-<div id="statusMessageBox" style="text-align:center; margin-top:10px; font-size:14px; color:#333;"></div>
-
-
-<div class="bottom-banner" id="openSchedule">Hẹn giờ cho các phòng</div>
-
-
-
-
-
-
-</div>
-
-<div id="scheduleModal">
-<div class="modal-box">
-<h3>Hẹn giờ cho phòng</h3>
-
-<label>Chọn phòng:</label>
-<select id="roomSelect" style="width:100%; padding:10px; border-radius:12px;">
-<option>Phòng khách</option>
-<option>Phòng bếp</option>
-<option>Phòng đọc</option>
-<option>Phòng ngủ</option>
-<option>Phòng tắm</option>
-<option>Đèn sân nhà</option>
-</select>
-
-<br><br>
-
-<label>Giờ bật:</label>
-<input type="time" id="timeOn" style="width:100%; padding:10px; border-radius:12px;">
-
-<br><br>
-
-<label>Giờ tắt:</label>
-<input type="time" id="timeOff" style="width:100%; padding:10px; border-radius:12px;">
-
-<br><br> 
-
-<button class="btn-save" onclick="saveSchedule()">Lưu hẹn giờ</button>
- 
-<button class="btn-save" onclick="viewSchedule()">Xem hẹn giờ</button>
-
-<div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
-<button class="btn-delete" style="flex: 1;" onclick="deleteSingleSchedule()">
-Xóa (1 Phòng)
-</button>
-<button class="btn-delete" style="flex: 1; background: #f44336;" onclick="deleteAllSchedules()">
-Xóa TẤT CẢ
-</button>
-</div>
-
-<button id="sendAllSchedulesInModal" 
-style="width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 12px; font-size: 16px; margin-bottom: 10px; cursor: pointer;">
-Gửi TẤT CẢ LỊCH
-</button>
-
-<button class="close-btn" onclick="closeModal()" 
-style="width: 100%; padding: 8px; background: #6c757d; color: white; border: none; border-radius: 12px; font-size: 16px; cursor: pointer;">
-Đóng
-</button>
-</div>
-</div>
-
-
-
-
-<div id="viewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); 
-justify-content:center; align-items:center; z-index:999;">
-    <div style="background:white; width:88%; max-width:360px; padding:22px; border-radius: 12px;">
-        <h3>Danh sách hẹn giờ</h3>
-        <ul id="viewList"></ul>
-        <button class="btn-save" onclick="closeView()">Đóng</button>
-    </div>
-</div>
-<script>
-// =========================================================================================
+    
+    <script>
+       // =========================================================================================
 // KHỐI CODE JAVASCRIPT ĐƯỢC CHỈNH SỬA VÀ BỔ SUNG
 // =========================================================================================
+
+// CÁC HẰNG SỐ
 const LIGHT_PINS = {
     "Phòng khách": "V3",
     "Phòng bếp": "V4",
@@ -367,40 +346,39 @@ const LIGHT_PINS = {
     "Phòng tắm": "V7",
     "Đèn sân nhà": "V8"
 };
+
+const ROOM_IDS_MAP = {
+    "Phòng khách": 1,
+    "Phòng bếp": 2,
+    "Phòng đọc": 3,
+    "Phòng ngủ": 4,
+    "Phòng tắm": 5,
+    "Đèn sân nhà": 6
+};
+
+// BIẾN TRẠNG THÁI
 // trạng thái từng đèn (0 = OFF, 1 = ON)
 let lightStates = {
-    "V3": 0,
-    "V4": 0,
-    "V5": 0,
-    "V6": 0,
-    "V7": 0,
-    "V8": 0
+    "V3": 0, "V4": 0, "V5": 0, "V6": 0, "V7": 0, "V8": 0
 };
 // 🔥 BIẾN TOÀN CỤC MỚI: Dùng để lưu trữ lịch hẹn giờ
-let allSchedules = {}; 
+let allSchedules = {};
 // URL Worker của bạn
 const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
-
 // === ĐỌC CỜ QUYỀN TỪ LOCAL STORAGE ===
-const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
+const isAdmin = localStorage.getItem('isAdmin') === 'true';
 const isUserAllowedToWrite = isAdmin; // Chỉ Admin được GHI
 // =======================================
-// Hàm gửi lệnh tới Worker (KHÔNG ĐỔI)
-async function sendCommand(pin, value){
-    // ... (Giữ nguyên logic sendCommand của bạn) ...
-     const responseBox = document.getElementById("responseBox");
 
-    if (!isUserAllowedToWrite) {
-        // Cho Khách thấy giao diện thay đổi (demo)
-        // Dừng ở đây vì nó chỉ là đoạn demo UI
-        // responseBox.textContent = "❌ (Khách Demo bị chặn lệnh)";
-        // responseBox.style.color = "red";
+// --- HÀM GỬI LỆNH TỚI WORKER (Blynk Proxy) ---
+async function sendCommand(pin, value) {
+    const responseBox = document.getElementById("responseBox");
+    if (!isUserAllowedToWrite && pin !== "V10") { // Cho phép gửi V10 (CRED) để demo
         return; // CHẶN LỆNH GỬI ĐI
     }
     try {
         // Nếu value là object → stringify (an toàn)
         const raw = (typeof value === "string") ? value : JSON.stringify(value);
-
         // Encode để không làm vỡ URL query
         const encoded = encodeURIComponent(raw);
 
@@ -408,74 +386,74 @@ async function sendCommand(pin, value){
         if (encoded.length > 1800) {
             const res = await fetch(WORKER_URL, {
                 method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
                 // Worker phải xử lý body dạng urlencoded (action, pin, value, device)
                 body: `action=update&pin=${encodeURIComponent(pin)}&value=${encoded}&device=cay`
             });
-            if(res.ok) console.log(`✅ [POST] ${pin} gửi thành công`);
+            if (res.ok) console.log(`✅ [POST] ${pin} gửi thành công`);
             else console.error(`❌ [POST] lỗi ${pin}: ${res.status}`);
             return;
         }
 
         // Với chuỗi ngắn, dùng GET truyền param đã encode
         const res = await fetch(`${WORKER_URL}?action=update&pin=${encodeURIComponent(pin)}&value=${encoded}&device=cay`);
-        if(res.ok){
+        if (res.ok) {
             console.log(`✅ [GET] Lệnh ${pin} gửi thành công`);
         } else {
             console.error(`❌ [GET] Lỗi gửi ${pin}: ${res.status}`);
         }
-    } catch(err){
+    } catch (err) {
         console.error("⚠️ Không gửi được lệnh", err);
     }
 }
+
+// --- HÀM ĐIỀU KHIỂN BẬT/TẮT ĐÈN ---
 function toggleLight(pin, card) {
     const current = lightStates[pin] || 0;
     const nextState = current === 1 ? 0 : 1;
+
     // cập nhật UI (Gọi hàm chung để nó áp dụng cả class is-on)
     updateLightUI(pin, nextState, card);
-    const btn = card.querySelector(".btn-toggle");
-    const img = card.querySelector(".room-img");
 
-
-
-    if(btn){
-        btn.innerText = nextState === 1 ? "ON" : "OFF";
-        btn.classList.toggle("btn-onstate", nextState===1);
-        btn.classList.toggle("btn-offstate", nextState===0);
-    }
-    if(img){
-        img.style.backgroundImage = `url('${nextState===1 ? card.dataset.on : card.dataset.off}')`;
-    }
     // lưu trạng thái
     lightStates[pin] = nextState;
+
     // gửi lệnh Worker
     sendCommand(pin, nextState);
 }
-// Cập nhật giao diện (UI) cho từng đèn (KHÔNG ĐỔI)
+
+// Cập nhật giao diện (UI) cho từng đèn
 function updateLightUI(pin, state, card) {
     const btn = card.querySelector(".btn-toggle");
     const img = card.querySelector(".room-img");
+
     // Lưu trạng thái mới
     lightStates[pin] = state;
+    card.classList.toggle("is-on", state === 1); // Cập nhật class is-on
+
     if (btn) {
         btn.innerText = state === 1 ? "ON" : "OFF";
         btn.classList.toggle("btn-onstate", state === 1);
         btn.classList.toggle("btn-offstate", state === 0);
     }
+
     if (img) {
         // Lấy đường dẫn ảnh dựa trên trạng thái
         const imgUrl = state === 1 ? card.dataset.on : card.dataset.off;
         img.style.backgroundImage = `url('${imgUrl}')`;
     }
 }
-// Đọc trạng thái TỪNG ĐÈN (pin) từ Worker/Blynk (KHÔNG ĐỔI)
+
+// --- HÀM ĐỌC TRẠNG THÁI TỪ WORKER (get) ---
 async function getStatus(pin, card) {
     try {
-        const res = await fetch(`${WORKER_URL}?action=get&pin=${pin}&device=cay`); 
+        const res = await fetch(`${WORKER_URL}?action=get&pin=${pin}&device=cay`);
         if (res.ok) {
             const rawValue = await res.text();
             // Lọc chỉ lấy số '1' hoặc '0'
-            const cleanValue = rawValue.replace(/[^0-9]/g, ''); 
+            const cleanValue = rawValue.replace(/[^0-9]/g, '');
             let state = 0;
             // Xử lý giá trị: Chỉ chấp nhận 1 hoặc 0
             if (cleanValue === '1' || cleanValue === '0') {
@@ -483,10 +461,10 @@ async function getStatus(pin, card) {
             } else {
                 console.warn(`[ĐÈN] Pin ${pin} trả về giá trị không hợp lệ: ${rawValue}`);
                 // Báo lỗi nhưng không dừng các pin khác
-                return { success: false, error: 'Invalid Value' }; 
+                return { success: false, error: 'Invalid Value' };
             }
             // 🔥 CẬP NHẬT GIAO DIỆN NGAY LẬP TỨC CHO ĐÈN NÀY
-            updateLightUI(pin, state, card); 
+            updateLightUI(pin, state, card);
             return { success: true, state: state }; // Trả về thành công
         } else {
             console.error(`❌ Lỗi đọc ${pin}: Mã trạng thái ${res.status}`);
@@ -495,26 +473,24 @@ async function getStatus(pin, card) {
     } catch (error) {
         // Lỗi kết nối, timeout...
         console.error(`⚠️ Lỗi kết nối hoặc timeout cho ${pin}`, error);
-        return { success: false, error: 'Connection Error' }; 
+        return { success: false, error: 'Connection Error' };
     }
 }
-// Đọc trạng thái tất cả đèn (KHÔNG ĐỔI)
+
+// Đọc trạng thái tất cả đèn
 async function getAllStatus() {
     const messageBox = document.getElementById("statusMessageBox");
     messageBox.textContent = "Đang đọc trạng thái tất cả đèn...";
     messageBox.style.color = "gray";
-
     const allCards = document.querySelectorAll(".room-card");
     let successfulReads = 0;
-    
+
     // Chạy các lệnh đọc trạng thái đồng thời (Promise.all)
     const statusPromises = Array.from(allCards).map(async (card) => {
         const roomName = card.dataset.room;
         const pin = LIGHT_PINS[roomName];
-        
         if (pin) {
             const result = await getStatus(pin, card);
-            
             // Chỉ đếm khi thành công (success: true)
             if (result.success) {
                 successfulReads++;
@@ -530,23 +506,78 @@ async function getAllStatus() {
         messageBox.textContent = `✅ Đã đọc trạng thái thành công cho tất cả ${successfulReads}/${allCards.length} đèn.`;
         messageBox.style.color = "green";
     } else if (successfulReads > 0) {
-        messageBox.textContent = `⚠️ Hoàn thành ${successfulReads}/${allCards.length} đèn. Vui lòng thử lại nếu muốn đọc đủ 6/6.`;
+        messageBox.textContent = `⚠️ Hoàn thành ${successfulReads}/${allCards.length} đèn. Vui lòng thử lại nếu muốn đọc đủ ${allCards.length}/${allCards.length}.`;
         messageBox.style.color = "#FF9800"; // Màu cam đậm
     } else {
-        messageBox.textContent = `❌ Lỗi kết nối. Không đọc được trạng thái đèn nào.`;
+        messageBox.textContent = "❌ Lỗi kết nối. Không đọc được trạng thái đèn nào.";
         messageBox.style.color = "red";
     }
 }
 
 
-// 🔥 LOGIC HẸN GIỜ MỚI (Lưu vào localStorage để không bị mất khi chuyển trang)
+// --- HÀM CẬP NHẬT TÊN/MẬT KHẨU (Gửi V10 - CRED) ---
+function togglePasswordForm() {
+    const form = document.getElementById('passwordUpdateForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    document.getElementById('passwordStatusMessage').textContent = '';
+}
+
+async function sendNewCredentials() {
+    if (!isUserAllowedToWrite) {
+        alert("❌ Bạn là Khách Demo. Không thể Cập nhật thông tin xác thực.");
+        return;
+    }
+    const usernameInput = document.getElementById('newUsername');
+    const passwordInput = document.getElementById('newPassword');
+    const messageBox = document.getElementById('passwordStatusMessage');
+    const newUsername = usernameInput.value.trim();
+    const newPassword = passwordInput.value.trim();
+
+    if (newUsername.length < 4 || newPassword.length < 6) {
+        messageBox.textContent = "❌ Tên đăng nhập (min 4) hoặc Mật khẩu (min 6) quá ngắn.";
+        messageBox.style.color = "red";
+        return;
+    }
+
+    if (!confirm(`Xác nhận cập nhật Tên: "${newUsername}" và Mật khẩu mới? (Thiết bị sẽ khởi động lại)`)) {
+        return;
+    }
+
+    // Chuẩn bị dữ liệu JSON để gửi
+    const jsonPayload = { // <--- Đổi tên biến để rõ ràng hơn
+        u: newUsername,
+        p: newPassword
+    };
+    // 2. Chuyển đối tượng JSON thành chuỗi
+    const jsonString = JSON.stringify(jsonPayload);
+    // 3. THÊM TIỀN TỐ ĐẶC BIỆT "CRED:"
+    const finalPayload = "CRED:" + jsonString; // Ví dụ: "CRED:{\"u\":\"new_user\",\"p\":\"new_pass\"}"
+
+    // Gửi chuỗi JSON này lên Virtual Pin V10
+    const VIRTUAL_PIN_CREDENTIALS = "V10";
+    messageBox.textContent = "Đang gửi thông tin mới đến ESP32...";
+    messageBox.style.color = "gray";
+    try {
+        await sendCommand(VIRTUAL_PIN_CREDENTIALS, finalPayload);
+        messageBox.textContent = `✅ Đã gửi Tên/Mật khẩu mới. Thiết bị đang khởi động lại để áp dụng.`;
+        messageBox.style.color = "green";
+        // Xóa trường sau khi gửi thành công
+        usernameInput.value = '';
+        passwordInput.value = '';
+    } catch (error) {
+        messageBox.textContent = `❌ Lỗi gửi lệnh: ${error.message}`;
+        messageBox.style.color = "red";
+    }
+}
+
+
+// --- LOGIC HẸN GIỜ (Lưu vào localStorage để không bị mất khi chuyển trang) ---
 
 // Tải lịch đã lưu khi trang vừa tải
 function loadSchedules() {
     try {
         const stored = localStorage.getItem('savedSchedules');
         allSchedules = stored ? JSON.parse(stored) : {};
-        
         // Cập nhật lại thuộc tính data-timer của các thẻ phòng
         document.querySelectorAll(".room-card").forEach(card => {
             const roomName = card.dataset.room;
@@ -568,59 +599,50 @@ function saveSchedulesToLocal() {
     localStorage.setItem('savedSchedules', JSON.stringify(allSchedules));
 }
 
-
 // Hàm LƯU HẸN GIỜ (Giải quyết Vấn đề 1: Lưu vào localStorage)
-function saveSchedule() {
-    if (!isUserAllowedToWrite) {
-        alert("❌ Bạn là Khách Demo. Không thể Thêm Lịch Trình Tự Động.");
-        return; 
+async function saveSchedule() {
+    const room = document.getElementById("roomSelect").value;
+    const timeOn = document.getElementById("timeOn").value;
+    const timeOff = document.getElementById("timeOff").value;
+
+    if (!timeOn || !timeOff) return alert("Vui lòng nhập đủ giờ Bật và Tắt!");
+
+    // 1. Gửi lệnh cho ESP qua Blynk (Ví dụ pin V10 tùy bạn cấu hình)
+    // sendCommand("V10", `${room}|${timeOn}|${timeOff}`); 
+
+    // 2. GỬI LỊCH LÊN CLOUDFLARE ĐỂ BÁO TELEGRAM
+    try {
+        const res = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: "SAVE_LICH_DEN",
+                phong: room,
+                bat: timeOn,
+                tat: timeOff
+            })
+        });
+        
+        if(res.ok) {
+            alert(`✅ Đã lưu lịch ${room}. Telegram sẽ báo khi tới giờ!`);
+            closeModal();
+        }
+    } catch (e) {
+        alert("❌ Lỗi kết nối Cloudflare");
     }
-    
-    const room = document.getElementById('roomSelect').value;
-    const on = document.getElementById('timeOn').value;
-    const off = document.getElementById('timeOff').value;
-
-    if(!on || !off){
-        alert("Vui lòng chọn đầy đủ giờ bật và tắt");
-        return;
-    }
-    
-    const scheduleString = `${on} → ${off}`;
-    
-    // Cập nhật biến cục bộ và localStorage
-    allSchedules[room] = scheduleString;
-    saveSchedulesToLocal();
-
-    // Cập nhật data-timer cho thẻ phòng tương ứng
-    const card = document.querySelector(`[data-room="${room}"]`);
-    card.dataset.timer = scheduleString;
-
-    alert(`✅ Đã lưu lịch hẹn cho ${room}: ${scheduleString}. Vui lòng bấm 'Gửi TẤT CẢ LỊCH' để áp dụng.`);
-    // closeModal(); // Không đóng ngay
 }
 
-
-// Hàm XÓA MỘT LỊCH (Giải quyết Vấn đề 3a: Xóa 1 lịch và gửi lại toàn bộ)
+// Hàm XÓA MỘT LỊCH
 function deleteSingleSchedule() {
     if (!isUserAllowedToWrite) {
         alert("❌ Bạn là Khách Demo. Không thể Xóa Lịch Trình Tự Động.");
-        return; 
+        return;
     }
-
     const room = document.getElementById('roomSelect').value;
-
-    const roomID = {
-        "Phòng khách": 3,
-        "Bếp": 4,
-        "Phòng ngủ 1": 5,
-        "Phòng ngủ 2": 6,
-        "Phòng ngủ 3": 7,
-        "Cổng chính": 8,
-        "Sân vườn": 9
-    }[room];
+    const roomID = ROOM_IDS_MAP[room];
 
     if (!roomID) {
-        alert("⚠️ roomID = undefined. Kiểm tra lại tên phòng trong roomID map.");
+        alert("⚠️ Không tìm thấy ID phòng. Kiểm tra lại tên phòng trong ROOM_IDS_MAP.");
         return;
     }
 
@@ -630,28 +652,25 @@ function deleteSingleSchedule() {
 
     // 1. Xóa local
     delete allSchedules[room];
-    saveSchedulesToLocal(); 
+    saveSchedulesToLocal();
 
     // 2. Cập nhật UI
-    document.querySelector(`[data-room="${room}"]`).dataset.timer = "Chưa đặt";
+    const card = document.querySelector(`[data-room="${room}"]`);
+    if(card) card.dataset.timer = "Chưa đặt";
 
-    // 3. Gửi lại TẤT CẢ lịch (đã xóa phòng này)
-    //sendAllSchedulesFromModal();
-
-    // 4. Gửi lệnh DELETE về ESP32
-    let cmd = `DEL:${roomID}`.trim();
-    console.log("SEND CMD =", JSON.stringify(cmd));
+    // 3. Gửi lệnh DELETE về ESP32 (DEL:roomID)
+    let cmd = `DEL:${roomID}`;
+    console.log("SEND CMD (Xóa 1 lịch) =", JSON.stringify(cmd));
     sendCommand("V10", cmd);
-
-    alert(`Đã xóa lịch phòng: ${room}`);
+    
+    alert(`Đã xóa lịch phòng: ${room}. Vui lòng bấm 'Gửi TẤT CẢ LỊCH' nếu muốn cập nhật trạng thái các phòng còn lại.`);
 }
 
-
-// Hàm XÓA TẤT CẢ LỊCH (Giải quyết Vấn đề 2)
+// Hàm XÓA TẤT CẢ LỊCH
 function deleteAllSchedules() {
     if (!isUserAllowedToWrite) {
         alert("❌ Bạn là Khách Demo. Không thể Xóa TẤT CẢ Lịch Trình Tự Động.");
-        return; 
+        return;
     }
 
     if (!confirm("⚠️ Bạn có chắc chắn muốn XÓA TẤT CẢ lịch hẹn giờ cho mọi phòng?")) {
@@ -668,79 +687,73 @@ function deleteAllSchedules() {
     });
 
     // 3. Gửi chuỗi V10 rỗng lên thiết bị (Xóa tất cả trên thiết bị)
-    sendCommand("V10", "DELETE_ALL"); // Gửi chuỗi rỗng để xóa hết lịch cũ trên thiết bị
-    
+    sendCommand("V10", "DELETE_ALL"); // Gửi chuỗi đặc biệt để xóa hết lịch cũ trên thiết bị
+
     alert("✅ Đã XÓA TẤT CẢ lịch hẹn thành công (trên trình duyệt và đã gửi lệnh xóa đến thiết bị).");
     closeModal();
 }
 
-
-// Hàm GỬI V10 (Được gọi bởi nút Gửi TẤT CẢ LỊCH và hàm Xóa 1 lịch)
+// Hàm GỬI TẤT CẢ LỊCH (Gửi chuỗi tổng hợp V10)
 function sendAllSchedulesFromModal() {
     if (!isUserAllowedToWrite) {
         console.warn("❌ Bạn là Khách Demo. Không thể Gửi Lịch Trình Tự Động.");
-        return false; 
+        return false;
     }
-    
     let result = "";
     let count = 0;
 
+    // Duyệt qua tất cả các phòng
     document.querySelectorAll(".room-card").forEach(card => {
         const roomName = card.dataset.room;
         const scheduleString = allSchedules[roomName]; // Lấy từ biến đã tải
-        const id = card.dataset.roomId; 
+        const id = card.dataset.roomId; // Lấy ID phòng (1-6)
 
-        if(scheduleString && id){
+        if (scheduleString && id) {
+            // scheduleString có dạng "HH:mm → HH:mm"
             const [onTime, offTime] = scheduleString.split("→").map(t => t.trim());
-            
-            // Định dạng chuỗi V10: id:1 HH:mm true HH:mm false
+            // Định dạng chuỗi V10: id:1 HH:mm true HH:mm false,
             result += `id:${id} ${onTime} true ${offTime} false,`;
             count++;
         }
     });
 
-    if(result.length > 0){
-        const finalString = result.slice(0, -1); 
-        
+    if (result.length > 0) {
+        const finalString = result.slice(0, -1); // Loại bỏ dấu phẩy cuối cùng
         // Gửi chuỗi V10 đã tổng hợp
-        sendCommand("V10", finalString); 
+        sendCommand("V10", finalString);
+        console.log("Chuỗi V10 gửi:", finalString);
         return true;
     } else {
-        // Gửi V10 rỗng nếu không có lịch nào
-        sendCommand("V10", ""); 
+        // Gửi lệnh xóa tất cả nếu không có lịch nào được lưu
+        sendCommand("V10", "DELETE_ALL");
         return false;
     }
 }
 
-
-// Hàm xem lịch hẹn (KHÔNG ĐỔI)
+// Hàm xem lịch hẹn
 function viewSchedule() {
     const list = document.getElementById("viewList");
     list.innerHTML = "";
-
     document.querySelectorAll(".room-card").forEach(room => {
         const li = document.createElement("li");
         li.style.margin = "6px 0";
         li.textContent = `${room.dataset.room} : ${room.dataset.timer || "Chưa đặt"}`;
         list.appendChild(li);
     });
-
     document.getElementById("viewModal").style.display = "flex";
 }
 
-
-// Hàm đóng Pop-up View (KHÔNG ĐỔI)
+// Hàm đóng Pop-up View
 function closeView() {
     document.getElementById("viewModal").style.display = "none";
 }
 
-
-// Hàm đóng Pop-up Modal (KHÔNG ĐỔI)
+// Hàm đóng Pop-up Modal
 function closeModal() {
     document.getElementById('scheduleModal').style.display = "none";
 }
 
-// Hàm tải trước ảnh (KHÔNG ĐỔI)
+// Hàm tải trước ảnh
 function preloadImages() {
     const allCards = document.querySelectorAll(".room-card");
     allCards.forEach(card => {
@@ -752,17 +765,13 @@ function preloadImages() {
 }
 
 
-// GÁN SỰ KIỆN KHI DOM TẢI XONG
+// --- GÁN SỰ KIỆN KHI DOM TẢI XONG ---
 document.addEventListener('DOMContentLoaded', () => {
-
     // 🔥 1. Tải lịch đã lưu từ localStorage
     loadSchedules();
 
-    // Gán sự kiện cho nút Xem trạng thái (KHÔNG ĐỔI)
-    document.querySelector(".bottom-banner2").onclick = getAllStatus;
-    
-    // 🔥 VÔ HIỆU HÓA NÚT XEM TRẠNG THÁI (KHÔNG ĐỔI)
-    if (isAdmin === false) { 
+    // 🔥 VÔ HIỆU HÓA NÚT XEM TRẠNG THÁI (Nếu là Khách Demo)
+    if (isAdmin === false) {
         const checkStatusBtn = document.querySelector(".bottom-banner2");
         checkStatusBtn.classList.add("disabled-banner");
         checkStatusBtn.onclick = () => {
@@ -770,6 +779,9 @@ document.addEventListener('DOMContentLoaded', () => {
             messageBox.textContent = "❌ Bạn là Khách Demo. Không thể đọc trạng thái.";
             messageBox.style.color = "red";
         };
+    } else {
+         // Nếu là Admin, gán sự kiện xem trạng thái bình thường
+         document.querySelector(".bottom-banner2").onclick = getAllStatus;
     }
     
     // 🔥 2. Gán sự kiện Mở Pop-up cho nút "Hẹn giờ cho các phòng"
@@ -786,19 +798,25 @@ document.addEventListener('DOMContentLoaded', () => {
         sendInModalBtn.onclick = () => {
             if (!isUserAllowedToWrite) {
                 alert("❌ Bạn là Khách Demo. Không thể Gửi Lịch Trình Tự Động.");
-                return; 
+                return;
             }
             const sent = sendAllSchedulesFromModal();
-            if(sent) {
-                 alert("✅ Đã gửi TẤT CẢ lịch hẹn thành công!");
-                 closeModal();
+            if (sent) {
+                alert("✅ Đã gửi TẤT CẢ lịch hẹn thành công!");
+                closeModal();
             } else {
-                 alert("⚠️ Không có lịch hẹn nào để gửi. Vui lòng Lưu trước.");
+                alert("⚠️ Không có lịch hẹn nào để gửi. Vui lòng Lưu trước.");
             }
         };
     }
 
-    // 🔥 4. Khởi tạo ảnh OFF + Gán sự kiện nút ON/OFF
+    // 🔥 4. Gán sự kiện cho nút Gửi Username/Password
+    const sendCredBtn = document.getElementById('sendNewCredentials');
+    if (sendCredBtn) {
+        sendCredBtn.onclick = sendNewCredentials;
+    }
+
+    // 🔥 5. Khởi tạo ảnh OFF + Gán sự kiện nút ON/OFF
     document.querySelectorAll(".room-card").forEach(card => {
         const btn = card.querySelector(".btn-toggle");
         const img = card.querySelector(".room-img");
@@ -808,30 +826,18 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.dataset.state = "off";
         btn.classList.add("btn-offstate");
 
+        // Gán sự kiện bật/tắt
         btn.onclick = () => {
             const roomName = card.dataset.room;
             const pin = LIGHT_PINS[roomName];
-            if(!pin) return console.error("Không tìm thấy pin cho", roomName);
+            if (!pin) return console.error("Không tìm thấy pin cho", roomName);
             toggleLight(pin, card);
         };
     });
 
     // Gọi hàm preload
-    preloadImages(); 
+    preloadImages();
 });
-
-
-
-</script>
-
-
-
-
-
-
-
-
+    </script>
 </body>
 </html>
-
-
