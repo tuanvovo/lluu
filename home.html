@@ -485,21 +485,19 @@
   </div>
 
 </div>
-<div id="telegramPopup" style="display:none;
-    position:fixed; inset:0; background:rgba(0,0,0,.6);
-    z-index:9999;">
+<div id="telegramPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999;">
+  <div style="background:#fff; padding:20px; margin:15% auto; width:300px; border-radius:12px; text-align:center;">
+    <h3>📩 Quản lý Telegram</h3>
+    
+    <input id="tg_id" placeholder="Nhập Telegram Chat ID" style="width:90%; padding:8px; margin:10px 0;">
 
-  <div style="background:#fff; padding:20px;
-      margin:15% auto; width:300px; border-radius:12px;">
-
-    <h3>📩 Kết nối Telegram</h3>
-
-    <input id="tg_id" placeholder="Nhập Telegram Chat ID"
-           style="width:100%; padding:8px; margin:10px 0;">
-
-    <button onclick="saveTelegramId()">Lưu</button>
-<button onclick="testTelegram()">OK</button>
-<button onclick="closeTelegramPopup()">Hủy</button>
+    <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+      <button onclick="saveTelegramId()" style="background:#28a745; color:white; border:none; padding:8px 15px; border-radius:5px;">Lưu & Bật</button>
+      <button onclick="disconnectTelegram()" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:5px;">Hủy kết nối</button>
+      <button onclick="closeTelegramPopup()" style="background:#6c757d; color:white; border:none; padding:8px 15px; border-radius:5px;">Đóng</button>
+    </div>
+    <br>
+    <button onclick="testTelegram()" style="width:100%; padding:8px;">🔔 Thử chuông</button>
   </div>
 </div>
 
@@ -525,35 +523,40 @@ function showTelegramPopup(){
 function closeTelegramPopup(){
     document.getElementById("telegramPopup").style.display = "none";
 }
+function disconnectTelegram() {
+    if (confirm("Bạn có chắc muốn Hủy nhận thông báo Telegram không?")) {
+        // 1. Xóa ID ở máy cá nhân
+        localStorage.removeItem("telegram_chat_id");
+        
+        // 2. Gửi lệnh OFF lên Cloudflare Worker (Ghi vào ngăn tủ KV)
+        // Lưu ý: Bạn dùng URL của Worker blynk-token-proxy
+        fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=OFF")
+        .then(() => {
+            alert("❌ Đã hủy kết nối Telegram.\nWorker sẽ không làm phiền bạn nữa.");
+            closeTelegramPopup();
+        })
+        .catch(err => alert("Lỗi khi ngắt kết nối: " + err));
+    }
+}
 
+
+// Cập nhật lại hàm saveTelegramId để khi lưu là tự động BẬT lại
 function saveTelegramId(){
     const id = document.getElementById("tg_id").value.trim();
-
     if(!id){
         alert("❌ Chưa nhập Telegram ID");
         return;
     }
-
     localStorage.setItem("telegram_chat_id", id);
-    closeTelegramPopup();
-
-    sendTelegramTest("✅ Đã liên kết Telegram thành công!");
-    alert("✅ Đã lưu Telegram ID\nBây giờ chỉ cần bấm 🔔 để test");
+    
+    // Ghi lệnh ON lên Cloudflare để kích hoạt lại Worker
+    fetch("https://blynk-token-proxy.tanthanhlttb123.workers.dev/set-tg-status?value=ON")
+    .then(() => {
+        sendTelegramTest("✅ Đã kết nối lại Telegram thành công!");
+        alert("✅ Đã liên kết & Bật thông báo!");
+        closeTelegramPopup();
+    });
 }
-
-function sendTelegramTest(text){
-    fetch("https://telegram-bell.tanthanhlttb123.workers.dev/telegram", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: localStorage.getItem("telegram_chat_id"),
-            message: text
-        })
-    })
-    .then(()=>console.log("Telegram sent"))
-    .catch(err=>console.error("Telegram error", err));
-}
-
 function testTelegram(){
     const id = localStorage.getItem("telegram_chat_id");
     if(!id){
