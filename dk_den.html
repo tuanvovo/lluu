@@ -600,36 +600,31 @@ function saveSchedulesToLocal() {
 }
 
 // Hàm LƯU HẸN GIỜ (Giải quyết Vấn đề 1: Lưu vào localStorage)
-async function saveSchedule() {
-    const room = document.getElementById("roomSelect").value;
-    const timeOn = document.getElementById("timeOn").value;
-    const timeOff = document.getElementById("timeOff").value;
-
-    if (!timeOn || !timeOff) return alert("Vui lòng nhập đủ giờ Bật và Tắt!");
-
-    // 1. Gửi lệnh cho ESP qua Blynk (Ví dụ pin V10 tùy bạn cấu hình)
-    // sendCommand("V10", `${room}|${timeOn}|${timeOff}`); 
-
-    // 2. GỬI LỊCH LÊN CLOUDFLARE ĐỂ BÁO TELEGRAM
-    try {
-        const res = await fetch(WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: "SAVE_LICH_DEN",
-                phong: room,
-                bat: timeOn,
-                tat: timeOff
-            })
-        });
-        
-        if(res.ok) {
-            alert(`✅ Đã lưu lịch ${room}. Telegram sẽ báo khi tới giờ!`);
-            closeModal();
-        }
-    } catch (e) {
-        alert("❌ Lỗi kết nối Cloudflare");
+function saveSchedule() {
+    if (!isUserAllowedToWrite) {
+        alert("❌ Bạn là Khách Demo. Không thể Thêm Lịch Trình Tự Động.");
+        return;
     }
+    const room = document.getElementById('roomSelect').value;
+    const on = document.getElementById('timeOn').value;
+    const off = document.getElementById('timeOff').value;
+
+    if (!on || !off) {
+        alert("Vui lòng chọn đầy đủ giờ bật và tắt");
+        return;
+    }
+
+    const scheduleString = `${on} → ${off}`;
+    // Cập nhật biến cục bộ và localStorage
+    allSchedules[room] = scheduleString;
+    saveSchedulesToLocal();
+
+    // Cập nhật data-timer cho thẻ phòng tương ứng
+    const card = document.querySelector(`[data-room="${room}"]`);
+    card.dataset.timer = scheduleString;
+
+    alert(`✅ Đã lưu lịch hẹn cho ${room}: ${scheduleString}. Vui lòng bấm 'Gửi TẤT CẢ LỊCH' để áp dụng.`);
+    // closeModal(); // Không đóng ngay
 }
 
 // Hàm XÓA MỘT LỊCH
