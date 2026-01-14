@@ -211,6 +211,13 @@
             <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> </div>
         <div class="navbtn" onclick="goto('page-quangcao')">
             <i class="fa-solid fa-video"></i> <span>Video</span> </div>
+            
+<div class="navbtn" onclick="openTelegramLink()">
+    <i class="fa-solid fa-bell"></i>
+    <span>Thông báo</span>
+</div>
+
+
         <div class="navbtn" onclick="logout()">
             <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> </div>
     </div>
@@ -440,6 +447,25 @@
     </div>
 </section>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <section id="page-light" class="page hidden">
     <div class="sub-header">
         <div class="back" onclick="back()"> 
@@ -453,18 +479,112 @@
     </div>
 </section>
 
+
+
+
   </div>
 
 </div>
+<div id="telegramPopup" style="display:none;
+    position:fixed; inset:0; background:rgba(0,0,0,.6);
+    z-index:9999;">
+
+  <div style="background:#fff; padding:20px;
+      margin:15% auto; width:300px; border-radius:12px;">
+
+    <h3>📩 Kết nối Telegram</h3>
+
+    <input id="tg_id" placeholder="Nhập Telegram Chat ID"
+           style="width:100%; padding:8px; margin:10px 0;">
+
+    <button onclick="saveTelegramId()">Lưu</button>
+<button onclick="testTelegram()">OK</button>
+<button onclick="closeTelegramPopup()">Hủy</button>
+  </div>
+</div>
 
 
+
+<script>
+
+function openTelegramLink() {
+    const chatId = localStorage.getItem("telegram_chat_id");
+
+    if (!chatId) {
+        showTelegramPopup();
+    } else {
+        sendTelegramTest("🔔 Chuông Telegram đã được kích hoạt!");
+        alert("✅ Telegram đã liên kết");
+    }
+}
+
+function showTelegramPopup(){
+    document.getElementById("telegramPopup").style.display = "block";
+}
+
+function closeTelegramPopup(){
+    document.getElementById("telegramPopup").style.display = "none";
+}
+
+function saveTelegramId(){
+    const id = document.getElementById("tg_id").value.trim();
+
+    if(!id){
+        alert("❌ Chưa nhập Telegram ID");
+        return;
+    }
+
+    localStorage.setItem("telegram_chat_id", id);
+    closeTelegramPopup();
+
+    sendTelegramTest("✅ Đã liên kết Telegram thành công!");
+    alert("✅ Đã lưu Telegram ID\nBây giờ chỉ cần bấm 🔔 để test");
+}
+
+function sendTelegramTest(text){
+    fetch("https://telegram-bell.tanthanhlttb123.workers.dev/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chat_id: localStorage.getItem("telegram_chat_id"),
+            message: text
+        })
+    })
+    .then(()=>console.log("Telegram sent"))
+    .catch(err=>console.error("Telegram error", err));
+}
+
+function testTelegram(){
+    const id = localStorage.getItem("telegram_chat_id");
+    if(!id){
+        alert("⚠️ Chưa lưu Telegram ID");
+        return;
+    }
+    sendTelegramTest("🔔 Test chuông Telegram thành công!");
+}
+
+
+    
+</script>
 
 <script src="js/app.js"></script>
 
 
 
-
-
-
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
