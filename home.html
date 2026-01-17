@@ -211,6 +211,12 @@
             <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> </div>
         <div class="navbtn" onclick="goto('page-quangcao')">
             <i class="fa-solid fa-video"></i> <span>Video</span> </div>
+
+
+              <div class="navbtn" onclick="goto('page-notification')">
+        <i class="fa-solid fa-bell"></i>
+        <span>Báo động</span>
+    </div>
         <div class="navbtn" onclick="logout()">
             <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> </div>
     </div>
@@ -472,6 +478,32 @@
     </div>
 </section>
 
+<section id="page-notification" class="page hidden">
+    <div class="sub-header">
+        <div class="back" onclick="goto('page-home')"><i class="fa-solid fa-chevron-left"></i></div>
+        <h3>Cấu hình Telegram</h3>
+    </div>
+    <div class="sub-card" style="padding: 20px;">
+    <p style="font-weight: bold;">Telegram Token:</p>
+    <input type="text" id="user_tele_token" placeholder="Bot Token của bạn...">
+
+    <p style="font-weight: bold;">Telegram Chat ID:</p>
+    <input type="text" id="user_chat_id" placeholder="ID người nhận...">
+
+    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+        <input type="checkbox" id="notify_checkbox" style="width: 20px; height: 20px;" checked>
+        <label for="notify_checkbox" style="font-weight: bold; color: blue;">Bật thông báo chuông</label>
+    </div>
+
+    <button onclick="saveSmartConfig()" class="big-toggle" style="background: #2563eb; color: white; width: 100%; margin-bottom: 10px;">
+        LƯU VÀ CẬP NHẬT
+    </button>
+
+    <button onclick="clearForNewUser()" style="background: #dc2626; color: white; width: 100%; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+        XÓA TẤT CẢ (KHI BÀN GIAO MÁY)
+    </button>
+</div>
+</section>
 
 
 
@@ -483,8 +515,97 @@
 
 <script src="js/app.js"></script>
 
+<script>
 
+     function goto(pageId) {
+    console.log("Đang chuyển tới trang:", pageId);
+    // 1. Ẩn tất cả các trang
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.add('hidden');
+        p.style.display = 'none';
+    });
+    // 2. Hiện trang được chọn
+    const target = document.getElementById(pageId);
+    if (target) {
+        target.classList.remove('hidden');
+        target.style.display = 'block';
+    } else {
+        console.error("Không tìm thấy trang có ID:", pageId);
+    }
+}
 
+function back() { 
+    goto('page-home'); 
+}
+
+// 1. Hàm lưu và cập nhật trạng thái ô vuông
+async function saveSmartConfig() {
+    const token = document.getElementById('user_tele_token').value.trim();
+    const id = document.getElementById('user_chat_id').value.trim();
+    const isChecked = document.getElementById('notify_checkbox').checked;
+    const status = isChecked ? 'on' : 'off';
+
+    const workerUrl = "https://blynk-token-proxy.tanthanhlttb123.workers.dev"; 
+    const finalUrl = `${workerUrl}?from=web&action=saveConfig&teleToken=${token}&chatId=${id}&notify=${status}`;
+    
+    try {
+        await fetch(finalUrl);
+        alert(isChecked ? "🔔 Đã bật báo chuông!" : "🔕 Đã tắt báo chuông!");
+        document.getElementById('user_tele_token').value = ""; 
+        document.getElementById('user_chat_id').value = "";
+    } catch (e) { alert("❌ Lỗi kết nối!"); }
+}
+
+// 2. Hàm xóa sạch dữ liệu để đưa cho người khác
+async function clearForNewUser() {
+    if (confirm("Bạn có chắc muốn xóa sạch mã Telegram để bàn giao máy cho người khác không?")) {
+        const workerUrl = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
+        // Gửi lệnh xóa (clear) lên Worker
+        const finalUrl = `${workerUrl}?from=web&action=clearConfig`;
+        
+        try {
+            const res = await fetch(finalUrl);
+            if(res.ok) {
+                alert("✅ Đã xóa sạch dữ liệu! Bạn có thể giao máy cho khách mới.");
+            }
+        } catch (e) { alert("❌ Lỗi xóa dữ liệu!"); }
+    }
+}
+    // Hàm lưu cấu hình thông minh
+// Đổi tên hàm thành saveSmartConfig để hết lỗi "is not defined"
+
+(function() {
+    const originalSendCommand = window.sendCommand;
+    if (typeof originalSendCommand === 'function') {
+        window.sendCommand = async function(commandValue) {
+            // Lấy thông tin người dùng đã lưu
+            const savedWorker = localStorage.getItem('user_worker_url');
+            const tToken = localStorage.getItem('user_tele_token') || "";
+            const tId = localStorage.getItem('user_chat_id') || "";
+
+            // Nếu người dùng đã nhập link mới, ta dùng link đó thay cho WORKER_URL cũ
+            if (savedWorker) {
+                const finalUrl = `${savedWorker}?action=update&pin=V1&value=${commandValue}&teleToken=${tToken}&chatId=${tId}&from=esp`;
+                
+                // Thực hiện gửi lệnh (Phần này thay thế fetch trong app.js của bạn)
+                try {
+                    updateUI(commandValue); // Vẫn gọi hàm update video của bạn
+                    const res = await fetch(finalUrl);
+                    console.log("Đã gửi kèm Telegram cho người dùng mới!");
+                } catch (e) {
+                    console.error("Lỗi gửi lệnh kèm Telegram:", e);
+                }
+            } else {
+                // Nếu chưa nhập gì, quay lại chạy hàm cũ của bạn
+                return originalSendCommand(commandValue);
+            }
+        };
+    }
+})();
+
+// Tự động điền lại thông tin cũ khi mở trang (cho người dùng dễ sửa)
+
+</script>
 
 
 
