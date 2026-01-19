@@ -97,57 +97,56 @@ const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
 //---------------------------------------------------------------------
 // KHỞI TẠO DUY NHẤT 1 LẦN KHI MỞ WEB
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Kiểm tra túi tạm (LocalStorage)
+    // 1. Lấy dữ liệu từ túi (LocalStorage) ra dùng ngay - LUÔN LUÔN CHẠY
     let cachedNames = localStorage.getItem('last_config');
     let cachedV2 = localStorage.getItem('v2_list_cache');
     let cachedV10 = localStorage.getItem('v10_list_cache');
 
-    // Nếu túi có đồ thì lấy ra xài ngay cho nhanh
     if(cachedNames) customNames = JSON.parse(cachedNames);
     if(cachedV2) listV2 = JSON.parse(cachedV2);
     if(cachedV10) listV10 = JSON.parse(cachedV10);
 
-    // VẼ LẦN 1 (Dù túi trống hay có đồ cũng phải vẽ để hiện khung)
     renderUI(); 
 
-    // 2. PHỤC HỒI DỮ LIỆU (Đề phòng bạn vừa xóa History)
-    // Lấy lại tên thiết bị
-    fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
-        if(data && Object.keys(data).length > 0) {
-            customNames = data;
-            localStorage.setItem('last_config', JSON.stringify(data));
-            renderUI(); // Vẽ lại lần 2 để cập nhật tên và hình ảnh đúng
-        }
-    }).catch(()=>{});
+    // 2. CHỈ KHI Ở NHÀ (isLocal) MỚI ĐI HỎI ESP32 (Để tránh lỗi 404 trên Git)
+    if (isLocal) {
+        // Lấy lại tên thiết bị
+        fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
+            if(data && Object.keys(data).length > 0) {
+                customNames = data;
+                localStorage.setItem('last_config', JSON.stringify(data));
+                renderUI();
+            }
+        }).catch(()=>{});
 
-    // Lấy lại lịch tưới V2
-    fetch('/tuoi.txt?t=' + Date.now()).then(r => r.json()).then(data => {
-        if (Array.isArray(data)) {
-            listV2 = data.filter(x => x.a === true).map(x => ({
-                t: (x.h < 10 ? "0"+x.h : x.h) + ":" + (x.m < 10 ? "0"+x.m : x.m),
-                d: x.d
-            }));
-            localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
-            renderUI(); // Vẽ lại để hiện lịch
-        }
-    }).catch(()=>{});
+        // Lấy lại lịch tưới V2
+        fetch('/tuoi.txt?t=' + Date.now()).then(r => r.json()).then(data => {
+            if (Array.isArray(data)) {
+                listV2 = data.filter(x => x.a === true).map(x => ({
+                    t: (x.h < 10 ? "0"+x.h : x.h) + ":" + (x.m < 10 ? "0"+x.m : x.m),
+                    d: x.d
+                }));
+                localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
+                renderUI();
+            }
+        }).catch(()=>{});
 
-    // Lấy lại lịch đèn V10
-    fetch('/den.txt?t=' + Date.now()).then(r => r.text()).then(data => {
-        if (data && data.length > 5 && data !== "clear") {
-            let items = data.split(', ');
-            listV10 = items.map(item => {
-                let p = item.trim().split(' ');
-                if(p.length >= 4) return { id: p[0].split(':')[1] || p[0], on: p[1], off: p[3] };
-                return null;
-            }).filter(x => x !== null);
-            localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
-            renderUI();
-        }
-    }).catch(()=>{});
+        // Lấy lại lịch đèn V10
+        fetch('/den.txt?t=' + Date.now()).then(r => r.text()).then(data => {
+            if (data && data.length > 5 && data !== "clear") {
+                let items = data.split(', ');
+                listV10 = items.map(item => {
+                    let p = item.trim().split(' ');
+                    if(p.length >= 4) return { id: p[0].split(':')[1] || p[0], on: p[1], off: p[3] };
+                    return null;
+                }).filter(x => x !== null);
+                localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
+                renderUI();
+            }
+        }).catch(()=>{});
+    }
 
     setInterval(updateStatusOnly, 3000);
-  
 });
   setInterval(function() {
     if (!isLocal) return;
