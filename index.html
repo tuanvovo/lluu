@@ -1,81 +1,3 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Hệ Thống Thông Minh</title>
-    <style>
-        /* Tìm và thay thế các dòng tương ứng trong :root và các class btn */
-:root { 
-    --bg: #f0f2f5; 
-    --primary: #1a73e8; 
-    --on-active: #2ecc71;   /* Xanh đậm khi BẬT */
-    --on-dim: #e8f5e9;      /* Xanh nhạt khi chưa BẬT */
-    --off-active: #7f8c8d;  /* Xám lông chuột đậm khi TẮT */
-    --off-dim: #f5f5f5;     /* Xám lông chuột nhạt khi chưa TẮT */
-}
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .device-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; text-align: center; padding: 10px; display: flex; flex-direction: column; }
-        .device-img { width: 100%; height: 100px; object-fit: cover; border-radius: 5px; cursor: pointer; background: #eee; transition: 0.3s; }
-        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
-        .btn { border: none; padding: 8px; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; font-size: 12px; }
-        /* Nút BẬT mặc định */
-.btn-on { background: var(--on-dim); color: var(--on-active); border: 1px solid var(--on-active); }
-/* Nút TẮT mặc định */
-.btn-off { background: var(--off-dim); color: var(--off-active); border: 1px solid var(--off-active); }
-      /* Khi đang ở trạng thái BẬT (Active) */
-.active-on { background: var(--on-active) !important; color: white !important; }
-/* Khi đang ở trạng thái TẮT (Active) */
-.active-off { background: var(--off-active) !important; color: white !important; }
-       
-       
-        .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
-        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; flex: 1; }
-        .list-box { border: 1px solid #eee; padding: 10px; border-radius: 5px; margin-bottom: 10px; min-height: 40px; background: #fafafa; }
-        .list-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 13px; }
-        .btn-del { color: red; cursor: pointer; font-weight: bold; padding: 0 10px; }
-        .btn-save { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-   
-         .device-img:active {
-    transform: scale(0.95);
-    opacity: 0.8;
-}
-   </style>
-</head>
-<body>
-
-    <div class="card">
-        <h3>Điều khiển thiết bị</h3>
-        <div id="device_list" class="grid-container"></div>
-    </div>
-
-    <div class="card">
-        <h3>Lịch Tưới Lan (V2)</h3>
-        <div class="input-group">
-            <input type="time" id="v2_t">
-            <input type="number" id="v2_d" placeholder="Phút">
-            <button onclick="addV2()" style="padding:0 15px;">+</button>
-        </div>
-        <div id="v2_list" class="list-box"></div>
-        <button class="btn-save" style="background: var(--on)" onclick="saveV2(this)">GỬI & LƯU LỊCH TƯỚI</button>
-    </div>
-
-    <div class="card">
-        <h3>Lập lịch Đèn (V10)</h3>
-        <select id="v10_id"></select>
-        <div class="input-group" style="margin-top:10px;">
-            <input type="time" id="v10_on">
-            <input type="time" id="v10_off">
-            <button onclick="addV10()" style="padding:0 15px;">+</button>
-        </div>
-        <div id="v10_list" class="list-box"></div>
-        <button class="btn-save" onclick="saveV10(this)">GỬI & LƯU LỊCH ĐÈN</button>
-    </div>
-
-    <button class="btn-save" style="background: #e67e22; margin-bottom: 30px;" onclick="phatWifiConfig()">🔄 ĐỔI MẠNG WIFI (PHÁT AP)</button>
-
 <script>
 const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"];
 const v10Mapping = {"1":"V3", "2":"V4", "3":"V6", "4":"V5", "5":"V7", "6":"V8"};
@@ -84,20 +6,16 @@ let customNames = {};
 let listV2 = [], listV10 = [];
 
 // --- CẤU HÌNH THÔNG MINH ---
-const IP_ESP32 = "192.168.1.200"; // Thay IP thật của bạn vào đây
+const IP_ESP32 = "192.168.1.200"; 
+const segment = "1"; // Định nghĩa số segment để tránh lỗi fetch
 const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
 const DEVICE_NAME = "cay";
 
-// Tự động kiểm tra xem đang ở nhà hay ở ngoài
 const isLocal = window.location.hostname.includes("192.168") || window.location.hostname === "localhost";
 const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
-// ---------------------------
-
 
 //---------------------------------------------------------------------
-// KHỞI TẠO DUY NHẤT 1 LẦN KHI MỞ WEB
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Lấy dữ liệu từ túi (LocalStorage) ra dùng ngay - LUÔN LUÔN CHẠY
     let cachedNames = localStorage.getItem('last_config');
     let cachedV2 = localStorage.getItem('v2_list_cache');
     let cachedV10 = localStorage.getItem('v10_list_cache');
@@ -108,9 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     renderUI(); 
 
-    // 2. CHỈ KHI Ở NHÀ (isLocal) MỚI ĐI HỎI ESP32 (Để tránh lỗi 404 trên Git)
     if (isLocal) {
-        // Lấy lại tên thiết bị
         fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
             if(data && Object.keys(data).length > 0) {
                 customNames = data;
@@ -118,88 +34,38 @@ document.addEventListener("DOMContentLoaded", function() {
                 renderUI();
             }
         }).catch(()=>{});
-
-        // Lấy lại lịch tưới V2
-        fetch('/tuoi.txt?t=' + Date.now()).then(r => r.json()).then(data => {
-            if (Array.isArray(data)) {
-                listV2 = data.filter(x => x.a === true).map(x => ({
-                    t: (x.h < 10 ? "0"+x.h : x.h) + ":" + (x.m < 10 ? "0"+x.m : x.m),
-                    d: x.d
-                }));
-                localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
-                renderUI();
-            }
-        }).catch(()=>{});
-
-        // Lấy lại lịch đèn V10
-        fetch('/den.txt?t=' + Date.now()).then(r => r.text()).then(data => {
-            if (data && data.length > 5 && data !== "clear") {
-                let items = data.split(', ');
-                listV10 = items.map(item => {
-                    let p = item.trim().split(' ');
-                    if(p.length >= 4) return { id: p[0].split(':')[1] || p[0], on: p[1], off: p[3] };
-                    return null;
-                }).filter(x => x !== null);
-                localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
-                renderUI();
-            }
-        }).catch(()=>{});
     }
-
     setInterval(updateStatusOnly, 3000);
 });
-  setInterval(function() {
+
+// Hàm lấy thông báo giọng nói
+setInterval(function() {
     if (!isLocal) return;
-    fetch('/get_notify') // Master sẽ nhả câu chữ ở đường dẫn này
-    .then(r => r.text())
-    .then(txt => {
-        // Nếu nhận được chữ và không phải thông báo trống
+    fetch('/get_notify').then(r => r.text()).then(txt => {
         if (txt && txt.trim().length > 1) {
             let msg = new SpeechSynthesisUtterance(txt);
-            msg.lang = 'vi-VN'; // Đọc tiếng Việt
-            msg.rate = 1.0;     // Tốc độ đọc bình thường
+            msg.lang = 'vi-VN';
             window.speechSynthesis.speak(msg);
-            console.log("Loa kêu: " + txt);
         }
-    })
-    .catch(e => {}); // Lờ đi nếu mạng lag để không làm chậm trình duyệt
-}, 1000); // 1000ms = 1 giây hỏi một lần
-
-// Hàm chuyên đi "săn" thông báo giọng nói (1 giây một lần)
+    }).catch(e => {});
+}, 1000);
 
 function renderUI() {
     let h = "";
     allPins.forEach(p => {
-        let ver = localStorage.getItem('v_' + p) || '1';
-        
-        // --- ĐOẠN SỬA QUAN TRỌNG Ở ĐÂY ---
-        // 1. Kiểm tra xem trong máy có ảnh đã lưu chưa
-
-      let savedImg = localStorage.getItem('img_' + p);
-
-      // --- SỬA LOGIC CHỖ NÀY ---
+        let savedImg = localStorage.getItem('img_' + p);
         let imgSrc = "";
+        
         if (savedImg) {
-            // Nếu đã có ảnh lưu trong máy (LocalStorage) thì lấy ra dùng luôn
-            imgSrc = savedImg;
+            imgSrc = savedImg; // Ưu tiên ảnh nét trong máy
         } else if (isLocal) {
-            // Nếu ở nhà mà chưa chọn ảnh thì mới lấy từ chip
-            imgSrc = `/${p.toUpperCase()}.JPG?v=${ver}`;
+            imgSrc = `/${p.toUpperCase()}.JPG?t=${Date.now()}`; // Lấy từ ESP32 nếu ở nhà
         } else {
-            // Nếu ở trên Git mà chưa chọn ảnh, hiện một cái ảnh xám mặc định
             imgSrc = "https://via.placeholder.com/150/cccccc/ffffff?text=" + p;
         }
-        
-// Nếu là Web Git và có ảnh trong máy thì lấy ảnh đó ra hiện lên.
-// Nếu ở nhà (Nội bộ) hoặc chưa có ảnh lưu thì mới gọi file .JPG
 
-
-
-        
-        // ---------------------------------
-
-      h += `<div class="device-card">
-            <img src="${imgSrc}" 
+        h += `<div class="device-card">
+            <img src="${imgSrc}" id="img-tag-${p}"
             class="device-img" 
             onerror="this.src='https://via.placeholder.com/150/cccccc/ffffff?text=No+Image'"
             onclick="uploadImg('${p}')" >
@@ -214,11 +80,13 @@ function renderUI() {
     });
     document.getElementById('device_list').innerHTML = h;
 
+    // Load options cho V10
     let opt = "";
     for (let id in v10Mapping) {
         opt += `<option value="${id}">${customNames[v10Mapping[id]] || ("Đèn " + id)}</option>`;
     }
-    document.getElementById('v10_id').innerHTML = opt;
+    let v10Select = document.getElementById('v10_id');
+    if(v10Select) v10Select.innerHTML = opt;
 
     document.getElementById('v2_list').innerHTML = listV2.map((x, i) => 
         `<div class="list-item"><span><b>${x.t}</b> - Tưới ${x.d}p</span><span class="btn-del" onclick="removeV2(${i})">✖</span></div>`
@@ -229,62 +97,93 @@ function renderUI() {
     ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
 }
 
+// --- HÀM CHỌN ẢNH SIÊU NÉT ---
+function uploadImg(pin) {
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+        let file = e.target.files[0];
+        if (!file) return;
+
+        let reader = new FileReader();
+        reader.onload = event => {
+            let img = new Image();
+            img.onload = () => {
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+
+                // 1. LƯU BẢN NÉT VÀO LOCALSTORAGE (Dùng cho Web Git)
+                let MAX_WEB = 600; 
+                let scaleWeb = MAX_WEB / img.width;
+                canvas.width = MAX_WEB;
+                canvas.height = img.height * scaleWeb;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                let highResData = canvas.toDataURL('image/jpeg', 0.8);
+                try {
+                    localStorage.setItem('img_' + pin, highResData);
+                    document.getElementById('img-tag-' + pin).src = highResData;
+                } catch(e) { console.log("Bộ nhớ đầy, không thể lưu ảnh nét"); }
+
+                // 2. NÉN 20KB GỬI ESP32 (Chỉ gửi khi ở nhà - isLocal)
+                if (isLocal) {
+                    let MAX_ESP = 300;
+                    let scaleESP = MAX_ESP / img.width;
+                    canvas.width = MAX_ESP;
+                    canvas.height = img.height * scaleESP;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob(blob => {
+                        let formData = new FormData();
+                        formData.append("image", blob, pin.toUpperCase() + ".JPG");
+                        fetch('/upload', { method: 'POST', body: formData });
+                    }, 'image/jpeg', 0.5);
+                }
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+// Các hàm bổ trợ giữ nguyên
 function sendCmd(p, v) {
     let status = (v == 1) ? "ON" : "OFF";
-    
-    // Tạo link thông minh
     let finalUrl = isLocal 
         ? `${basePrefix}/cmd?id=${idLookup[p]}&val=${status}`
         : `${basePrefix}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
-
     fetch(finalUrl, { mode: 'no-cors' });
-
     if ('speechSynthesis' in window) {
         window.speechSynthesis.speak(new SpeechSynthesisUtterance((v == 1 ? "Bật " : "Tắt ") + (customNames[p] || p)));
     }
 }
-function updateStatusOnly() {
-      // Nếu đi xa thì lấy trạng thái từ Worker, ở nhà lấy từ ESP32
-    let statusUrl = isLocal ? `${basePrefix}/get_status` : `${basePrefix}?action=get_all&device=${DEVICE_NAME}`;
 
-     fetch(statusUrl).then(r => r.json()).then(data => {
+function updateStatusOnly() {
+    let statusUrl = isLocal ? `${basePrefix}/get_status` : `${basePrefix}?action=get_all&device=${DEVICE_NAME}`;
+    fetch(statusUrl).then(r => r.json()).then(data => {
         for (let p in data) {
             let onBtn = document.getElementById(`on-${p}`);
             let offBtn = document.getElementById(`off-${p}`);
             if(onBtn && offBtn) {
-                // Nếu data[p] == 1 (Thiết bị đang mở)
                 if (data[p] == 1) {
-                    onBtn.className = "btn btn-on active-on";   // Nút ON sáng xanh đậm
-                    offBtn.className = "btn btn-off";           // Nút OFF xám nhạt
-                } 
-                // Nếu data[p] == 0 (Thiết bị đang tắt)
-                else {
-                    onBtn.className = "btn btn-on";             // Nút ON xanh nhạt
-                    offBtn.className = "btn btn-off active-off"; // Nút OFF sáng xám lông chuột
+                    onBtn.className = "btn btn-on active-on";
+                    offBtn.className = "btn btn-off";
+                } else {
+                    onBtn.className = "btn btn-on";
+                    offBtn.className = "btn btn-off active-off";
                 }
             }
         }
-    }).catch(e => console.log("Chưa kết nối được thiết bị"));
+    }).catch(e => {});
 }
 
 function addV2() {
     let t = document.getElementById('v2_t').value;
     let d = document.getElementById('v2_d').value;
-    
     if(t && d) {
-        // THÊM ĐOẠN NÀY: Kiểm tra nếu đã đủ 6 lần thì báo lỗi
-        if (listV2.length >= 6) {
-            alert("⚠️ Hệ thống chỉ hỗ trợ tối đa 6 lần tưới/ngày để đảm bảo ổn định!");
-            return; // Dừng lại, không cho push vào list nữa
-        }
-        if (d > 255) {
-            alert("⚠️ Số phút tưới tối đa là 255 phút (4h15p)!");
-            return;
-        }
-        
-        
-        listV2.push({t, d}); 
-        renderUI(); 
+        if (listV2.length >= 6) return alert("Tối đa 6 lần!");
+        listV2.push({t, d}); renderUI(); 
     }
 }
 
@@ -300,8 +199,7 @@ function saveV2(btn) {
     }
     localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
     fetch('/irrigation?d=' + encodeURIComponent(JSON.stringify(full))).then(() => {
-        btn.innerText = "✅ ĐÃ LƯU!"; btn.style.background = "#2ecc71";
-        setTimeout(() => { btn.innerText = "GỬI & LƯU LỊCH TƯỚI"; btn.style.background = ""; }, 2000);
+        btn.innerText = "✅ ĐÃ LƯU!"; setTimeout(() => btn.innerText = "GỬI & LƯU LỊCH TƯỚI", 2000);
     });
 }
 
@@ -311,8 +209,7 @@ function addV10() {
     let off = document.getElementById('v10_off').value;
     if(on && off) {
         listV10 = listV10.filter(x => x.id !== id);
-        listV10.push({id, on, off});
-        renderUI();
+        listV10.push({id, on, off}); renderUI();
     }
 }
 
@@ -320,56 +217,15 @@ function saveV10(btn) {
     localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
     let dataStr = listV10.map(s => `id:${s.id} ${s.on} true ${s.off} false`).join(', ');
     fetch('/schedule_save?d=' + encodeURIComponent(dataStr));
-    listV10.forEach(s => {
-        fetch(`/cmd_sched?pin=${v10Mapping[s.id]}&on=${s.on}&off=${s.off}`);
-    });
-    btn.innerText = "✅ ĐÃ LƯU!"; btn.style.background = "#2ecc71";
-    setTimeout(() => { btn.innerText = "GỬI & LƯU LỊCH ĐÈN"; btn.style.background = ""; }, 2000);
+    btn.innerText = "✅ ĐÃ LƯU!"; setTimeout(() => btn.innerText = "GỬI & LƯU LỊCH ĐÈN", 2000);
 }
-function removeV2(i) {
-    if(confirm("Bạn muốn xóa lịch tưới này?")) {
-        // 1. Xóa khỏi danh sách tạm trên web
-        listV2.splice(i, 1);
-        renderUI();
-        
-        // 2. Cập nhật lại vào bộ nhớ máy (LocalStorage)
-        localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
 
-        // 3. RA LỆNH CHO CHIP GHI ĐÈ FILE MỚI (Xóa vĩnh viễn trong Flash)
-        let full = [];
-        for(let j=0; j<6; j++) {
-            if(listV2[j]) {
-                let p = listV2[j].t.split(':');
-                full.push({id:j+1, h:parseInt(p[0]), m:parseInt(p[1]), d:parseInt(listV2[j].d), a:true});
-            } else {
-                full.push({id:j+1, h:0, m:0, d:0, a:false});
-            }
-        }
-        fetch('/irrigation?d=' + encodeURIComponent(JSON.stringify(full)));
-    }
+function removeV2(i) {
+    if(confirm("Xóa lịch?")) { listV2.splice(i, 1); renderUI(); saveV2({innerText:""}); }
 }
 
 function removeV10(i) {
-    if(confirm("Bạn muốn xóa lịch đèn này?")) {
-        let item = listV10[i];
-        let pinName = v10Mapping[item.id]; 
-
-        // 1. Ra lệnh cho Slave ngừng chạy lịch này
-        fetch(`/cmd_sched_off?pin=${pinName}`);
-
-        // 2. Xóa khỏi danh sách tạm trên web và cập nhật LocalStorage
-        listV10.splice(i, 1);
-        localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
-        renderUI();
-
-        // 3. RA LỆNH CHO MASTER GHI ĐÈ FILE DEN.TXT MỚI
-        // Nếu không còn lịch nào thì gửi chữ "clear" để xóa sạch file
-        let dataStr = listV10.length > 0 
-            ? listV10.map(s => `id:${s.id} ${s.on} true ${s.off} false`).join(', ') 
-            : "clear";
-        
-        fetch('/schedule_save?d=' + encodeURIComponent(dataStr));
-    }
+    if(confirm("Xóa lịch?")) { listV10.splice(i, 1); renderUI(); saveV10({innerText:""}); }
 }
 
 function editName(p) {
@@ -383,82 +239,11 @@ function editName(p) {
         });
     }
 }
-let imageLinks = {}; // Biến tạm để giữ ảnh trong phiên làm việc
-
-function uploadImg(pin) {
-    let input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = e => {
-        let file = e.target.files[0];
-        if (!file) return;
-
-        // 1. TẠO LINK TẠM ĐỂ HIỂN THỊ NÉT NGAY LẬP TỨC
-        let blobUrl = URL.createObjectURL(file);
-        imageLinks[pin] = blobUrl; 
-        
-        // 2. HIỂN THỊ LÊN GIAO DIỆN (Cực nét vì là ảnh gốc)
-        document.getElementById('img_' + pin).src = blobUrl;
-
-        // 3. NÉN XUỐNG 20KB ĐỂ GỬI VÀO ESP32 (LƯU TRỮ LÂU DÀI)
-        let reader = new FileReader();
-        reader.onload = event => {
-            let img = new Image();
-            img.onload = () => {
-                let canvas = document.createElement('canvas');
-                let ctx = canvas.getContext('2d');
-                let MAX_WIDTH = 400; // Kích thước gửi lên ESP32
-                let scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scaleSize;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                canvas.toBlob(blob => {
-                    let formData = new FormData();
-                    formData.append("image", blob, pin.toUpperCase() + ".JPG");
-                    // Gửi lên ESP32 (IP Master của bạn)
-                    fetch('http://192.168.' + segment + '.200/upload', { 
-                        method: 'POST', 
-                        body: formData 
-                    });
-                }, 'image/jpeg', 0.6); // Nén vừa đủ 20-30KB
-            };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-
-
 
 function phatWifiConfig() {
-    let code = prompt("NHẬP MÃ XÁC THỰC (Security Code):");
-    if (code == null || code == "") return;
-
-    // Gửi yêu cầu đến ESP32
+    let code = prompt("MÃ XÁC THỰC:");
+    if (!code) return;
     fetch('/phat_wifi_ap?auth_code=' + encodeURIComponent(code))
-    .then(response => {
-        if (!response.ok) throw new Error('Mất kết nối');
-        return response.text();
-    })
-    .then(txt => {
-        if (txt.includes("MÃ ĐÚNG")) {
-            // Hiển thị thông báo ngay lập tức trước khi chip ngắt mạng
-            alert("✅ XÁC THỰC THÀNH CÔNG!\n\n1. Chip đang chuyển sang chế độ phát WiFi.\n2. Vui lòng tìm WiFi tên: 'Sua_WiFi_ThietBi'\n3. Sau khi cài xong, thiết bị sẽ tự quay lại IP .200");
-        } else {
-            alert("❌ Mã số sai rồi bạn ơi! Vui lòng thử lại.");
-        }
-    })
-    .catch(err => {
-        // Trường hợp này thường xảy ra khi chip ngắt WiFi để phát AP quá nhanh
-        alert("🔄 Đang chuyển đổi chế độ... \nHãy kiểm tra danh sách WiFi trên điện thoại của bạn sau 5 giây.");
-    });
+    .then(r => r.text()).then(txt => alert(txt)).catch(() => alert("Đang chuyển chế độ..."));
 }
-
-// Hỏi thông báo nhanh hơn (1 giây một lần) để không bỏ lỡ giọng nói
-
-//hoan hao 111
 </script>
-</body>
-</html>
