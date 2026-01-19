@@ -1,613 +1,410 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="vi">
-
 <head>
-
-<script>
-    // BẢO VỆ: Nếu chưa đăng nhập, chuyển hướng về index.html (ĐÃ SỬA)
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        window.location.replace('index.html'); // <<< SỬA TẠI ĐÂY
-    }
-</script>
-
-
-
-<meta charset="utf-8" />
-
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<title>Demo Mobile App T@ Smart</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Hệ Thống Thông Minh</title>
+    <style>
+        /* Tìm và thay thế các dòng tương ứng trong :root và các class btn */
+:root { 
+    --bg: #f0f2f5; 
+    --primary: #1a73e8; 
+    --on-active: #2ecc71;   /* Xanh đậm khi BẬT */
+    --on-dim: #e8f5e9;      /* Xanh nhạt khi chưa BẬT */
+    --off-active: #7f8c8d;  /* Xám lông chuột đậm khi TẮT */
+    --off-dim: #f5f5f5;     /* Xám lông chuột nhạt khi chưa TẮT */
+}
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .device-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; text-align: center; padding: 10px; display: flex; flex-direction: column; }
+        .device-img { width: 100%; height: 100px; object-fit: cover; border-radius: 5px; cursor: pointer; background: #eee; transition: 0.3s; }
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .btn { border: none; padding: 8px; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; font-size: 12px; }
+        /* Nút BẬT mặc định */
+.btn-on { background: var(--on-dim); color: var(--on-active); border: 1px solid var(--on-active); }
+/* Nút TẮT mặc định */
+.btn-off { background: var(--off-dim); color: var(--off-active); border: 1px solid var(--off-active); }
+      /* Khi đang ở trạng thái BẬT (Active) */
+.active-on { background: var(--on-active) !important; color: white !important; }
+/* Khi đang ở trạng thái TẮT (Active) */
+.active-off { background: var(--off-active) !important; color: white !important; }
+       
+       
+        .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; flex: 1; }
+        .list-box { border: 1px solid #eee; padding: 10px; border-radius: 5px; margin-bottom: 10px; min-height: 40px; background: #fafafa; }
+        .list-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+        .btn-del { color: red; cursor: pointer; font-weight: bold; padding: 0 10px; }
+        .btn-save { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
    
-
+         .device-img:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+   </style>
 </head>
-
-
-
 <body>
 
+    <div class="card">
+        <h3>Điều khiển thiết bị</h3>
+        <div id="device_list" class="grid-container"></div>
+    </div>
 
-
-
-
-<script>
-    // 1. Nếu chưa login → quay về index.html (ĐÃ SỬA)
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        window.location.replace('index.html'); // <<< SỬA TẠI ĐÂY
-    }
-
-    // 2. Logout: cũng sửa link chuyển hướng
-    const logoutBtn = document.getElementById('logoutBtn');
-    if(logoutBtn){
-        logoutBtn.addEventListener('click', () => {
-            // ...
-            window.location.href = "index.html"; // <<< SỬA TẠI ĐÂY
-        });
-    }
-</script>
-
-
-
-
-
-
-
-
-
-<div class="wrap">
-
-  <div class="viewport">
-
-
-
-    <!-- Trang đăng nhập -->
-
-
-   
-
-      
-
-
-    <!-- Trang chính -->
-    <section id="page-home" class="page center" style="background:linear-gradient(180deg,#A8C9E4,#FFFFFF)">
-        <header class="top">
-        <div class="home-brand">
-            <div class="home-logo">T@</div>
-            <div class="home-title">Nhà của T@</div>
+    <div class="card">
+        <h3>Lịch Tưới Lan (V2)</h3>
+        <div class="input-group">
+            <input type="time" id="v2_t">
+            <input type="number" id="v2_d" placeholder="Phút">
+            <button onclick="addV2()" style="padding:0 15px;">+</button>
         </div>
-        <div class="chip">Quản trị</div>
-    </header>
+        <div id="v2_list" class="list-box"></div>
+        <button class="btn-save" style="background: var(--on)" onclick="saveV2(this)">GỬI & LƯU LỊCH TƯỚI</button>
+    </div>
 
-    <main style="padding:0 6px 100px 6px">
-        <div class="control-card">
-            <div class="control-left">
-                <div class="control-title">Bếp Điện</div>
-                <div class="control-desc" style="margin-bottom: 12px;">
-                    Trạng thái: <span id="stove">Tắt</span>
-                </div>
-
-                <div class="control-actions-group">
-                    <div class="control-actions">
-                        <button id="btn-turn-on" class="small-btn on" onclick="turnOn()">MỞ</button>
-                        <button id="btn-turn-off" class="small-btn off" onclick="turnOff()">TẮT</button>
-                    </div>
-                    <div id="responseBox"></div>
-                </div>
-
-                <div class="status-control-row">
-                    <button onclick="getStatus()" class="small-btn view-status-btn off">Xem</button>
-                    <div class="cb-display">
-                        <span>CB:</span>
-                        <div id="cb-status" class="cb-dot"></div>
-                    </div>
-                </div>
-            </div>
-
-
-
-
-
-   <div id="imgBep" class="control-thumb">
-    <video id="video-on" src="img/aptomat_on.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
-    <video id="video-off" src="img/aptomat_off.mp4" preload="auto" style="display:block; width:100%; height:100%; object-fit:contain;" playsinline></video>
-    <video id="video-on2" src="img/aptomat_on2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
-    <video id="video-off2" src="img/aptomat_off2.mp4" preload="auto" style="display:none; width:100%; height:100%; object-fit:contain;" playsinline></video>
-</div>
-
-
-
-       
-       
+    <div class="card">
+        <h3>Lập lịch Đèn (V10)</h3>
+        <select id="v10_id"></select>
+        <div class="input-group" style="margin-top:10px;">
+            <input type="time" id="v10_on">
+            <input type="time" id="v10_off">
+            <button onclick="addV10()" style="padding:0 15px;">+</button>
         </div>
-
-        <div class="thumbs">
-            
-
-<a class="thumb" href="dk_cay.html">
-    <div class="thumb-logo">
-        <i class="fa-solid fa-water-ladder text-blue-500"></i>
-    </div> 
-    <div class="img bg-tuoi"></div>
-    <h4></h4>
-    <p>Kiểu </p>
-</a>
-
-
-
-
-
-
-
-
-
-
-
-<div class="thumb" onclick="goto('page-rem')">
-    <div class="thumb-logo">
-        <i class="fa-solid fa-house-chimney-window text-indigo-500"></i>
-    </div>
-    <div class="img-rem"></div>
-    <h4></h4>
-    <p>kiểu</p>
-</div>
-
-
-
-            <div class="thumb" onclick="goto('page-aptomat')">
-                <div class="thumb-logo"><i class="fa-solid fa-bolt text-yellow-500"></i></div>
-                <div class="img bg-apt"></div>
-                <h4></h4>
-                <p>Nguồn chính</p>
-            </div>
-
-
-
-            <div class="thumb" onclick="goto('page-quangcao')">
-                <div class="thumb-logo"><i class="fa-solid fa-bag-shopping text-pink-500"></i></div>
-                <div class="img bg-prod"></div>
-                <h4></h4>
-                <p>Kiểu</p>
-            </div>
-
-
-
-           
-
-          <a class="thumb" href="https://alfred.camera/" target="_blank">
- <div class="thumb-logo"><i class="fa-solid fa-video text-gray-700"></i></div>
- <div class="img bg-cam"></div>
-<h4></h4>
- <p>Sân thượng</p>
-</a>
-
-
-
-
-
-
-<a class="thumb" href="dk_den.html">
-    <div class="thumb-logo">
-        <i class="fa-solid fa-water-ladder text-blue-500"></i>
-    </div> 
-    <div class="img bg-light"></div>
-    <h4></h4>
-    <p>Kiểu </p>
-</a>
-
-
-
-
-            
-        </div>
-    </main>
-
-    <div class="bottombar">
-        <div class="navbtn">
-            <i class="fa-solid fa-house"></i> <span>Trang Chủ</span> </div>
-        <div class="navbtn" onclick="goto('page-quangcao')">
-            <i class="fa-solid fa-video"></i> <span>Video</span> </div>
-
-
-              <div class="navbtn" onclick="goto('page-notification')">
-        <i class="fa-solid fa-bell"></i>
-        <span>Báo động</span>
-    </div>
-        <div class="navbtn" onclick="logout()">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Đăng Xuất</span> </div>
-    </div>
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!-- Các trang khác -->
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<section id="page-rem" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="back()"> 
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-        </div>
-        <h3>Các loại cây thuốc</h3> 
+        <div id="v10_list" class="list-box"></div>
+        <button class="btn-save" onclick="saveV10(this)">GỬI & LƯU LỊCH ĐÈN</button>
     </div>
 
-    <main style="padding:0 6px 100px 6px">
-        <div class="thumbs">
-            
-            <div class="thumb" 
-                 data-name="Cây Chay" 
-                 data-desc="Mô tả công dụng Cây Chay: Chữa các bệnh về răng miệng, đau nhức xương khớp và có thể dùng làm thuốc bổ.">
-                <img src="img/caychay.jpg" alt="Cây Chay" onclick="goToDetailPage(this)"/>
-                <p>Kiểu Cây Chay</p>
-            </div>
-
-            <div class="thumb" 
-                 data-name="Hoa thiên lý" 
-                 data-desc="Mô tả công dụng Hoa Thiên Lý: Dùng để an thần, chữa mất ngủ và bồi bổ cơ thể.">
-                <img src="img/thienly.jpg" alt="Hoa thiên lý" onclick="goToDetailPage(this)"/>
-                <p>Hoa thiên lý</p>
-            </div>
-            
-            <div class="thumb" 
-                 data-name="Hà thủ ô" 
-                 data-desc="Mô tả công dụng Hà Thủ Ô: Có tác dụng bổ máu, trị suy nhược thần kinh, và làm đen tóc.">
-                <img src="img/hathuo.jpg" alt="Hà thủ ô" onclick="goToDetailPage(this)"/>
-                <p>Hà thủ ô</p>
-            </div>
-            
-            <div class="thumb" 
-                 data-name="Đan sâm" 
-                 data-desc="Mô tả công dụng Đan Sâm: Được dùng để hoạt huyết, trục ứ, trị kinh nguyệt không đều và các bệnh tim mạch.">
-                <img src="img/dan_sam.jpg" alt="Đan sâm" onclick="goToDetailPage(this)"/>
-                <p>Đan sâm</p>
-            </div>
-            
-            <div class="thumb" 
-                 data-name="Cây ráy gai" 
-                 data-desc="Mô tả công dụng Cây Ráy Gai: Thường dùng để chữa phong thấp, đau nhức xương khớp. (Cẩn thận khi dùng, cần chế biến kỹ).">
-                <img src="img/ray_gai.jpg" alt="Cây ráy gai" onclick="goToDetailPage(this)"/>
-                <p>Cây ráy gai</p>
-            </div>
-
-            <div class="thumb" 
-                 data-name="Cây mật gấu" 
-                 data-desc="Mô tả công dụng Cây Mật Gấu: Giúp thanh nhiệt, giải độc, hỗ trợ tiêu hóa và gan mật.">
-                <img src="img/matgau.jpg" alt="Cây mật gấu" onclick="goToDetailPage(this)"/>
-                <p>Cây mật gấu</p>
-            </div>
-            
-            <div class="thumb" 
-                 data-name="Sâm cau" 
-                 data-desc="Mô tả công dụng Sâm Cau: Dùng để ôn thận, tráng dương, điều trị đau lưng mỏi gối và các chứng suy nhược.">
-                <img src="img/samcau.jpg" alt="Sâm cau" onclick="goToDetailPage(this)"/>
-                <p>Sâm cau</p>
-            </div>
-
-            <div class="thumb" 
-                 data-name="Cà gai leo" 
-                 data-desc="Mô tả công dụng Cà Gai Leo: Được dùng để giải độc gan, hỗ trợ điều trị viêm gan B và tăng cường chức năng gan.">
-                <img src="img/ca_gai_leo.jpg" alt="Cà gai leo"onclick="goToDetailPage(this)"/>
-                <p>Cà gai leo</p>
-            </div>
-
-        </div>
-    </main>
-    
-   
-</section>
-
-
-
-
-
-
-<section id="page-detail" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="showPage('page-rem', 'right')"> 
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-        </div>
-        <h3 id="detail-plant-name"></h3> 
-    </div>
-
-    <main style="padding: 20px 20px 100px 20px;">
-        <div class="detail-container">
-            <img id="detail-image" src="" alt="Cây thuốc chi tiết" class="full-width-image" />
-
-            <div class="detail-content">
-                <h4 class="content-title">Công Dụng và Mô Tả</h4>
-                <p id="detail-description">Nội dung mô tả chi tiết sẽ được chèn vào đây.</p>
-                <button class="download-btn" onclick="downloadDetailPageImage()">Tải ảnh</button>
-            </div>
-        </div>
-    </main>
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-   <section id="page-aptomat" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="back()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </div>
-        <h3>Áp-tô-mát</h3>
-    </div>
-    <div class="sub-card">
-        <p>Điều khiển nguồn điện chính.</p>
-        <button class="big-toggle" onclick="setApt(true)">BẬT ÁP TÔ MÁT</button>
-        <button class="big-toggle" style="margin-top: 10px;" onclick="setApt(false)">TẮT ÁP TÔ MÁT</button>
-    </div>
-</section>
-    <section id="page-quangcao" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="back()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </div>
-        <h3>Sản phẩm / Video</h3>
-    </div>
-    <div class="sub-card">
-        <p>Trang này hiển thị nội dung quảng cáo.</p>
-        <p class="muted">Bạn có thể nhúng video YouTube vào đây.</p>
-    </div>
-</section>
-
-
-
-
- <section id="page-camera" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="back()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </div>
-        <h3>Camera Sân Thượng</h3>
-    </div>
-    <div class="sub-card" style="height: auto; padding: 0 10px 10px 10px;"> 
-        <iframe 
-            src="https://alfred.camera/" 
-            id="alfred-viewer"
-            style="width: 100%; height: 80vh; border: 1px solid #ccc; border-radius: 8px; overflow: hidden;" 
-            title="Alfred Camera Viewer"
-        >
-            Trình duyệt của bạn không hỗ trợ iframe.
-        </iframe>
-
-        <p class="muted" style="margin-top: 10px; text-align: center;">
-            💡 Vui lòng đăng nhập vào tài khoản Google Alfred của bạn.
-        </p>
-    </div>
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<section id="page-light" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="back()"> 
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </div>
-        <h3>Điều khiển Đèn</h3> 
-    </div>
-    <div class="sub-card">
-       <p>Trang này hiển thị nội dung quảng cáo.</p>
-        <p class="muted">Bạn có thể nhúng video YouTube vào đây.</p>
-    </div>
-</section>
-
-<section id="page-notification" class="page hidden">
-    <div class="sub-header">
-        <div class="back" onclick="goto('page-home')"><i class="fa-solid fa-chevron-left"></i></div>
-        <h3>Cấu hình Telegram</h3>
-    </div>
-    <div class="sub-card" style="padding: 20px;">
-    <p style="font-weight: bold;">Telegram Token:</p>
-    <input type="text" id="user_tele_token" placeholder="Bot Token của bạn...">
-
-    <p style="font-weight: bold;">Telegram Chat ID:</p>
-    <input type="text" id="user_chat_id" placeholder="ID người nhận...">
-
-    <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
-        <input type="checkbox" id="notify_checkbox" style="width: 20px; height: 20px;" checked>
-        <label for="notify_checkbox" style="font-weight: bold; color: blue;">Bật thông báo chuông</label>
-    </div>
-
-    <button onclick="saveSmartConfig()" class="big-toggle" style="background: #2563eb; color: white; width: 100%; margin-bottom: 10px;">
-        LƯU VÀ CẬP NHẬT
-    </button>
-
-    <button onclick="clearForNewUser()" style="background: #dc2626; color: white; width: 100%; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-        XÓA TẤT CẢ (KHI BÀN GIAO MÁY)
-    </button>
-</div>
-</section>
-
-
-
-  </div>
-
-</div>
-
-
-
-<script src="js/app.js"></script>
+    <button class="btn-save" style="background: #e67e22; margin-bottom: 30px;" onclick="phatWifiConfig()">🔄 ĐỔI MẠNG WIFI (PHÁT AP)</button>
 
 <script>
 
-     function goto(pageId) {
-    console.log("Đang chuyển tới trang:", pageId);
-    // 1. Ẩn tất cả các trang
-    document.querySelectorAll('.page').forEach(p => {
-        p.classList.add('hidden');
-        p.style.display = 'none';
+
+
+const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"];
+const v10Mapping = {"1":"V3", "2":"V4", "3":"V6", "4":"V5", "5":"V7", "6":"V8"};
+const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10};
+let customNames = {};
+let listV2 = [], listV10 = [];
+
+// --- CẤU HÌNH THÔNG MINH ---
+const IP_ESP32 = "192.168.1.200"; 
+const segment = "1"; // Định nghĩa số segment để tránh lỗi fetch
+const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
+const DEVICE_NAME = "cay";
+
+const isLocal = window.location.hostname.includes("192.168") || window.location.hostname === "localhost";
+const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
+
+
+
+//---------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", function() {
+    let cachedNames = localStorage.getItem('last_config');
+    let cachedV2 = localStorage.getItem('v2_list_cache');
+    let cachedV10 = localStorage.getItem('v10_list_cache');
+
+    if(cachedNames) customNames = JSON.parse(cachedNames);
+    if(cachedV2) listV2 = JSON.parse(cachedV2);
+    if(cachedV10) listV10 = JSON.parse(cachedV10);
+
+    renderUI(); 
+
+    if (isLocal) {
+        fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
+            if(data && Object.keys(data).length > 0) {
+                customNames = data;
+                localStorage.setItem('last_config', JSON.stringify(data));
+                renderUI();
+            }
+        }).catch(()=>{});
+    }
+    setInterval(updateStatusOnly, 3000);
+});
+
+// Hàm lấy thông báo giọng nói
+setInterval(function() {
+    if (!isLocal) return;
+    fetch('/get_notify').then(r => r.text()).then(txt => {
+        if (txt && txt.trim().length > 1) {
+            let msg = new SpeechSynthesisUtterance(txt);
+            msg.lang = 'vi-VN';
+            window.speechSynthesis.speak(msg);
+        }
+    }).catch(e => {});
+}, 1000);
+
+function renderUI() {
+    let h = "";
+    allPins.forEach(p => {
+        let savedImg = localStorage.getItem('img_' + p);
+        let imgSrc = "";
+        
+        if (savedImg) {
+            imgSrc = savedImg; // Ưu tiên ảnh nét trong máy
+        } else if (isLocal) {
+            imgSrc = `/${p.toUpperCase()}.JPG?t=${Date.now()}`; // Lấy từ ESP32 nếu ở nhà
+        } else {
+            imgSrc = "https://via.placeholder.com/150/cccccc/ffffff?text=" + p;
+        }
+
+        h += `<div class="device-card">
+            <img src="${imgSrc}" id="img-tag-${p}"
+            class="device-img" 
+            onerror="this.src='https://via.placeholder.com/150/cccccc/ffffff?text=No+Image'"
+            onclick="uploadImg('${p}')" >
+            <span id="name-device-${p}" style="cursor:pointer; font-weight:bold; margin-top:5px; display:block;" onclick="editName('${p}')">
+                ${customNames[p] || p} ✏️
+            </span>
+            <div class="btn-group">
+                <button id="on-${p}" class="btn btn-on" onclick="sendCmd('${p}',1)">BẬT</button>
+                <button id="off-${p}" class="btn btn-off" onclick="sendCmd('${p}',0)">TẮT</button>
+            </div>
+        </div>`;
     });
-    // 2. Hiện trang được chọn
-    const target = document.getElementById(pageId);
-    if (target) {
-        target.classList.remove('hidden');
-        target.style.display = 'block';
-    } else {
-        console.error("Không tìm thấy trang có ID:", pageId);
+    document.getElementById('device_list').innerHTML = h;
+
+    // Load options cho V10
+    let opt = "";
+    for (let id in v10Mapping) {
+        opt += `<option value="${id}">${customNames[v10Mapping[id]] || ("Đèn " + id)}</option>`;
+    }
+    let v10Select = document.getElementById('v10_id');
+    if(v10Select) v10Select.innerHTML = opt;
+
+    document.getElementById('v2_list').innerHTML = listV2.map((x, i) => 
+        `<div class="list-item"><span><b>${x.t}</b> - Tưới ${x.d}p</span><span class="btn-del" onclick="removeV2(${i})">✖</span></div>`
+    ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
+
+    document.getElementById('v10_list').innerHTML = listV10.map((x, i) => 
+        `<div class="list-item"><span><b>${customNames[v10Mapping[x.id]] || 'Đèn '+x.id}:</b> ${x.on} ➔ ${x.off}</span><span class="btn-del" onclick="removeV10(${i})">✖</span></div>`
+    ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
+}
+
+// --- HÀM CHỌN ẢNH SIÊU NÉT ---
+function uploadImg(pin) {
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = e => {
+        let file = e.target.files[0];
+        if (!file) return;
+
+        let reader = new FileReader();
+        reader.onload = event => {
+            let img = new Image();
+            img.onload = () => {
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+
+                // 1. LƯU BẢN NÉT VÀO LOCALSTORAGE (Dùng cho Web Git)
+                let MAX_WEB = 600; 
+                let scaleWeb = MAX_WEB / img.width;
+                canvas.width = MAX_WEB;
+                canvas.height = img.height * scaleWeb;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                let highResData = canvas.toDataURL('image/jpeg', 0.8);
+                try {
+                    localStorage.setItem('img_' + pin, highResData);
+                    document.getElementById('img-tag-' + pin).src = highResData;
+                } catch(e) { console.log("Bộ nhớ đầy, không thể lưu ảnh nét"); }
+
+                // 2. NÉN 20KB GỬI ESP32 (Chỉ gửi khi ở nhà - isLocal)
+                if (isLocal) {
+                    let MAX_ESP = 300;
+                    let scaleESP = MAX_ESP / img.width;
+                    canvas.width = MAX_ESP;
+                    canvas.height = img.height * scaleESP;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob(blob => {
+                        let formData = new FormData();
+                        formData.append("image", blob, pin.toUpperCase() + ".JPG");
+                        fetch('/upload', { method: 'POST', body: formData });
+                    }, 'image/jpeg', 0.5);
+                }
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+// Các hàm bổ trợ giữ nguyên
+function sendCmd(p, v) {
+    let status = (v == 1) ? "ON" : "OFF";
+    let finalUrl = isLocal 
+        ? `${basePrefix}/cmd?id=${idLookup[p]}&val=${status}`
+        : `${basePrefix}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
+    fetch(finalUrl, { mode: 'no-cors' });
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance((v == 1 ? "Bật " : "Tắt ") + (customNames[p] || p)));
     }
 }
 
-function back() { 
-    goto('page-home'); 
+function updateStatusOnly() {
+    let statusUrl = isLocal ? `${basePrefix}/get_status` : `${basePrefix}?action=get_all&device=${DEVICE_NAME}`;
+    fetch(statusUrl).then(r => r.json()).then(data => {
+        for (let p in data) {
+            let onBtn = document.getElementById(`on-${p}`);
+            let offBtn = document.getElementById(`off-${p}`);
+            if(onBtn && offBtn) {
+                if (data[p] == 1) {
+                    onBtn.className = "btn btn-on active-on";
+                    offBtn.className = "btn btn-off";
+                } else {
+                    onBtn.className = "btn btn-on";
+                    offBtn.className = "btn btn-off active-off";
+                }
+            }
+        }
+    }).catch(e => {});
 }
 
-// 1. Hàm lưu và cập nhật trạng thái ô vuông
-async function saveSmartConfig() {
-    const token = document.getElementById('user_tele_token').value.trim();
-    const id = document.getElementById('user_chat_id').value.trim();
-    const isChecked = document.getElementById('notify_checkbox').checked;
-    const status = isChecked ? 'on' : 'off';
+function addV2() {
+    let t = document.getElementById('v2_t').value;
+    let d = document.getElementById('v2_d').value;
+    if(t && d) {
+        if (listV2.length >= 6) return alert("Tối đa 6 lần!");
+        listV2.push({t, d}); renderUI(); 
+    }
+}
 
-    const workerUrl = "https://blynk-token-proxy.tanthanhlttb123.workers.dev"; 
-    const finalUrl = `${workerUrl}?from=web&action=saveConfig&teleToken=${token}&chatId=${id}&notify=${status}`;
+function saveV2(btn) {
+    let full = [];
+    for(let i=0; i<6; i++) {
+        if(listV2[i]) {
+            let p = listV2[i].t.split(':');
+            full.push({id:i+1, h:parseInt(p[0]), m:parseInt(p[1]), d:parseInt(listV2[i].d), a:true});
+        } else {
+            full.push({id:i+1, h:0, m:0, d:0, a:false});
+        }
+    }
+    localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
+
+    // SỬA TẠI ĐÂY: Dùng basePrefix để gửi đúng chỗ
+    let url = `${isLocal ? '' : 'http://' + IP_ESP32}/irrigation?d=` + encodeURIComponent(JSON.stringify(full));
+    
+    fetch(url).then(() => {
+        btn.innerText = "✅ ĐÃ LƯU!"; 
+        btn.style.background = "#2ecc71";
+        setTimeout(() => { btn.innerText = "GỬI & LƯU LỊCH TƯỚI"; btn.style.background = ""; }, 2000);
+    }).catch(e => alert("Không gửi được lịch, hãy kiểm tra kết nối với ESP32!"));
+}
+
+function addV10() {
+    let id = document.getElementById('v10_id').value;
+    let on = document.getElementById('v10_on').value;
+    let off = document.getElementById('v10_off').value;
+    if(on && off) {
+        listV10 = listV10.filter(x => x.id !== id);
+        listV10.push({id, on, off}); renderUI();
+    }
+}
+
+async function saveV10(btn) {
+    // 1. Lưu vào trình duyệt trước (Cache)
+    localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
+
+    // 2. Tạo chuỗi dữ liệu theo định dạng ESP32 Gateway đang dùng: 
+    // "id:1 08:00 true 22:00 false, id:2 07:00 true..."
+    let dataStr = listV10.map(s => {
+        return `id:${s.id} ${s.on} true ${s.off} false`;
+    }).join(', ');
+
+    if (!dataStr) {
+        alert("Chưa có lịch để gửi!");
+        return;
+    }
+
+    // 3. Gửi qua Worker (Virtual Pin V10)
+    // encodeURIComponent cực kỳ quan trọng để không lỗi chuỗi khi gửi qua Cloud
+    const url = `${WORKER_URL}?action=update&pin=V10&value=${encodeURIComponent(dataStr)}&device=cay`;
+
+    btn.innerText = "ĐANG GỬI...";
     
     try {
-        await fetch(finalUrl);
-        alert(isChecked ? "🔔 Đã bật báo chuông!" : "🔕 Đã tắt báo chuông!");
-        document.getElementById('user_tele_token').value = ""; 
-        document.getElementById('user_chat_id').value = "";
-    } catch (e) { alert("❌ Lỗi kết nối!"); }
+        const res = await fetch(url);
+        if (res.ok) {
+            btn.innerText = "✅ ĐÃ ĐỒNG BỘ!";
+            btn.style.background = "#2ecc71";
+            setTimeout(() => { 
+                btn.innerText = "GỬI & LƯU LỊCH ĐÈN"; 
+                btn.style.background = ""; 
+            }, 3000);
+        } else {
+            throw new Error("Worker trả lỗi");
+        }
+    } catch (err) {
+        alert("Lỗi: Không thể gửi lịch qua Cloud. Kiểm tra Worker!");
+        btn.innerText = "THỬ LẠI";
+    }
 }
 
-// 2. Hàm xóa sạch dữ liệu để đưa cho người khác
-async function clearForNewUser() {
-    if (confirm("Bạn có chắc muốn xóa sạch mã Telegram để bàn giao máy cho người khác không?")) {
-        const workerUrl = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
-        // Gửi lệnh xóa (clear) lên Worker
-        const finalUrl = `${workerUrl}?from=web&action=clearConfig`;
+function removeV2(i) {
+    if(confirm("Xóa lịch?")) { listV2.splice(i, 1); renderUI(); saveV2({innerText:""}); }
+}
+
+function removeV10(i) {
+    if(confirm("Bạn muốn xóa lịch phòng này?")) {
+        // Lấy ID của phòng đang chọn xóa
+        let idToRemove = listV10[i].id; 
         
-        try {
-            const res = await fetch(finalUrl);
+        // Tạo lệnh xóa theo định dạng Slave hiểu: "DEL:id"
+        // Hoặc gửi lịch trống: "id:1 00:00 true 00:00 false"
+        let cmdDelete = `DEL:${idToRemove}`; 
+
+        // Gửi lệnh này lên V10 qua Worker
+        const url = `${WORKER_URL}?action=update&pin=V10&value=${encodeURIComponent(cmdDelete)}&device=cay`;
+        
+        fetch(url).then(res => {
             if(res.ok) {
-                alert("✅ Đã xóa sạch dữ liệu! Bạn có thể giao máy cho khách mới.");
+                listV10.splice(i, 1); // Xóa khỏi giao diện web
+                renderUI();
+                console.log("Đã gửi lệnh xóa ID:", idToRemove);
             }
-        } catch (e) { alert("❌ Lỗi xóa dữ liệu!"); }
+        });
     }
 }
-    // Hàm lưu cấu hình thông minh
-// Đổi tên hàm thành saveSmartConfig để hết lỗi "is not defined"
 
-(function() {
-    const originalSendCommand = window.sendCommand;
-    if (typeof originalSendCommand === 'function') {
-        window.sendCommand = async function(commandValue) {
-            // Lấy thông tin người dùng đã lưu
-            const savedWorker = localStorage.getItem('user_worker_url');
-            const tToken = localStorage.getItem('user_tele_token') || "";
-            const tId = localStorage.getItem('user_chat_id') || "";
 
-            // Nếu người dùng đã nhập link mới, ta dùng link đó thay cho WORKER_URL cũ
-            if (savedWorker) {
-                const finalUrl = `${savedWorker}?action=update&pin=V1&value=${commandValue}&teleToken=${tToken}&chatId=${tId}&from=esp`;
-                
-                // Thực hiện gửi lệnh (Phần này thay thế fetch trong app.js của bạn)
-                try {
-                    updateUI(commandValue); // Vẫn gọi hàm update video của bạn
-                    const res = await fetch(finalUrl);
-                    console.log("Đã gửi kèm Telegram cho người dùng mới!");
-                } catch (e) {
-                    console.error("Lỗi gửi lệnh kèm Telegram:", e);
-                }
-            } else {
-                // Nếu chưa nhập gì, quay lại chạy hàm cũ của bạn
-                return originalSendCommand(commandValue);
-            }
-        };
+async function deleteAllSchedules() {
+    if (!confirm("⚠️ Bạn có muốn XÓA TẤT CẢ lịch đèn không?")) return;
+
+    // Gửi lệnh CLEAR_DEN lên V10 qua Worker
+    const deleteUrl = `${WORKER_URL}?action=update&pin=V10&value=CLEAR_DEN&device=cay`;
+    
+    try {
+        const res = await fetch(deleteUrl);
+        if(res.ok) {
+            alert("✅ Đã gửi lệnh xóa lịch đèn thành công!");
+            // Xóa sạch dữ liệu tạm trên trình duyệt
+            localStorage.removeItem('savedSchedules'); 
+            location.reload(); 
+        }
+    } catch (err) {
+        alert("Lỗi kết nối Worker!");
     }
-})();
+}
+function editName(p) {
+    let oldName = (customNames[p] || p);
+    let newName = prompt("Tên mới:", oldName);
+    if (newName && newName !== oldName) {
+        fetch(`/set_name?pin=${p}&name=${encodeURIComponent(newName)}`).then(() => {
+            customNames[p] = newName;
+            localStorage.setItem('last_config', JSON.stringify(customNames));
+            renderUI();
+        });
+    }
+}
 
-// Tự động điền lại thông tin cũ khi mở trang (cho người dùng dễ sửa)
-
+function phatWifiConfig() {
+    let code = prompt("MÃ XÁC THỰC:");
+    if (!code) return;
+    fetch('/phat_wifi_ap?auth_code=' + encodeURIComponent(code))
+    .then(r => r.text()).then(txt => alert(txt)).catch(() => alert("Đang chuyển chế độ..."));
+}
 </script>
-
-
 
 </body>
 </html>
