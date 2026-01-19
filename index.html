@@ -176,19 +176,32 @@ function renderUI() {
         // 1. Kiểm tra xem trong máy có ảnh đã lưu chưa
 
       let savedImg = localStorage.getItem('img_' + p);
+
+      // --- SỬA LOGIC CHỖ NÀY ---
+        let imgSrc = "";
+        if (savedImg) {
+            // Nếu đã có ảnh lưu trong máy (LocalStorage) thì lấy ra dùng luôn
+            imgSrc = savedImg;
+        } else if (isLocal) {
+            // Nếu ở nhà mà chưa chọn ảnh thì mới lấy từ chip
+            imgSrc = `/${p.toUpperCase()}.JPG?v=${ver}`;
+        } else {
+            // Nếu ở trên Git mà chưa chọn ảnh, hiện một cái ảnh xám mặc định
+            imgSrc = "https://via.placeholder.com/150/cccccc/ffffff?text=" + p;
+        }
         
 // Nếu là Web Git và có ảnh trong máy thì lấy ảnh đó ra hiện lên.
 // Nếu ở nhà (Nội bộ) hoặc chưa có ảnh lưu thì mới gọi file .JPG
-let imgSrc = (!isLocal && savedImg) ? savedImg : `/${p.toUpperCase()}.JPG?v=${ver}`;
 
 
 
         
         // ---------------------------------
 
-        h += `<div class="device-card">
+      h += `<div class="device-card">
             <img src="${imgSrc}" 
             class="device-img" 
+            onerror="this.src='https://via.placeholder.com/150/cccccc/ffffff?text=No+Image'"
             onclick="uploadImg('${p}')" >
             <span id="name-device-${p}" style="cursor:pointer; font-weight:bold; margin-top:5px; display:block;" onclick="editName('${p}')">
                 ${customNames[p] || p} ✏️
