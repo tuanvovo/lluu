@@ -77,6 +77,9 @@
     <button class="btn-save" style="background: #e67e22; margin-bottom: 30px;" onclick="phatWifiConfig()">🔄 ĐỔI MẠNG WIFI (PHÁT AP)</button>
 
 <script>
+
+
+
 const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"];
 const v10Mapping = {"1":"V3", "2":"V4", "3":"V6", "4":"V5", "5":"V7", "6":"V8"};
 const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10};
@@ -91,6 +94,8 @@ const DEVICE_NAME = "cay";
 
 const isLocal = window.location.hostname.includes("192.168") || window.location.hostname === "localhost";
 const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
+
+
 
 //---------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function() {
@@ -276,9 +281,15 @@ function saveV2(btn) {
         }
     }
     localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
-    fetch('/irrigation?d=' + encodeURIComponent(JSON.stringify(full))).then(() => {
-        btn.innerText = "✅ ĐÃ LƯU!"; setTimeout(() => btn.innerText = "GỬI & LƯU LỊCH TƯỚI", 2000);
-    });
+
+    // SỬA TẠI ĐÂY: Dùng basePrefix để gửi đúng chỗ
+    let url = `${isLocal ? '' : 'http://' + IP_ESP32}/irrigation?d=` + encodeURIComponent(JSON.stringify(full));
+    
+    fetch(url).then(() => {
+        btn.innerText = "✅ ĐÃ LƯU!"; 
+        btn.style.background = "#2ecc71";
+        setTimeout(() => { btn.innerText = "GỬI & LƯU LỊCH TƯỚI"; btn.style.background = ""; }, 2000);
+    }).catch(e => alert("Không gửi được lịch, hãy kiểm tra kết nối với ESP32!"));
 }
 
 function addV10() {
@@ -291,11 +302,43 @@ function addV10() {
     }
 }
 
-function saveV10(btn) {
+async function saveV10(btn) {
+    // 1. Lưu vào trình duyệt trước (Cache)
     localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
-    let dataStr = listV10.map(s => `id:${s.id} ${s.on} true ${s.off} false`).join(', ');
-    fetch('/schedule_save?d=' + encodeURIComponent(dataStr));
-    btn.innerText = "✅ ĐÃ LƯU!"; setTimeout(() => btn.innerText = "GỬI & LƯU LỊCH ĐÈN", 2000);
+
+    // 2. Tạo chuỗi dữ liệu theo định dạng ESP32 Gateway đang dùng: 
+    // "id:1 08:00 true 22:00 false, id:2 07:00 true..."
+    let dataStr = listV10.map(s => {
+        return `id:${s.id} ${s.on} true ${s.off} false`;
+    }).join(', ');
+
+    if (!dataStr) {
+        alert("Chưa có lịch để gửi!");
+        return;
+    }
+
+    // 3. Gửi qua Worker (Virtual Pin V10)
+    // encodeURIComponent cực kỳ quan trọng để không lỗi chuỗi khi gửi qua Cloud
+    const url = `${WORKER_URL}?action=update&pin=V10&value=${encodeURIComponent(dataStr)}&device=cay`;
+
+    btn.innerText = "ĐANG GỬI...";
+    
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+            btn.innerText = "✅ ĐÃ ĐỒNG BỘ!";
+            btn.style.background = "#2ecc71";
+            setTimeout(() => { 
+                btn.innerText = "GỬI & LƯU LỊCH ĐÈN"; 
+                btn.style.background = ""; 
+            }, 3000);
+        } else {
+            throw new Error("Worker trả lỗi");
+        }
+    } catch (err) {
+        alert("Lỗi: Không thể gửi lịch qua Cloud. Kiểm tra Worker!");
+        btn.innerText = "THỬ LẠI";
+    }
 }
 
 function removeV2(i) {
