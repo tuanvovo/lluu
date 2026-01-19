@@ -1,133 +1,417 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Demo Mobile App T@ Smart</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Hệ Thống Thông Minh</title>
+    <style>
+        /* Tìm và thay thế các dòng tương ứng trong :root và các class btn */
+:root { 
+    --bg: #f0f2f5; 
+    --primary: #1a73e8; 
+    --on-active: #2ecc71;   /* Xanh đậm khi BẬT */
+    --on-dim: #e8f5e9;      /* Xanh nhạt khi chưa BẬT */
+    --off-active: #7f8c8d;  /* Xám lông chuột đậm khi TẮT */
+    --off-dim: #f5f5f5;     /* Xám lông chuột nhạt khi chưa TẮT */
+}
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .device-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; text-align: center; padding: 10px; display: flex; flex-direction: column; }
+        .device-img { width: 100%; height: 100px; object-fit: cover; border-radius: 5px; cursor: pointer; background: #eee; transition: 0.3s; }
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .btn { border: none; padding: 8px; border-radius: 5px; cursor: pointer; flex: 1; font-weight: bold; font-size: 12px; }
+        /* Nút BẬT mặc định */
+.btn-on { background: var(--on-dim); color: var(--on-active); border: 1px solid var(--on-active); }
+/* Nút TẮT mặc định */
+.btn-off { background: var(--off-dim); color: var(--off-active); border: 1px solid var(--off-active); }
+      /* Khi đang ở trạng thái BẬT (Active) */
+.active-on { background: var(--on-active) !important; color: white !important; }
+/* Khi đang ở trạng thái TẮT (Active) */
+.active-off { background: var(--off-active) !important; color: white !important; }
+       
+       
+        .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; flex: 1; }
+        .list-box { border: 1px solid #eee; padding: 10px; border-radius: 5px; margin-bottom: 10px; min-height: 40px; background: #fafafa; }
+        .list-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+        .btn-del { color: red; cursor: pointer; font-weight: bold; padding: 0 10px; }
+        .btn-save { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+   
+         .device-img:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="viewport">
 
-    <!-- Trang đăng nhập -->
-    <section id="page-login" class="page" style="background:linear-gradient(180deg,#10223f,#0b2a4a);color:#fff">
-      <div class="auth-card">
-        <div class="auth-top">
-          <div class="brand">
-            <div class="logo-drop">T@</div>
-            <div>
-              <div class="auth-title">T@</div>
-              <div class="auth-sub">Ứng dụng điều khiển nhà thông minh</div>
-            </div>
-          </div>
-          <div class="chip">Demo</div>
+    <div class="card">
+        <h3>Điều khiển thiết bị</h3>
+        <div id="device_list" class="grid-container"></div>
+    </div>
+
+    <div class="card">
+        <h3>Lịch Tưới Lan (V2)</h3>
+        <div class="input-group">
+            <input type="time" id="v2_t">
+            <input type="number" id="v2_d" placeholder="Phút">
+            <button onclick="addV2()" style="padding:0 15px;">+</button>
         </div>
+        <div id="v2_list" class="list-box"></div>
+        <button class="btn-save" style="background: var(--on)" onclick="saveV2(this)">GỬI & LƯU LỊCH TƯỚI</button>
+    </div>
 
-        <div id="auth-slider" style="overflow:hidden;margin-top:12px;border-radius:12px">
-          <div id="auth-inner" style="display:flex;transition:transform .5s cubic-bezier(.2,.9,.2,1)">
-            <div style="min-width:100%;padding-right:8px">
-              <div class="field">
-                <input id="li-email" placeholder="Email hoặc username">
-              </div>
-              <div class="field">
-                <input id="li-pass" type="password" placeholder="Mật khẩu">
-              </div>
-              <button class="btn btn-primary w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition duration-150 shadow-md" id="btn-do-login">
-                <i class="fa-solid fa-right-to-bracket mr-2"></i>Đăng nhập
-              </button>
-              <div id="login-status" class="mt-4 text-center text-sm text-gray-200"></div>
-            </div>
-          </div>
+    <div class="card">
+        <h3>Lập lịch Đèn (V10)</h3>
+        <select id="v10_id"></select>
+        <div class="input-group" style="margin-top:10px;">
+            <input type="time" id="v10_on">
+            <input type="time" id="v10_off">
+            <button onclick="addV10()" style="padding:0 15px;">+</button>
         </div>
-      </div>
-    </section>
+        <div id="v10_list" class="list-box"></div>
+        <button class="btn-save" onclick="saveV10(this)">GỬI & LƯU LỊCH ĐÈN</button>
+    </div>
 
-  </div>
-</div>
+    <button class="btn-save" style="background: #e67e22; margin-bottom: 30px;" onclick="phatWifiConfig()">🔄 ĐỔI MẠNG WIFI (PHÁT AP)</button>
 
-<!-- Firebase Logic -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+<script>
+const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"];
+const v10Mapping = {"1":"V3", "2":"V4", "3":"V6", "4":"V5", "5":"V7", "6":"V8"};
+const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10};
+let customNames = {};
+let listV2 = [], listV10 = [];
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBDWHfbNKaWCHCu4PkmzScWWkfnQXYfvnI",
-    authDomain: "myloginapp-web.firebaseapp.com",
-    projectId: "myloginapp-web",
-    storageBucket: "myloginapp-web.firebasestorage.app",
-    messagingSenderId: "512830007983",
-    appId: "1:512830007983:web:18963568636309d0fc425a",
-    measurementId: "G-PCY2YSSRPT"
-  };
+// --- CẤU HÌNH THÔNG MINH ---
+const IP_ESP32 = "192.168.1.200"; // Thay IP thật của bạn vào đây
+const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
+const DEVICE_NAME = "cay";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+// Tự động kiểm tra xem đang ở nhà hay ở ngoài
+const isLocal = window.location.hostname.includes("192.168") || window.location.hostname === "localhost";
+const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
+// ---------------------------
 
-  const btnLogin = document.getElementById("btn-do-login");
-  const statusBox = document.getElementById("login-status");
 
-  btnLogin.addEventListener("click", async () => {
-    const email = document.getElementById("li-email").value.trim();
-    const password = document.getElementById("li-pass").value.trim();
+//---------------------------------------------------------------------
+// KHỞI TẠO DUY NHẤT 1 LẦN KHI MỞ WEB
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Kiểm tra túi tạm (LocalStorage)
+    let cachedNames = localStorage.getItem('last_config');
+    let cachedV2 = localStorage.getItem('v2_list_cache');
+    let cachedV10 = localStorage.getItem('v10_list_cache');
 
-    if (!email || password.length < 7) {
-      showStatus("❌ Email không hợp lệ hoặc mật khẩu quá ngắn (≥7 ký tự).", "text-red-400");
-      return;
+    // Nếu túi có đồ thì lấy ra xài ngay cho nhanh
+    if(cachedNames) customNames = JSON.parse(cachedNames);
+    if(cachedV2) listV2 = JSON.parse(cachedV2);
+    if(cachedV10) listV10 = JSON.parse(cachedV10);
+
+    // VẼ LẦN 1 (Dù túi trống hay có đồ cũng phải vẽ để hiện khung)
+    renderUI(); 
+
+    // 2. PHỤC HỒI DỮ LIỆU (Đề phòng bạn vừa xóa History)
+    // Lấy lại tên thiết bị
+    fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
+        if(data && Object.keys(data).length > 0) {
+            customNames = data;
+            localStorage.setItem('last_config', JSON.stringify(data));
+            renderUI(); // Vẽ lại lần 2 để cập nhật tên và hình ảnh đúng
+        }
+    }).catch(()=>{});
+
+    // Lấy lại lịch tưới V2
+    fetch('/tuoi.txt?t=' + Date.now()).then(r => r.json()).then(data => {
+        if (Array.isArray(data)) {
+            listV2 = data.filter(x => x.a === true).map(x => ({
+                t: (x.h < 10 ? "0"+x.h : x.h) + ":" + (x.m < 10 ? "0"+x.m : x.m),
+                d: x.d
+            }));
+            localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
+            renderUI(); // Vẽ lại để hiện lịch
+        }
+    }).catch(()=>{});
+
+    // Lấy lại lịch đèn V10
+    fetch('/den.txt?t=' + Date.now()).then(r => r.text()).then(data => {
+        if (data && data.length > 5 && data !== "clear") {
+            let items = data.split(', ');
+            listV10 = items.map(item => {
+                let p = item.trim().split(' ');
+                if(p.length >= 4) return { id: p[0].split(':')[1] || p[0], on: p[1], off: p[3] };
+                return null;
+            }).filter(x => x !== null);
+            localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
+            renderUI();
+        }
+    }).catch(()=>{});
+
+    setInterval(updateStatusOnly, 3000);
+  
+});
+  setInterval(function() {
+    fetch('/get_notify') // Master sẽ nhả câu chữ ở đường dẫn này
+    .then(r => r.text())
+    .then(txt => {
+        // Nếu nhận được chữ và không phải thông báo trống
+        if (txt && txt.trim().length > 1) {
+            let msg = new SpeechSynthesisUtterance(txt);
+            msg.lang = 'vi-VN'; // Đọc tiếng Việt
+            msg.rate = 1.0;     // Tốc độ đọc bình thường
+            window.speechSynthesis.speak(msg);
+            console.log("Loa kêu: " + txt);
+        }
+    })
+    .catch(e => {}); // Lờ đi nếu mạng lag để không làm chậm trình duyệt
+}, 1000); // 1000ms = 1 giây hỏi một lần
+
+// Hàm chuyên đi "săn" thông báo giọng nói (1 giây một lần)
+
+function renderUI() {
+    let h = "";
+    allPins.forEach(p => {
+        let ver = localStorage.getItem('v_' + p) || '1';
+        h += `<div class="device-card">
+            <img src="/${p.toUpperCase()}.JPG?v=${ver}" 
+            class="device-img" 
+            onclick="uploadImg('${p}')" >
+            <span id="name-device-${p}" style="cursor:pointer; font-weight:bold; margin-top:5px; display:block;" onclick="editName('${p}')">
+                ${customNames[p] || p} ✏️
+            </span>
+            <div class="btn-group">
+                <button id="on-${p}" class="btn btn-on" onclick="sendCmd('${p}',1)">BẬT</button>
+                <button id="off-${p}" class="btn btn-off" onclick="sendCmd('${p}',0)">TẮT</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('device_list').innerHTML = h;
+
+    let opt = "";
+    for (let id in v10Mapping) {
+        opt += `<option value="${id}">${customNames[v10Mapping[id]] || ("Đèn " + id)}</option>`;
     }
+    document.getElementById('v10_id').innerHTML = opt;
 
-    btnLogin.disabled = true;
-    btnLogin.textContent = "Đang kiểm tra...";
+    document.getElementById('v2_list').innerHTML = listV2.map((x, i) => 
+        `<div class="list-item"><span><b>${x.t}</b> - Tưới ${x.d}p</span><span class="btn-del" onclick="removeV2(${i})">✖</span></div>`
+    ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
 
-    try {
+    document.getElementById('v10_list').innerHTML = listV10.map((x, i) => 
+        `<div class="list-item"><span><b>${customNames[v10Mapping[x.id]] || 'Đèn '+x.id}:</b> ${x.on} ➔ ${x.off}</span><span class="btn-del" onclick="removeV10(${i})">✖</span></div>`
+    ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
+}
 
-
-
-
+function sendCmd(p, v) {
+    let status = (v == 1) ? "ON" : "OFF";
     
+    // Tạo link thông minh
+    let finalUrl = isLocal 
+        ? `${basePrefix}/cmd?id=${idLookup[p]}&val=${status}`
+        : `${basePrefix}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
 
+    fetch(finalUrl, { mode: 'no-cors' });
 
-
-
-
-    // ...
- const userCredential = await signInWithEmailAndPassword(auth, email, password);
- const userEmail = userCredential.user.email; // Lấy email người dùng vừa đăng nhập
- console.log("Đăng nhập thành công:", userEmail);
-
- // Định nghĩa Admin và kiểm tra quyền
- const ADMIN_EMAIL = 'test@gmail.com'; // <<< ĐÂY LÀ EMAIL ADMIN CỦA BẠN!
-const isAdminUser = (userEmail === ADMIN_EMAIL);
-
- // Lưu trạng thái login VÀ QUYỀN ADMIN vào localStorage
- localStorage.setItem('isLoggedIn', 'true');
-localStorage.setItem('userEmail', userEmail);
- localStorage.setItem('isAdmin', isAdminUser ? 'true' : 'false'); // <<< DÒNG MỚI QUAN TRỌNG
-
- // Chuyển vào home
- window.location.href = "home.html";
-
- } catch (error) {
-// ...
-
-
-
-
-
-      console.error("Xác thực thất bại:", error);
-      showStatus("❌ Email hoặc mật khẩu không đúng!", "text-red-400");
-    } finally {
-      btnLogin.disabled = false;
-      btnLogin.textContent = "Đăng nhập";
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance((v == 1 ? "Bật " : "Tắt ") + (customNames[p] || p)));
     }
-  });
+}
+function updateStatusOnly() {
+      // Nếu đi xa thì lấy trạng thái từ Worker, ở nhà lấy từ ESP32
+    let statusUrl = isLocal ? `${basePrefix}/get_status` : `${basePrefix}?action=get_all&device=${DEVICE_NAME}`;
 
-  function showStatus(text, colorClass) {
-    statusBox.textContent = text;
-    statusBox.className = `mt-4 text-center text-sm font-medium ${colorClass}`;
-  }
+     fetch(statusUrl).then(r => r.json()).then(data => {
+        for (let p in data) {
+            let onBtn = document.getElementById(`on-${p}`);
+            let offBtn = document.getElementById(`off-${p}`);
+            if(onBtn && offBtn) {
+                // Nếu data[p] == 1 (Thiết bị đang mở)
+                if (data[p] == 1) {
+                    onBtn.className = "btn btn-on active-on";   // Nút ON sáng xanh đậm
+                    offBtn.className = "btn btn-off";           // Nút OFF xám nhạt
+                } 
+                // Nếu data[p] == 0 (Thiết bị đang tắt)
+                else {
+                    onBtn.className = "btn btn-on";             // Nút ON xanh nhạt
+                    offBtn.className = "btn btn-off active-off"; // Nút OFF sáng xám lông chuột
+                }
+            }
+        }
+    }).catch(e => console.log("Chưa kết nối được thiết bị"));
+}
+
+function addV2() {
+    let t = document.getElementById('v2_t').value;
+    let d = document.getElementById('v2_d').value;
+    
+    if(t && d) {
+        // THÊM ĐOẠN NÀY: Kiểm tra nếu đã đủ 6 lần thì báo lỗi
+        if (listV2.length >= 6) {
+            alert("⚠️ Hệ thống chỉ hỗ trợ tối đa 6 lần tưới/ngày để đảm bảo ổn định!");
+            return; // Dừng lại, không cho push vào list nữa
+        }
+        if (d > 255) {
+            alert("⚠️ Số phút tưới tối đa là 255 phút (4h15p)!");
+            return;
+        }
+        
+        
+        listV2.push({t, d}); 
+        renderUI(); 
+    }
+}
+
+function saveV2(btn) {
+    let full = [];
+    for(let i=0; i<6; i++) {
+        if(listV2[i]) {
+            let p = listV2[i].t.split(':');
+            full.push({id:i+1, h:parseInt(p[0]), m:parseInt(p[1]), d:parseInt(listV2[i].d), a:true});
+        } else {
+            full.push({id:i+1, h:0, m:0, d:0, a:false});
+        }
+    }
+    localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
+    fetch('/irrigation?d=' + encodeURIComponent(JSON.stringify(full))).then(() => {
+        btn.innerText = "✅ ĐÃ LƯU!"; btn.style.background = "#2ecc71";
+        setTimeout(() => { btn.innerText = "GỬI & LƯU LỊCH TƯỚI"; btn.style.background = ""; }, 2000);
+    });
+}
+
+function addV10() {
+    let id = document.getElementById('v10_id').value;
+    let on = document.getElementById('v10_on').value;
+    let off = document.getElementById('v10_off').value;
+    if(on && off) {
+        listV10 = listV10.filter(x => x.id !== id);
+        listV10.push({id, on, off});
+        renderUI();
+    }
+}
+
+function saveV10(btn) {
+    localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
+    let dataStr = listV10.map(s => `id:${s.id} ${s.on} true ${s.off} false`).join(', ');
+    fetch('/schedule_save?d=' + encodeURIComponent(dataStr));
+    listV10.forEach(s => {
+        fetch(`/cmd_sched?pin=${v10Mapping[s.id]}&on=${s.on}&off=${s.off}`);
+    });
+    btn.innerText = "✅ ĐÃ LƯU!"; btn.style.background = "#2ecc71";
+    setTimeout(() => { btn.innerText = "GỬI & LƯU LỊCH ĐÈN"; btn.style.background = ""; }, 2000);
+}
+function removeV2(i) {
+    if(confirm("Bạn muốn xóa lịch tưới này?")) {
+        // 1. Xóa khỏi danh sách tạm trên web
+        listV2.splice(i, 1);
+        renderUI();
+        
+        // 2. Cập nhật lại vào bộ nhớ máy (LocalStorage)
+        localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
+
+        // 3. RA LỆNH CHO CHIP GHI ĐÈ FILE MỚI (Xóa vĩnh viễn trong Flash)
+        let full = [];
+        for(let j=0; j<6; j++) {
+            if(listV2[j]) {
+                let p = listV2[j].t.split(':');
+                full.push({id:j+1, h:parseInt(p[0]), m:parseInt(p[1]), d:parseInt(listV2[j].d), a:true});
+            } else {
+                full.push({id:j+1, h:0, m:0, d:0, a:false});
+            }
+        }
+        fetch('/irrigation?d=' + encodeURIComponent(JSON.stringify(full)));
+    }
+}
+
+function removeV10(i) {
+    if(confirm("Bạn muốn xóa lịch đèn này?")) {
+        let item = listV10[i];
+        let pinName = v10Mapping[item.id]; 
+
+        // 1. Ra lệnh cho Slave ngừng chạy lịch này
+        fetch(`/cmd_sched_off?pin=${pinName}`);
+
+        // 2. Xóa khỏi danh sách tạm trên web và cập nhật LocalStorage
+        listV10.splice(i, 1);
+        localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
+        renderUI();
+
+        // 3. RA LỆNH CHO MASTER GHI ĐÈ FILE DEN.TXT MỚI
+        // Nếu không còn lịch nào thì gửi chữ "clear" để xóa sạch file
+        let dataStr = listV10.length > 0 
+            ? listV10.map(s => `id:${s.id} ${s.on} true ${s.off} false`).join(', ') 
+            : "clear";
+        
+        fetch('/schedule_save?d=' + encodeURIComponent(dataStr));
+    }
+}
+
+function editName(p) {
+    let oldName = (customNames[p] || p);
+    let newName = prompt("Tên mới:", oldName);
+    if (newName && newName !== oldName) {
+        fetch(`/set_name?pin=${p}&name=${encodeURIComponent(newName)}`).then(() => {
+            customNames[p] = newName;
+            localStorage.setItem('last_config', JSON.stringify(customNames));
+            renderUI();
+        });
+    }
+}
+
+function uploadImg(pin) {
+    let input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+        let file = e.target.files[0]; if (!file) return;
+        let reader = new FileReader();
+        reader.onload = event => {
+            let img = new Image();
+            img.onload = () => {
+                let canvas = document.createElement('canvas');
+                canvas.width = 500; canvas.height = img.height * (500 / img.width);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                    let formData = new FormData(); formData.append("image", blob, pin.toUpperCase() + ".JPG");
+                    fetch('/upload?t=' + Date.now(), { method: 'POST', body: formData }).then(r => {
+                        if(r.ok) {
+                            let v = Date.now(); localStorage.setItem('v_' + pin, v);
+                            const imgEl = document.querySelector(`img[onclick*="${pin}"]`);
+                            if(imgEl) { imgEl.src = `/${pin.toUpperCase()}.JPG?v=${v}`;  }
+                        }
+                    });
+                }, 'image/jpeg', 0.6);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+function phatWifiConfig() {
+    let code = prompt("NHẬP MÃ XÁC THỰC (Security Code):");
+    if (code == null || code == "") return;
+
+    // Gửi yêu cầu đến ESP32
+    fetch('/phat_wifi_ap?auth_code=' + encodeURIComponent(code))
+    .then(response => {
+        if (!response.ok) throw new Error('Mất kết nối');
+        return response.text();
+    })
+    .then(txt => {
+        if (txt.includes("MÃ ĐÚNG")) {
+            // Hiển thị thông báo ngay lập tức trước khi chip ngắt mạng
+            alert("✅ XÁC THỰC THÀNH CÔNG!\n\n1. Chip đang chuyển sang chế độ phát WiFi.\n2. Vui lòng tìm WiFi tên: 'Sua_WiFi_ThietBi'\n3. Sau khi cài xong, thiết bị sẽ tự quay lại IP .200");
+        } else {
+            alert("❌ Mã số sai rồi bạn ơi! Vui lòng thử lại.");
+        }
+    })
+    .catch(err => {
+        // Trường hợp này thường xảy ra khi chip ngắt WiFi để phát AP quá nhanh
+        alert("🔄 Đang chuyển đổi chế độ... \nHãy kiểm tra danh sách WiFi trên điện thoại của bạn sau 5 giây.");
+    });
+}
+
+// Hỏi thông báo nhanh hơn (1 giây một lần) để không bỏ lỡ giọng nói
+
+//hoan hao 111
 </script>
 </body>
 </html>
