@@ -383,63 +383,55 @@ function editName(p) {
         });
     }
 }
+let imageLinks = {}; // Biến tạm để giữ ảnh trong phiên làm việc
+
 function uploadImg(pin) {
-    let input = document.createElement('input'); 
-    input.type = 'file'; 
+    let input = document.createElement('input');
+    input.type = 'file';
     input.accept = 'image/*';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-
     input.onchange = e => {
-        let file = e.target.files[0]; 
-        if (!file) {
-            document.body.removeChild(input);
-            return;
-        }
+        let file = e.target.files[0];
+        if (!file) return;
 
-        // Kiểm tra dung lượng (Nếu > 5MB báo lỗi ngay)
-        if (file.size > 5 * 1024 * 1024) {
-            alert("Ảnh quá lớn, vui lòng chọn ảnh nhẹ hơn!");
-            document.body.removeChild(input);
-            return;
-        }
+        // 1. TẠO LINK TẠM ĐỂ HIỂN THỊ NÉT NGAY LẬP TỨC
+        let blobUrl = URL.createObjectURL(file);
+        imageLinks[pin] = blobUrl; 
+        
+        // 2. HIỂN THỊ LÊN GIAO DIỆN (Cực nét vì là ảnh gốc)
+        document.getElementById('img_' + pin).src = blobUrl;
 
+        // 3. NÉN XUỐNG 20KB ĐỂ GỬI VÀO ESP32 (LƯU TRỮ LÂU DÀI)
         let reader = new FileReader();
         reader.onload = event => {
-            let imgData = event.target.result; 
+            let img = new Image();
+            img.onload = () => {
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+                let MAX_WIDTH = 400; // Kích thước gửi lên ESP32
+                let scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            // 1. LƯU VÀO MÁY (Dùng cho cả Git và Local)
-            localStorage.setItem('img_' + pin, imgData);
-            
-            // Cập nhật giao diện ngay lập tức
-            renderUI(); 
-
-            // 2. CHỈ KHI Ở NHÀ MỚI NÉN VÀ GỬI LÊN ESP32
-            if (isLocal) {
-                let img = new Image();
-                img.onload = () => {
-                    let canvas = document.createElement('canvas');
-                    canvas.width = 500; 
-                    canvas.height = img.height * (500 / img.width);
-                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob(blob => {
-                        let formData = new FormData(); 
-                        formData.append("image", blob, pin.toUpperCase() + ".JPG");
-                        fetch('/upload?t=' + Date.now(), { method: 'POST', body: formData });
-                    }, 'image/jpeg', 0.6);
-                };
-                img.src = imgData;
-            }
-
-            // Xong việc thì dọn dẹp input
-            if (document.body.contains(input)) {
-                document.body.removeChild(input);
-            }
+                canvas.toBlob(blob => {
+                    let formData = new FormData();
+                    formData.append("image", blob, pin.toUpperCase() + ".JPG");
+                    // Gửi lên ESP32 (IP Master của bạn)
+                    fetch('http://192.168.' + segment + '.200/upload', { 
+                        method: 'POST', 
+                        body: formData 
+                    });
+                }, 'image/jpeg', 0.6); // Nén vừa đủ 20-30KB
+            };
+            img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     };
     input.click();
 }
+
+
+
 function phatWifiConfig() {
     let code = prompt("NHẬP MÃ XÁC THỰC (Security Code):");
     if (code == null || code == "") return;
