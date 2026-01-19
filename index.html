@@ -357,28 +357,37 @@ function editName(p) {
 }
 
 function uploadImg(pin) {
-    let input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+    let input = document.createElement('input'); 
+    input.type = 'file'; 
+    input.accept = 'image/*';
     input.onchange = e => {
-        let file = e.target.files[0]; if (!file) return;
+        let file = e.target.files[0]; 
+        if (!file) return;
         let reader = new FileReader();
         reader.onload = event => {
+            let imgData = event.target.result; // Đây là chuỗi ảnh Base64
+            
+            // 1. LƯU VÀO ĐIỆN THOẠI (Để Web Git xem được ngay)
+            localStorage.setItem('img_' + pin, imgData);
+            
+            // Cập nhật ảnh hiển thị trên màn hình ngay lập tức
+            const imgEl = document.querySelector(`img[onclick*="${pin}"]`);
+            if(imgEl) imgEl.src = imgData;
+
+            // 2. NÉN VÀ GỬI LÊN ESP32 (Để lưu vào thẻ nhớ chip như cũ)
             let img = new Image();
             img.onload = () => {
                 let canvas = document.createElement('canvas');
-                canvas.width = 500; canvas.height = img.height * (500 / img.width);
+                canvas.width = 500; 
+                canvas.height = img.height * (500 / img.width);
                 canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                 canvas.toBlob(blob => {
-                    let formData = new FormData(); formData.append("image", blob, pin.toUpperCase() + ".JPG");
-                    fetch('/upload?t=' + Date.now(), { method: 'POST', body: formData }).then(r => {
-                        if(r.ok) {
-                            let v = Date.now(); localStorage.setItem('v_' + pin, v);
-                            const imgEl = document.querySelector(`img[onclick*="${pin}"]`);
-                            if(imgEl) { imgEl.src = `/${pin.toUpperCase()}.JPG?v=${v}`;  }
-                        }
-                    });
+                    let formData = new FormData(); 
+                    formData.append("image", blob, pin.toUpperCase() + ".JPG");
+                    fetch('/upload?t=' + Date.now(), { method: 'POST', body: formData });
                 }, 'image/jpeg', 0.6);
             };
-            img.src = event.target.result;
+            img.src = imgData;
         };
         reader.readAsDataURL(file);
     };
