@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
 });
   setInterval(function() {
+    if (!isLocal) return;
     fetch('/get_notify') // Master sẽ nhả câu chữ ở đường dẫn này
     .then(r => r.text())
     .then(txt => {
@@ -171,8 +172,23 @@ function renderUI() {
     let h = "";
     allPins.forEach(p => {
         let ver = localStorage.getItem('v_' + p) || '1';
+        
+        // --- ĐOẠN SỬA QUAN TRỌNG Ở ĐÂY ---
+        // 1. Kiểm tra xem trong máy có ảnh đã lưu chưa
+
+      let savedImg = localStorage.getItem('img_' + p);
+        
+// Nếu là Web Git và có ảnh trong máy thì lấy ảnh đó ra hiện lên.
+// Nếu ở nhà (Nội bộ) hoặc chưa có ảnh lưu thì mới gọi file .JPG
+let imgSrc = (!isLocal && savedImg) ? savedImg : `/${p.toUpperCase()}.JPG?v=${ver}`;
+
+
+
+        
+        // ---------------------------------
+
         h += `<div class="device-card">
-            <img src="/${p.toUpperCase()}.JPG?v=${ver}" 
+            <img src="${imgSrc}" 
             class="device-img" 
             onclick="uploadImg('${p}')" >
             <span id="name-device-${p}" style="cursor:pointer; font-weight:bold; margin-top:5px; display:block;" onclick="editName('${p}')">
