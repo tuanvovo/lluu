@@ -150,13 +150,13 @@ document.addEventListener("DOMContentLoaded", function() {
     updateStatusOnly();
 
     // 5. THIẾT LẬP VÒNG LẶP THÔNG MINH (CHỈ CHẠY KHI ĐANG MỞ TAB)
-    setInterval(() => {
+ // setInterval(() => {
         // Chỉ tốn pin/Cloud khi bạn đang nhìn vào trang web
-        if (!document.hidden) {
+    //   if (!document.hidden) {
             updateStatusOnly();
-            console.log("Đang tự động đồng bộ trạng thái...");
-        }
-    }, 10000); // 10 giây một lần là đẹp cho Web Git
+      //      console.log("Đang tự động đồng bộ trạng thái...");
+  //   }
+ // }, 10000); // 10 giây một lần là đẹp cho Web Git
 });
 // Hàm lấy thông báo giọng nói
 setInterval(function() {
@@ -313,42 +313,47 @@ function addV2() {
 }
 
 
-
 function updateStatusOnly() {
     const indicator = document.getElementById('status-indicator');
-    if(indicator) indicator.style.background = "#f1c40f"; // Đang quét...
+    if(indicator) indicator.style.background = "#f1c40f"; 
 
-    // Tự động chọn link theo mạng Nội bộ hoặc Git
     let statusUrl = isLocal ? `http://${IP_ESP32}/get_status` : `${WORKER_URL}?action=get_all&device=${DEVICE_NAME}`;
     
     fetch(statusUrl)
-    .then(r => r.json())
-    .then(data => {
-        console.log("Dữ liệu Cloud trả về:", data);
-        if(indicator) indicator.style.background = "#2ecc71"; // Quét xong
-        
-        for (let p in data) {
-            let onBtn = document.getElementById(`on-${p}`);
-            let offBtn = document.getElementById(`off-${p}`);
-            
-            if(onBtn && offBtn) {
-                // Ép kiểu dữ liệu về String để so sánh chính xác tuyệt đối
-                let val = String(data[p]); 
-
-                // Nếu là "1" thì BẬT (Xanh), nếu là "0" thì TẮT (Xám lông chuột)
-                if (val === "1" || val === "true") {
-                    onBtn.className = "btn btn-on active-on";      // Xanh đậm
-                    offBtn.className = "btn btn-off";              // Xám nhạt
-                } else {
-                    onBtn.className = "btn btn-on";                // Xanh nhạt
-                    offBtn.className = "btn btn-off active-off";   // Xám lông chuột đậm
+    .then(r => r.text()) // Đọc dữ liệu thô (dạng chữ) để kiểm tra trước
+    .then(text => {
+        try {
+            // Chỉ khi nào dữ liệu bắt đầu bằng dấu "{" thì mới xử lý đổi màu
+            if (text.trim().startsWith('{')) {
+                const data = JSON.parse(text);
+                console.log("Dữ liệu chuẩn:", data);
+                if(indicator) indicator.style.background = "#2ecc71";
+                
+                for (let p in data) {
+                    let onBtn = document.getElementById(`on-${p}`);
+                    let offBtn = document.getElementById(`off-${p}`);
+                    if(onBtn && offBtn) {
+                        let val = String(data[p]); 
+                        if (val === "1" || val === "true") {
+                            onBtn.className = "btn btn-on active-on";
+                            offBtn.className = "btn btn-off";
+                        } else {
+                            onBtn.className = "btn btn-on";
+                            offBtn.className = "btn btn-off active-off";
+                        }
+                    }
                 }
+            } else {
+                // Nếu Worker trả về chữ "Lệnh không..." thì báo lỗi nhưng không làm treo web
+                console.log("Worker chưa trả về JSON, đang chờ...:", text);
+                if(indicator) indicator.style.background = "#e67e22"; 
             }
+        } catch (err) {
+            console.log("Lỗi định dạng dữ liệu:", err);
         }
     })
     .catch(e => {
-        console.error("Lỗi đồng bộ:", e);
-        if(indicator) indicator.style.background = "#e74c3c"; // Báo đỏ nếu lỗi mạng
+        if(indicator) indicator.style.background = "#e74c3c"; 
     });
 }
 function saveV2(btn) {
