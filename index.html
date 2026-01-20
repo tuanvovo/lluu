@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/628/628283.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/628/628283.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
     <title>Hệ Thống Thông Minh</title>
     <style>
         /* Tìm và thay thế các dòng tương ứng trong :root và các class btn */
 :root { 
     --bg: #f0f2f5; 
     --primary: #1a73e8; 
-     --on: #2ecc71;
+    --on: #2ecc71;
     --on-active: #2ecc71;   /* Xanh đậm khi BẬT */
     --on-dim: #e8f5e9;      /* Xanh nhạt khi chưa BẬT */
     --off-active: #7f8c8d;  /* Xám lông chuột đậm khi TẮT */
@@ -52,11 +54,26 @@
 
     <div class="card">
         <h3>Điều khiển thiết bị</h3>
+
         <div id="device_list" class="grid-container"></div>
     </div>
 
+
+    <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <div id="status-indicator" style="width: 12px; height: 12px; background: #95a5a6; border-radius: 50%;"></div>
+        <span style="font-weight: bold; color: #2c3e50;">TRẠNG THÁI HỆ THỐNG</span>
+    </div>
+    
+    <button onclick="updateStatusOnly()" class="btn-save" style="width: auto; margin: 0; padding: 8px 20px; background: #3498db; display: flex; align-items: center; gap: 8px;">
+        <span>🔄 ĐỒNG BỘ NGAY</span>
+    </button>
+</div>
+
     <div class="card">
+        
         <h3>Lịch Tưới Lan (V2)</h3>
+        
         <div class="input-group">
             <input type="time" id="v2_t">
             <input type="number" id="v2_d" placeholder="Phút">
@@ -103,6 +120,7 @@ const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
 
 //---------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function() {
+    // 1. LẤY DỮ LIỆU TỪ BỘ NHỚ TẠM (CACHE)
     let cachedNames = localStorage.getItem('last_config');
     let cachedV2 = localStorage.getItem('v2_list_cache');
     let cachedV10 = localStorage.getItem('v10_list_cache');
@@ -111,20 +129,32 @@ document.addEventListener("DOMContentLoaded", function() {
     if(cachedV2) listV2 = JSON.parse(cachedV2);
     if(cachedV10) listV10 = JSON.parse(cachedV10);
 
+    // 2. VẼ GIAO DIỆN LẦN ĐẦU
     renderUI(); 
 
+    // 3. NẾU Ở NHÀ (ISLOCAL), LẤY TÊN THIẾT BỊ MỚI NHẤT TỪ ESP32
     if (isLocal) {
         fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
             if(data && Object.keys(data).length > 0) {
                 customNames = data;
                 localStorage.setItem('last_config', JSON.stringify(data));
-                renderUI();
+                renderUI(); // Vẽ lại để cập nhật tên mới
             }
         }).catch(()=>{});
     }
-    setInterval(updateStatusOnly, 3000);
-});
 
+    // 4. ĐỒNG BỘ TRẠNG THÁI NÚT BẤM NGAY LẬP TỨC KHI VỪA MỞ WEB
+    updateStatusOnly();
+
+    // 5. THIẾT LẬP VÒNG LẶP THÔNG MINH (CHỈ CHẠY KHI ĐANG MỞ TAB)
+    setInterval(() => {
+        // Chỉ tốn pin/Cloud khi bạn đang nhìn vào trang web
+        if (!document.hidden) {
+            updateStatusOnly();
+            console.log("Đang tự động đồng bộ trạng thái...");
+        }
+    }, 10000); // 10 giây một lần là đẹp cho Web Git
+});
 // Hàm lấy thông báo giọng nói
 setInterval(function() {
     if (!isLocal) return;
@@ -246,14 +276,26 @@ function sendCmd(p, v) {
     }
 }
 
+// Hàm này để cập nhật trạng thái nút và đổi màu cái đèn nhỏ trên thanh trạng thái
 function updateStatusOnly() {
-    let statusUrl = isLocal ? `${basePrefix}/get_status` : `${basePrefix}?action=get_all&device=${DEVICE_NAME}`;
-    fetch(statusUrl).then(r => r.json()).then(data => {
+    const indicator = document.getElementById('status-indicator');
+    if(indicator) indicator.style.background = "#f1c40f"; // Đèn vàng: Đang kiểm tra
+
+    // Link lấy trạng thái (tự động đổi theo môi trường Local hay Git)
+    let statusUrl = isLocal ? `http://${IP_ESP32}/get_status` : `${WORKER_URL}?action=get_all&device=${DEVICE_NAME}`;
+    
+    fetch(statusUrl)
+    .then(r => r.json())
+    .then(data => {
+        console.log("Đã nhận trạng thái mới:", data);
+        if(indicator) indicator.style.background = "#2ecc71"; // Đèn xanh: Thành công
+        
+        // Quét qua các ID thiết bị (V1, V2, V3...) để đổi màu nút
         for (let p in data) {
             let onBtn = document.getElementById(`on-${p}`);
             let offBtn = document.getElementById(`off-${p}`);
             if(onBtn && offBtn) {
-                if (data[p] == 1) {
+                if (data[p] == 1 || data[p] == "1") {
                     onBtn.className = "btn btn-on active-on";
                     offBtn.className = "btn btn-off";
                 } else {
@@ -262,8 +304,15 @@ function updateStatusOnly() {
                 }
             }
         }
-    }).catch(e => {});
+    })
+    .catch(e => {
+        console.log("Lỗi đồng bộ:", e);
+        if(indicator) indicator.style.background = "#e74c3c"; // Đèn đỏ: Lỗi kết nối
+    });
 }
+
+// TỰ ĐỘNG CHẠY KHI MỞ WEB1
+
 
 function addV2() {
     let t = document.getElementById('v2_t').value;
@@ -350,9 +399,46 @@ function removeV2(i) {
 }
 
 function removeV10(i) {
-    if(confirm("Xóa lịch?")) { listV10.splice(i, 1); renderUI(); saveV10({innerText:""}); }
+    if(confirm("Bạn muốn xóa lịch phòng này?")) {
+        // Lấy ID của phòng đang chọn xóa
+        let idToRemove = listV10[i].id; 
+        
+        // Tạo lệnh xóa theo định dạng Slave hiểu: "DEL:id"
+        // Hoặc gửi lịch trống: "id:1 00:00 true 00:00 false"
+        let cmdDelete = `DEL:${idToRemove}`; 
+
+        // Gửi lệnh này lên V10 qua Worker
+        const url = `${WORKER_URL}?action=update&pin=V10&value=${encodeURIComponent(cmdDelete)}&device=cay`;
+        
+        fetch(url).then(res => {
+            if(res.ok) {
+                listV10.splice(i, 1); // Xóa khỏi giao diện web
+                renderUI();
+                console.log("Đã gửi lệnh xóa ID:", idToRemove);
+            }
+        });
+    }
 }
 
+
+async function deleteAllSchedules() {
+    if (!confirm("⚠️ Bạn có muốn XÓA TẤT CẢ lịch đèn không?")) return;
+
+    // Gửi lệnh CLEAR_DEN lên V10 qua Worker
+    const deleteUrl = `${WORKER_URL}?action=update&pin=V10&value=CLEAR_DEN&device=cay`;
+    
+    try {
+        const res = await fetch(deleteUrl);
+        if(res.ok) {
+            alert("✅ Đã gửi lệnh xóa lịch đèn thành công!");
+            // Xóa sạch dữ liệu tạm trên trình duyệt
+            localStorage.removeItem('savedSchedules'); 
+            location.reload(); 
+        }
+    } catch (err) {
+        alert("Lỗi kết nối Worker!");
+    }
+}
 function editName(p) {
     let oldName = (customNames[p] || p);
     let newName = prompt("Tên mới:", oldName);
