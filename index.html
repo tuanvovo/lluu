@@ -54,7 +54,10 @@
 
     <div class="card">
         <h3>Điều khiển thiết bị</h3>
-
+        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px; background: #e8f0fe; padding: 8px; border-radius: 8px;">
+    <input type="checkbox" id="voice_active" checked style="width: 18px; height: 18px;">
+    <label for="voice_active" style="font-size: 13px; font-weight: bold; color: #1a73e8;">🔊 Phát thông báo giọng nói</label>
+</div>
         <div id="device_list" class="grid-container"></div>
     </div>
 
@@ -267,49 +270,33 @@ function uploadImg(pin) {
 // Các hàm bổ trợ giữ nguyên
 function sendCmd(p, v) {
     let status = (v == 1) ? "ON" : "OFF";
+    
+    // Cập nhật màu nút bấm ngay lập tức trên giao diện cho sướng mắt
+    let onBtn = document.getElementById(`on-${p}`);
+    let offBtn = document.getElementById(`off-${p}`);
+    if (v == 1) {
+        onBtn.className = "btn btn-on active-on";
+        offBtn.className = "btn btn-off";
+    } else {
+        onBtn.className = "btn btn-on";
+        offBtn.className = "btn btn-off active-off";
+    }
+
     let finalUrl = isLocal 
         ? `${basePrefix}/cmd?id=${idLookup[p]}&val=${status}`
         : `${basePrefix}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
+    
     fetch(finalUrl, { mode: 'no-cors' });
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance((v == 1 ? "Bật " : "Tắt ") + (customNames[p] || p)));
-    }
+    
+    // Phần đọc giọng nói (Bạn có thể thêm Checkbox ở bước sau)
+   const canSpeak = document.getElementById('voice_active').checked;
+if (canSpeak && 'speechSynthesis' in window) {
+    window.speechSynthesis.speak(new SpeechSynthesisUtterance((v == 1 ? "Bật " : "Tắt ") + (customNames[p] || p)));
+}
 }
 
 // Hàm này để cập nhật trạng thái nút và đổi màu cái đèn nhỏ trên thanh trạng thái
-function updateStatusOnly() {
-    const indicator = document.getElementById('status-indicator');
-    if(indicator) indicator.style.background = "#f1c40f"; // Đèn vàng: Đang kiểm tra
 
-    // Link lấy trạng thái (tự động đổi theo môi trường Local hay Git)
-    let statusUrl = isLocal ? `http://${IP_ESP32}/get_status` : `${WORKER_URL}?action=get_all&device=${DEVICE_NAME}`;
-    
-    fetch(statusUrl)
-    .then(r => r.json())
-    .then(data => {
-        console.log("Đã nhận trạng thái mới:", data);
-        if(indicator) indicator.style.background = "#2ecc71"; // Đèn xanh: Thành công
-        
-        // Quét qua các ID thiết bị (V1, V2, V3...) để đổi màu nút
-        for (let p in data) {
-            let onBtn = document.getElementById(`on-${p}`);
-            let offBtn = document.getElementById(`off-${p}`);
-            if(onBtn && offBtn) {
-                if (data[p] == 1 || data[p] == "1") {
-                    onBtn.className = "btn btn-on active-on";
-                    offBtn.className = "btn btn-off";
-                } else {
-                    onBtn.className = "btn btn-on";
-                    offBtn.className = "btn btn-off active-off";
-                }
-            }
-        }
-    })
-    .catch(e => {
-        console.log("Lỗi đồng bộ:", e);
-        if(indicator) indicator.style.background = "#e74c3c"; // Đèn đỏ: Lỗi kết nối
-    });
-}
 
 // TỰ ĐỘNG CHẠY KHI MỞ WEB1
 
@@ -320,7 +307,39 @@ function addV2() {
     if(t && d) {
         if (listV2.length >= 6) return alert("Tối đa 6 lần!");
         listV2.push({t, d}); renderUI(); 
-    }
+    }function updateStatusOnly() {
+    const indicator = document.getElementById('status-indicator');
+    if(indicator) indicator.style.background = "#f1c40f"; 
+
+    let statusUrl = isLocal ? `http://${IP_ESP32}/get_status` : `${WORKER_URL}?action=get_all&device=${DEVICE_NAME}`;
+    
+    fetch(statusUrl)
+    .then(r => r.json())
+    .then(data => {
+        console.log("Dữ liệu mới:", data);
+        if(indicator) indicator.style.background = "#2ecc71"; 
+        
+        for (let p in data) {
+            let onBtn = document.getElementById(`on-${p}`);
+            let offBtn = document.getElementById(`off-${p}`);
+            if(onBtn && offBtn) {
+                // Chuyển dữ liệu về số để so sánh (tránh lỗi "1" vs 1)
+                let val = parseInt(data[p]); 
+
+                if (val === 1) {
+                    onBtn.className = "btn btn-on active-on";
+                    offBtn.className = "btn btn-off";
+                } else {
+                    onBtn.className = "btn btn-on";
+                    offBtn.className = "btn btn-off active-off";
+                }
+            }
+        }
+    })
+    .catch(e => {
+        if(indicator) indicator.style.background = "#e74c3c"; 
+    });
+}
 }
 
 function saveV2(btn) {
