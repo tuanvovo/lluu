@@ -31,11 +31,11 @@
 .btn-on { background: var(--on-dim); color: var(--on-active); border: 1px solid var(--on-active); }
 /* Nút TẮT mặc định */
 .btn-off { background: var(--off-dim); color: var(--off-active); border: 1px solid var(--off-active); }
-      /* Khi đang ở trạng thái BẬT (Active) */
 .active-on { background: var(--on-active) !important; color: white !important; }
+/* Khi đang ở trạng thái BẬT (Active) */
 /* Khi đang ở trạng thái TẮT (Active) */
-.active-off { background: var(--off-active) !important; color: white !important; }
-       
+
+ .active-off { background: var(--off-active) !important; color: white !important; }      
        
         .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
         input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; flex: 1; }
@@ -307,41 +307,50 @@ function addV2() {
     if(t && d) {
         if (listV2.length >= 6) return alert("Tối đa 6 lần!");
         listV2.push({t, d}); renderUI(); 
-    }function updateStatusOnly() {
-    const indicator = document.getElementById('status-indicator');
-    if(indicator) indicator.style.background = "#f1c40f"; 
+    }
+    
+    
+}
 
+
+
+function updateStatusOnly() {
+    const indicator = document.getElementById('status-indicator');
+    if(indicator) indicator.style.background = "#f1c40f"; // Đang quét...
+
+    // Tự động chọn link theo mạng Nội bộ hoặc Git
     let statusUrl = isLocal ? `http://${IP_ESP32}/get_status` : `${WORKER_URL}?action=get_all&device=${DEVICE_NAME}`;
     
     fetch(statusUrl)
     .then(r => r.json())
     .then(data => {
-        console.log("Dữ liệu mới:", data);
-        if(indicator) indicator.style.background = "#2ecc71"; 
+        console.log("Dữ liệu Cloud trả về:", data);
+        if(indicator) indicator.style.background = "#2ecc71"; // Quét xong
         
         for (let p in data) {
             let onBtn = document.getElementById(`on-${p}`);
             let offBtn = document.getElementById(`off-${p}`);
+            
             if(onBtn && offBtn) {
-                // Chuyển dữ liệu về số để so sánh (tránh lỗi "1" vs 1)
-                let val = parseInt(data[p]); 
+                // Ép kiểu dữ liệu về String để so sánh chính xác tuyệt đối
+                let val = String(data[p]); 
 
-                if (val === 1) {
-                    onBtn.className = "btn btn-on active-on";
-                    offBtn.className = "btn btn-off";
+                // Nếu là "1" thì BẬT (Xanh), nếu là "0" thì TẮT (Xám lông chuột)
+                if (val === "1" || val === "true") {
+                    onBtn.className = "btn btn-on active-on";      // Xanh đậm
+                    offBtn.className = "btn btn-off";              // Xám nhạt
                 } else {
-                    onBtn.className = "btn btn-on";
-                    offBtn.className = "btn btn-off active-off";
+                    onBtn.className = "btn btn-on";                // Xanh nhạt
+                    offBtn.className = "btn btn-off active-off";   // Xám lông chuột đậm
                 }
             }
         }
     })
     .catch(e => {
-        if(indicator) indicator.style.background = "#e74c3c"; 
+        console.error("Lỗi đồng bộ:", e);
+        if(indicator) indicator.style.background = "#e74c3c"; // Báo đỏ nếu lỗi mạng
     });
 }
-}
-
 function saveV2(btn) {
     let full = [];
     for(let i=0; i<6; i++) {
