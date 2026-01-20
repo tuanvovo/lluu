@@ -104,9 +104,11 @@
 
 
 
-const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"];
+// Thêm V11 vào cuối danh sách này
+const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11"];
 const v10Mapping = {"1":"V3", "2":"V4", "3":"V6", "4":"V5", "5":"V7", "6":"V8"};
-const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10};
+// Thêm "V11":11 vào cuối đối tượng này
+const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10, "V11":11};
 let customNames = {};
 let listV2 = [], listV10 = [];
 
@@ -134,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 2. VẼ GIAO DIỆN LẦN ĐẦU
     renderUI(); 
-
+   // updateStatusOnly();
     // 3. NẾU Ở NHÀ (ISLOCAL), LẤY TÊN THIẾT BỊ MỚI NHẤT TỪ ESP32
     if (isLocal) {
         fetch('/get_config?t=' + Date.now()).then(r => r.json()).then(data => {
@@ -152,11 +154,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // 5. THIẾT LẬP VÒNG LẶP THÔNG MINH (CHỈ CHẠY KHI ĐANG MỞ TAB)
  // setInterval(() => {
         // Chỉ tốn pin/Cloud khi bạn đang nhìn vào trang web
-    //   if (!document.hidden) {
-            updateStatusOnly();
+   //    if (!document.hidden) {
+//updateStatusOnly();
       //      console.log("Đang tự động đồng bộ trạng thái...");
-  //   }
- // }, 10000); // 10 giây một lần là đẹp cho Web Git
+   //  }
+//  }, 10000); // 10 giây một lần là đẹp cho Web Git
 });
 // Hàm lấy thông báo giọng nói
 setInterval(function() {
@@ -180,9 +182,10 @@ function renderUI() {
             imgSrc = savedImg; // Ưu tiên ảnh nét trong máy
         } else if (isLocal) {
             imgSrc = `/${p.toUpperCase()}.JPG?t=${Date.now()}`; // Lấy từ ESP32 nếu ở nhà
-        } else {
-            imgSrc = "https://via.placeholder.com/150/cccccc/ffffff?text=" + p;
-        }
+        }else {
+    // Dùng ảnh icon mặc định thay vì link placeholder bị lỗi
+    imgSrc = "https://cdn-icons-png.flaticon.com/512/628/628283.png"; 
+}
 
         h += `<div class="device-card">
             <img src="${imgSrc}" id="img-tag-${p}"
