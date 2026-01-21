@@ -119,13 +119,12 @@ let customNames = {};
 let listV2 = [], listV10 = [], listV0 = [];
 
 // --- CẤU HÌNH THÔNG MINH ---
-const IP_ESP32 = "192.168.1.200"; 
+
 const segment = "1"; // Định nghĩa số segment để tránh lỗi fetch
 const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
 const DEVICE_NAME = "cay";
 
 const isLocal = window.location.hostname.includes("192.168") || window.location.hostname === "localhost";
-const basePrefix = isLocal ? `http://${IP_ESP32}` : WORKER_URL;
 
 
 
@@ -282,10 +281,7 @@ function sendCmd(p, v) {
     let pinID = p.replace("V", ""); // Lấy số 1 từ "V1"
 
     let finalUrl = "";
-    if (isLocal) {
-        // Code ESP32 Master của bạn nhận tham số "id" và "val" (Dòng 388)
-        finalUrl = `http://${IP_ESP32}/cmd?id=${pinID}&val=${status}`;
-    } else {
+    {
         // Gửi qua Worker chuẩn action=update
         finalUrl = `${WORKER_URL}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
     }
@@ -320,7 +316,11 @@ function updateStatusOnly() {
     const indicator = document.getElementById('status-indicator');
     if(indicator) indicator.style.background = "#f1c40f"; 
 
-    let statusUrl = isLocal ? `http://${IP_ESP32}/get_status` : `${WORKER_URL}?action=get_all&device=${DEVICE_NAME}`;
+   
+    let statusUrl = `${WORKER_URL}?action=get_all&device=cay`;
+    // Gửi chuỗi lịch V2 (Tưới cây) hoặc V0 (Đèn) qua Worker để lưu lên Blynk Cloud
+  
+    
     
     fetch(statusUrl)
     .then(r => r.text()) // Đọc dữ liệu thô (dạng chữ) để kiểm tra trước
@@ -372,7 +372,9 @@ function saveV2(btn) {
     localStorage.setItem('v2_list_cache', JSON.stringify(listV2));
 
     // SỬA TẠI ĐÂY: Dùng basePrefix để gửi đúng chỗ
-    let url = `${isLocal ? '' : 'http://' + IP_ESP32}/irrigation?d=` + encodeURIComponent(JSON.stringify(full));
+    
+    // Gửi chuỗi lịch V2 (Tưới cây) hoặc V0 (Đèn) qua Worker để lưu lên Blynk Cloud
+    let url = `${WORKER_URL}?action=update&pin=V2&value=${encodeURIComponent(JSON.stringify(full))}&device=cay`;
     
     fetch(url).then(() => {
         btn.innerText = "✅ ĐÃ LƯU!"; 
@@ -475,6 +477,7 @@ async function deleteAllSchedules() {
         alert("Lỗi kết nối Worker!");
     }
 }
+/*
 function editName(p) {
     let oldName = (customNames[p] || p);
     let newName = prompt("Tên mới:", oldName);
@@ -486,7 +489,75 @@ function editName(p) {
         });
     }
 }
+/*
+function editName(p) {
+    let oldName = (customNames[p] || p);
+    let newName = prompt("Nhập tên mới cho " + p + ":", oldName);
+    
+    if (newName && newName !== oldName) {
+        // BƯỚC 1: Cập nhật ngay lập tức vào bộ nhớ trình duyệt (localStorage)
+        // Việc này giúp tên hiển thị đúng ngay cả khi không có kết nối tới chip
+        customNames[p] = newName;
+        localStorage.setItem('last_config', JSON.stringify(customNames));
+        renderUI(); // Vẽ lại giao diện để hiện tên mới
 
+        // BƯỚC 2: Gửi tên mới này lên Cloud (Worker) để lưu trữ lâu dài
+        // Bạn cần một Pin Virtual (ví dụ V20) để chứa chuỗi tên này nếu muốn đồng bộ
+        const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
+        const urlCloud = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(JSON.stringify(customNames))}&device=cay`;
+        
+        fetch(urlCloud)
+            .then(r => console.log("Đã đồng bộ tên lên Cloud"))
+            .catch(e => console.log("Chưa đồng bộ được lên Cloud, nhưng tên đã lưu tạm ở máy"));
+
+        // BƯỚC 3: Lệnh này CHỈ CHẠY khi bạn dùng Web Nội Bộ (Local)
+        // Nếu đang dùng Web Git, lệnh này sẽ bị lỗi đỏ (CORS) - bạn có thể lờ nó đi
+       if (window.location.protocol !== 'file:') {
+    fetch(`/set_name?pin=${p}&name=${encodeURIComponent(newName)}`)
+        .then(r => console.log("Đã gửi lệnh đổi tên tới ESP32"))
+        .catch(e => console.log("Không tìm thấy ESP32 nội bộ"));
+} else {
+    console.log("Đang chạy file offline, bỏ qua lệnh gửi tới ESP32 để tránh lỗi đỏ.");
+}
+    }
+}
+
+*/
+let isUpdating = false; // Biến chặn gửi trùng lặp
+
+function editName(p) {
+    if (isUpdating) return; // Nếu đang gửi thì không cho nhấn tiếp
+    
+    let oldName = (customNames[p] || p);
+    let newName = prompt("Tên mới cho " + p + ":", oldName);
+    
+    if (newName && newName !== oldName) {
+        isUpdating = true;
+        
+        // 1. Cập nhật giao diện ngay lập tức (Offline trước)
+        customNames[p] = newName;
+        localStorage.setItem('last_config', JSON.stringify(customNames));
+        renderUI();
+
+        // 2. Gửi Cloud (Chỉ gửi 1 lần)
+        const WORKER_URL = "https://blynk-token-proxy.tanthanhlttb123.workers.dev";
+        const urlCloud = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(JSON.stringify(customNames))}&device=cay`;
+        
+        fetch(urlCloud)
+            .then(() => {
+                console.log("Đã đồng bộ tên lên Cloud cho: " + p);
+                isUpdating = false;
+            })
+            .catch(() => isUpdating = false);
+
+        // 3. Chặn lỗi đỏ khi chạy file Offline
+        if (window.location.protocol !== 'file:') {
+            fetch(`/set_name?pin=${p}&name=${encodeURIComponent(newName)}`).catch(()=>{});
+        } else {
+            console.log("Đang chạy file offline, bỏ qua lệnh nội bộ để tránh lỗi đỏ.");
+        }
+    }
+}
 function phatWifiConfig() {
     let code = prompt("MÃ XÁC THỰC:");
     if (!code) return;
