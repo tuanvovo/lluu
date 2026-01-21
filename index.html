@@ -87,7 +87,7 @@
     </div>
 
     <div class="card">
-        <h3>Lập lịch Đèn (V10)</h3>
+        <h3>Lập lịch Đèn (V0)</h3>
         <select id="v10_id"></select>
         <div class="input-group" style="margin-top:10px;">
             <input type="time" id="v10_on">
@@ -95,7 +95,7 @@
             <button onclick="addV10()" style="padding:0 15px;">+</button>
         </div>
         <div id="v10_list" class="list-box"></div>
-        <button class="btn-save" onclick="saveV10(this)">GỬI & LƯU LỊCH ĐÈN</button>
+        <button class="btn-save" onclick="saveV0(this)">GỬI & LƯU LỊCH ĐÈN</button>
     </div>
 
     <button class="btn-save" style="background: #e67e22; margin-bottom: 30px;" onclick="phatWifiConfig()">🔄 ĐỔI MẠNG WIFI (PHÁT AP)</button>
@@ -105,12 +105,18 @@
 
 
 // Thêm V11 vào cuối danh sách này
-const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11"];
-const v10Mapping = {"1":"V3", "2":"V4", "3":"V6", "4":"V5", "5":"V7", "6":"V8"};
-// Thêm "V11":11 vào cuối đối tượng này
-const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10, "V11":11};
+
+const allPins = ["V1", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12"];
+const v10Mapping = {
+    "1":"V3", "2":"V4", "3":"V5", "4":"V6", "5":"V7", 
+    "6":"V8", "7":"V9", "8":"V10", "9":"V11", "10":"V12" 
+};
+const idLookup = {"V1":1,"V2":2,"V3":3,"V4":4,"V5":5,"V6":6,"V7":7,"V8":8,"V9":9,"V10":10,"V11":11,"V12":12};
+
+
+
 let customNames = {};
-let listV2 = [], listV10 = [];
+let listV2 = [], listV10 = [], listV0 = [];
 
 // --- CẤU HÌNH THÔNG MINH ---
 const IP_ESP32 = "192.168.1.200"; 
@@ -208,8 +214,8 @@ function renderUI() {
     for (let id in v10Mapping) {
         opt += `<option value="${id}">${customNames[v10Mapping[id]] || ("Đèn " + id)}</option>`;
     }
-    let v10Select = document.getElementById('v10_id');
-    if(v10Select) v10Select.innerHTML = opt;
+    let v0Select = document.getElementById('v10_id');
+    if(v0Select) v0Select.innerHTML = opt;
 
     document.getElementById('v2_list').innerHTML = listV2.map((x, i) => 
         `<div class="list-item"><span><b>${x.t}</b> - Tưới ${x.d}p</span><span class="btn-del" onclick="removeV2(${i})">✖</span></div>`
@@ -273,29 +279,23 @@ function uploadImg(pin) {
 // Các hàm bổ trợ giữ nguyên
 function sendCmd(p, v) {
     let status = (v == 1) ? "ON" : "OFF";
-    
-    // Cập nhật màu nút bấm ngay lập tức trên giao diện cho sướng mắt
-    let onBtn = document.getElementById(`on-${p}`);
-    let offBtn = document.getElementById(`off-${p}`);
-    if (v == 1) {
-        onBtn.className = "btn btn-on active-on";
-        offBtn.className = "btn btn-off";
+    let pinID = p.replace("V", ""); // Lấy số 1 từ "V1"
+
+    let finalUrl = "";
+    if (isLocal) {
+        // Code ESP32 Master của bạn nhận tham số "id" và "val" (Dòng 388)
+        finalUrl = `http://${IP_ESP32}/cmd?id=${pinID}&val=${status}`;
     } else {
-        onBtn.className = "btn btn-on";
-        offBtn.className = "btn btn-off active-off";
+        // Gửi qua Worker chuẩn action=update
+        finalUrl = `${WORKER_URL}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
     }
 
-    let finalUrl = isLocal 
-        ? `${basePrefix}/cmd?id=${idLookup[p]}&val=${status}`
-        : `${basePrefix}?action=update&pin=${p}&value=${v}&device=${DEVICE_NAME}`;
-    
+    console.log("Đang gửi tới:", finalUrl);
     fetch(finalUrl, { mode: 'no-cors' });
-    
-    // Phần đọc giọng nói (Bạn có thể thêm Checkbox ở bước sau)
-   const canSpeak = document.getElementById('voice_active').checked;
-if (canSpeak && 'speechSynthesis' in window) {
-    window.speechSynthesis.speak(new SpeechSynthesisUtterance((v == 1 ? "Bật " : "Tắt ") + (customNames[p] || p)));
-}
+
+    // Cập nhật nút bấm
+    document.getElementById(`on-${p}`).className = (v==1) ? "btn btn-on active-on" : "btn btn-on";
+    document.getElementById(`off-${p}`).className = (v==0) ? "btn btn-off active-off" : "btn btn-off";
 }
 
 // Hàm này để cập nhật trạng thái nút và đổi màu cái đèn nhỏ trên thanh trạng thái
@@ -391,7 +391,7 @@ function addV10() {
     }
 }
 
-async function saveV10(btn) {
+async function saveV0(btn) {
     // 1. Lưu vào trình duyệt trước (Cache)
     localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
 
@@ -408,7 +408,7 @@ async function saveV10(btn) {
 
     // 3. Gửi qua Worker (Virtual Pin V10)
     // encodeURIComponent cực kỳ quan trọng để không lỗi chuỗi khi gửi qua Cloud
-    const url = `${WORKER_URL}?action=update&pin=V10&value=${encodeURIComponent(dataStr)}&device=cay`;
+    const url = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(dataStr)}&device=cay`;
 
     btn.innerText = "ĐANG GỬI...";
     
@@ -444,7 +444,7 @@ function removeV10(i) {
         let cmdDelete = `DEL:${idToRemove}`; 
 
         // Gửi lệnh này lên V10 qua Worker
-        const url = `${WORKER_URL}?action=update&pin=V10&value=${encodeURIComponent(cmdDelete)}&device=cay`;
+        const url = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(cmdDelete)}&device=cay`;
         
         fetch(url).then(res => {
             if(res.ok) {
