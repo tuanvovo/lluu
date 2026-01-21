@@ -95,7 +95,7 @@
             <button onclick="addV10()" style="padding:0 15px;">+</button>
         </div>
         <div id="v10_list" class="list-box"></div>
-        <button class="btn-save" onclick="saveV0(this)">GỬI & LƯU LỊCH ĐÈN</button>
+        <button class="btn-save" >GỬI & LƯU LỊCH ĐÈN</button>
     </div>
 
     <button class="btn-save" style="background: #e67e22; margin-bottom: 30px;" onclick="phatWifiConfig()">🔄 ĐỔI MẠNG WIFI (PHÁT AP)</button>
@@ -220,9 +220,22 @@ function renderUI() {
         `<div class="list-item"><span><b>${x.t}</b> - Tưới ${x.d}p</span><span class="btn-del" onclick="removeV2(${i})">✖</span></div>`
     ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
 
-    document.getElementById('v10_list').innerHTML = listV10.map((x, i) => 
-        `<div class="list-item"><span><b>${customNames[v10Mapping[x.id]] || 'Đèn '+x.id}:</b> ${x.on} ➔ ${x.off}</span><span class="btn-del" onclick="removeV10(${i})">✖</span></div>`
-    ).join('') || '<div style="color:#ccc;text-align:center">Trống</div>';
+    // Cập nhật cách hiển thị danh sách V10
+document.getElementById('v10_list').innerHTML = listV10.map((x, i) => {
+    let tenPhong = customNames[v10Mapping[x.id]] || 'Đèn ' + x.id;
+    return `
+    <div class="list-item" style="display: flex; align-items: center; justify-content: space-between; background: #fff; margin-bottom: 5px; padding: 8px; border-radius: 5px; border-left: 4px solid var(--primary);">
+        <div style="flex: 1;">
+            <b style="color:var(--primary)">${tenPhong}:</b> 
+            <span style="font-size: 12px;">${x.on} ➔ ${x.off}</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="saveSingleV10(${i}, this)" style="background: #2ecc71; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 11px;">GỬI</button>
+            
+            <span class="btn-del" onclick="removeV10(${i})" style="color: #e74c3c; cursor: pointer; font-weight: bold; padding: 0 5px;">✖</span>
+        </div>
+    </div>`;
+}).join('') || '<div style="color:#ccc;text-align:center">Chưa có lịch được tạo</div>';
 }
 
 // --- HÀM CHỌN ẢNH SIÊU NÉT ---
@@ -298,7 +311,36 @@ function sendCmd(p, v) {
 
 
 // TỰ ĐỘNG CHẠY KHI MỞ WEB1
+async function saveSingleV10(index, btn) {
+    let item = listV10[index];
+    if(!item) return;
 
+    // Lấy ID thực tế (ví dụ: V3 lấy số 3)
+    let realId = v10Mapping[item.id].replace("V", "");
+    
+    // Tạo chuỗi đúng định dạng Master đang đợi
+    let dataStr = `id:${realId} ${item.on} true ${item.off} false`;
+
+    btn.innerText = "⏳";
+    btn.disabled = true;
+
+    const url = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(dataStr)}&device=cay`;
+
+    try {
+        await fetch(url);
+        btn.innerText = "✅ OK";
+        btn.style.background = "#95a5a6";
+        setTimeout(() => { 
+            btn.innerText = "GỬI"; 
+            btn.style.background = "#2ecc71";
+            btn.disabled = false;
+        }, 2000);
+    } catch (err) {
+        alert("Lỗi kết nối!");
+        btn.innerText = "THỬ LẠI";
+        btn.disabled = false;
+    }
+}
 
 function addV2() {
     let t = document.getElementById('v2_t').value;
@@ -393,71 +435,29 @@ function addV10() {
     }
 }
 
-async function saveV0(btn) {
-    // 1. Lưu vào trình duyệt trước (Cache)
-    localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
 
-    // 2. Tạo chuỗi dữ liệu theo định dạng ESP32 Gateway đang dùng: 
-    // "id:1 08:00 true 22:00 false, id:2 07:00 true..."
-    let dataStr = listV10.map(s => {
-        return `id:${s.id} ${s.on} true ${s.off} false`;
-    }).join(', ');
-
-    if (!dataStr) {
-        alert("Chưa có lịch để gửi!");
-        return;
-    }
-
-    // 3. Gửi qua Worker (Virtual Pin V10)
-    // encodeURIComponent cực kỳ quan trọng để không lỗi chuỗi khi gửi qua Cloud
-    const url = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(dataStr)}&device=cay`;
-
-    btn.innerText = "ĐANG GỬI...";
-    
-    try {
-        const res = await fetch(url);
-        if (res.ok) {
-            btn.innerText = "✅ ĐÃ ĐỒNG BỘ!";
-            btn.style.background = "#2ecc71";
-            setTimeout(() => { 
-                btn.innerText = "GỬI & LƯU LỊCH ĐÈN"; 
-                btn.style.background = ""; 
-            }, 3000);
-        } else {
-            throw new Error("Worker trả lỗi");
-        }
-    } catch (err) {
-        alert("Lỗi: Không thể gửi lịch qua Cloud. Kiểm tra Worker!");
-        btn.innerText = "THỬ LẠI";
-    }
-}
 
 function removeV2(i) {
     if(confirm("Xóa lịch?")) { listV2.splice(i, 1); renderUI(); saveV2({innerText:""}); }
 }
 
 function removeV10(i) {
-    if(confirm("Bạn muốn xóa lịch phòng này?")) {
-        // Lấy ID của phòng đang chọn xóa
-        let idToRemove = listV10[i].id; 
+    let item = listV10[i];
+    if(confirm(`Xóa lịch ${customNames[v10Mapping[item.id]] || 'này'}?`)) {
+        let realId = v10Mapping[item.id].replace("V", "");
         
-        // Tạo lệnh xóa theo định dạng Slave hiểu: "DEL:id"
-        // Hoặc gửi lịch trống: "id:1 00:00 true 00:00 false"
-        let cmdDelete = `DEL:${idToRemove}`; 
+        // Gửi lệnh đặc biệt để Slave biết đường mà xóa lịch
+        let cmdDelete = `id:${realId} DELETE`; 
 
-        // Gửi lệnh này lên V10 qua Worker
         const url = `${WORKER_URL}?action=update&pin=V0&value=${encodeURIComponent(cmdDelete)}&device=cay`;
         
-        fetch(url).then(res => {
-            if(res.ok) {
-                listV10.splice(i, 1); // Xóa khỏi giao diện web
-                renderUI();
-                console.log("Đã gửi lệnh xóa ID:", idToRemove);
-            }
+        fetch(url).then(() => {
+            listV10.splice(i, 1); // Xóa khỏi giao diện
+            localStorage.setItem('v10_list_cache', JSON.stringify(listV10));
+            renderUI();
         });
     }
 }
-
 
 async function deleteAllSchedules() {
     if (!confirm("⚠️ Bạn có muốn XÓA TẤT CẢ lịch đèn không?")) return;
@@ -564,6 +564,7 @@ function phatWifiConfig() {
     fetch('/phat_wifi_ap?auth_code=' + encodeURIComponent(code))
     .then(r => r.text()).then(txt => alert(txt)).catch(() => alert("Đang chuyển chế độ..."));
 }
+////22-1-2026 0H:48M
 </script>
 
 </body>
